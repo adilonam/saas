@@ -1,0 +1,9 @@
+# Cursor Rules
+
+## Technology Stack Versions
+
+1. **Use Tailwind CSS v4** - This project uses Tailwind CSS v4.1.17. When working with Tailwind, ensure you're using v4 syntax and features. The configuration uses the new @theme inline syntax in globals.css.
+
+2. **Use shadcn/ui v3** - This project uses shadcn/ui v3.5.1. When adding components, use `npx shadcn@latest add [component-name]`. Components are located in `components/components/ui/` and utilities are in `components/lib/utils.ts`.
+
+3. **Use Next.js v16** - This project uses Next.js v16.0.8 with React 19.2.1. Ensure all Next.js features and patterns follow v16 conventions, including App Router patterns and React Server Components.

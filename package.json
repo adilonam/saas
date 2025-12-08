@@ -1,12 +1,12 @@
 {
-  "name": "nextjs-saas-starter-template",
+  "name": "saas",
   "version": "1.0.0",
   "description": "Nextjs Saas Starter Template",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
@@ -28,6 +28,8 @@
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
+    "eslint": "^9.39.1",
+    "eslint-config-next": "^16.0.8",
     "postcss": "^8.4.47",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.7.2"

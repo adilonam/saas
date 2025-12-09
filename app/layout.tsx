@@ -11,8 +11,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Next JS SaaS Starter Template",
-  description: "Next JS SaaS Starter Template",
+  title: "Cryptit.pro - PDF Encryption & File Management",
+  description:
+    "Secure PDF encryption, signing, and file management tools. Sign PDFs manually, encrypt documents, and manage your files with ease.",
 };
 
 export default function RootLayout({

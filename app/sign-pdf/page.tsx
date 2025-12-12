@@ -59,6 +59,10 @@ export default function SignPDFPage() {
     SignaturePosition[]
   >([]);
   const [isDragging, setIsDragging] = useState(false);
+  const [draggedSignatureIndex, setDraggedSignatureIndex] = useState<
+    number | null
+  >(null);
+  const [isDraggingNewSignature, setIsDraggingNewSignature] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pdfPages, setPdfPages] = useState(1);
   const [penSize, setPenSize] = useState(3);
@@ -384,13 +388,24 @@ export default function SignPDFPage() {
 
   const handleDragStart = (e: React.DragEvent) => {
     if (!signatureImage) return;
+    setIsDraggingNewSignature(true);
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", "");
   };
 
+  const handleSignatureDragStart = (e: React.DragEvent, index: number) => {
+    e.stopPropagation();
+    setDraggedSignatureIndex(index);
+    setIsDragging(true);
+    e.dataTransfer.effectAllowed = "move";
+    e.dataTransfer.setData("text/plain", `signature-${index}`);
+  };
+
   const handleDragEnd = () => {
     setIsDragging(false);
+    setIsDraggingNewSignature(false);
+    setDraggedSignatureIndex(null);
   };
 
   const handleDragOver = (e: React.DragEvent) => {
@@ -402,39 +417,61 @@ export default function SignPDFPage() {
     e.preventDefault();
     if (!signatureImage || !pdfContainerRef.current) return;
 
-    const containerRect = pdfContainerRef.current.getBoundingClientRect();
-    const dropX = e.clientX - containerRect.left;
-    const dropY = e.clientY - containerRect.top;
+    // Find the actual image element to get its position
+    const container = pdfContainerRef.current;
+    const imgElement = container.querySelector("img") as HTMLImageElement;
+    if (!imgElement) return;
 
-    const containerWidth = containerRect.width;
-    const containerHeight = containerRect.height;
+    const containerRect = container.getBoundingClientRect();
+    const imgRect = imgElement.getBoundingClientRect();
 
-    const sigWidth = 0.15;
-    const sigHeight = 0.1;
+    // Calculate drop position relative to the image, not the container
+    const dropX = e.clientX - imgRect.left;
+    const dropY = e.clientY - imgRect.top;
 
-    const normalizedX =
-      Math.max(
-        sigWidth / 2,
-        Math.min(1 - sigWidth / 2, dropX / containerWidth)
-      ) -
-      sigWidth / 2;
-    const normalizedY =
-      Math.max(
-        sigHeight / 2,
-        Math.min(1 - sigHeight / 2, dropY / containerHeight)
-      ) -
-      sigHeight / 2;
+    // Get image dimensions
+    const imgWidth = imgRect.width;
+    const imgHeight = imgRect.height;
 
-    const newPosition: SignaturePosition = {
-      x: Math.max(0, normalizedX),
-      y: Math.max(0, normalizedY),
-      pageNumber: currentPage,
-      width: sigWidth,
-      height: sigHeight,
-    };
+    // Signature dimensions
+    const sigWidth = 0.15; // 15% of image width
+    const sigHeight = 0.1; // 10% of image height
 
-    setSignaturePositions([...signaturePositions, newPosition]);
+    // Calculate position as percentage of image (center signature on drop point)
+    const normalizedX = Math.max(
+      0,
+      Math.min(1 - sigWidth, dropX / imgWidth - sigWidth / 2)
+    );
+    const normalizedY = Math.max(
+      0,
+      Math.min(1 - sigHeight, dropY / imgHeight - sigHeight / 2)
+    );
+
+    // If we're moving an existing signature, update its position
+    if (draggedSignatureIndex !== null) {
+      const updatedPositions = [...signaturePositions];
+      updatedPositions[draggedSignatureIndex] = {
+        ...updatedPositions[draggedSignatureIndex],
+        x: normalizedX,
+        y: normalizedY,
+        pageNumber: currentPage,
+      };
+      setSignaturePositions(updatedPositions);
+    } else {
+      // Create a new signature at the drop position
+      const newPosition: SignaturePosition = {
+        x: normalizedX,
+        y: normalizedY,
+        pageNumber: currentPage,
+        width: sigWidth,
+        height: sigHeight,
+      };
+      setSignaturePositions([...signaturePositions, newPosition]);
+    }
+
     setIsDragging(false);
+    setIsDraggingNewSignature(false);
+    setDraggedSignatureIndex(null);
   };
 
   const removeSignature = (index: number) => {
@@ -695,7 +732,7 @@ export default function SignPDFPage() {
                   onDrop={handleDrop}
                   className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-800 p-4"
                 >
-                  <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-lg">
+                  <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-lg relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={pdfPageImages[currentPage - 1]}
@@ -713,7 +750,12 @@ export default function SignPDFPage() {
                       .map(({ position, originalIndex }) => (
                         <div
                           key={originalIndex}
-                          className="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded"
+                          draggable
+                          onDragStart={(e) =>
+                            handleSignatureDragStart(e, originalIndex)
+                          }
+                          onDragEnd={handleDragEnd}
+                          className="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition"
                           style={{
                             left: `${position.x * 100}%`,
                             top: `${position.y * 100}%`,
@@ -722,7 +764,10 @@ export default function SignPDFPage() {
                           }}
                         >
                           <button
-                            onClick={() => removeSignature(originalIndex)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              removeSignature(originalIndex);
+                            }}
                             className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 z-10"
                           >
                             <HiX size={14} />
@@ -732,7 +777,7 @@ export default function SignPDFPage() {
                             <img
                               src={signatureImage}
                               alt="Signature"
-                              className="w-full h-full object-contain"
+                              className="w-full h-full object-contain pointer-events-none"
                             />
                           )}
                         </div>

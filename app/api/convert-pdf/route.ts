@@ -1,5 +1,5 @@
+import "@ungap/with-resolvers";
 import { NextRequest, NextResponse } from "next/server";
-import { pdf } from "pdf-to-img";
 import { writeFileSync, unlinkSync } from "fs";
 import { join } from "path";
 import { tmpdir } from "os";
@@ -8,6 +8,13 @@ export async function POST(request: NextRequest) {
   let tempFilePath: string | null = null;
 
   try {
+    // Import the worker before using pdf-to-img
+    // pdf-to-img uses pdfjs-dist internally which needs the worker
+    await import("pdfjs-dist/build/pdf.worker.min.mjs");
+
+    // Import pdf-to-img after importing the worker
+    const { pdf } = await import("pdf-to-img");
+
     const formData = await request.formData();
     const file = formData.get("file") as File;
 
@@ -21,29 +28,28 @@ export async function POST(request: NextRequest) {
     // pdf-to-img requires a file path, so we need to save the file temporarily
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
+
     // Create a temporary file
-    tempFilePath = join(tmpdir(), `pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`);
+    tempFilePath = join(
+      tmpdir(),
+      `pdf-${Date.now()}-${Math.random().toString(36).substring(7)}.pdf`
+    );
     writeFileSync(tempFilePath, buffer);
 
     // Convert PDF to images using pdf-to-img
-    const document = await pdf(tempFilePath, {
-      scale: 2.0, // Higher scale for better quality
-    });
+    const document = await pdf(tempFilePath, { scale: 3 });
 
     const images: string[] = [];
-    let pageNum = 0;
+    let counter = 1;
 
     // Iterate through all pages
-    // Each page is directly the image buffer (Buffer object)
-    for await (const page of document) {
-      pageNum++;
+    for await (const image of document) {
       // Convert image buffer to base64
-      // The page itself is the Buffer, convert it to base64
-      const imageBuffer = Buffer.isBuffer(page) ? page : Buffer.from(page);
+      const imageBuffer = Buffer.isBuffer(image) ? image : Buffer.from(image);
       const base64Image = imageBuffer.toString("base64");
       const dataUrl = `data:image/png;base64,${base64Image}`;
       images.push(dataUrl);
+      counter++;
     }
 
     // Clean up temporary file
@@ -58,7 +64,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       success: true,
       images,
-      numPages: pageNum,
+      numPages: counter - 1,
     });
   } catch (error) {
     // Clean up temporary file on error

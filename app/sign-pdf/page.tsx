@@ -21,7 +21,7 @@ import {
   HiOutlineDocumentText,
 } from "react-icons/hi";
 import { FaStamp } from "react-icons/fa";
-import { HiOutlinePencil } from "react-icons/hi2";
+import { HiOutlinePencil as HiPencilOutline } from "react-icons/hi2";
 
 interface SignaturePosition {
   x: number;
@@ -82,6 +82,7 @@ export default function SignPDFPage() {
 
   useEffect(() => {
     return () => {
+      // Cleanup image URLs
       pdfPageImages.forEach((url) => {
         if (url.startsWith("blob:")) {
           URL.revokeObjectURL(url);
@@ -116,6 +117,7 @@ export default function SignPDFPage() {
         setPdfPages(data.numPages);
         setPdfPageImages(data.images);
 
+        // Store image references for later use
         data.images.forEach((imageDataUrl: string, index: number) => {
           const img = new Image();
           img.src = imageDataUrl;
@@ -149,6 +151,7 @@ export default function SignPDFPage() {
     }
   };
 
+  // Save canvas state for undo
   const saveState = (isInitials = false) => {
     const canvas = isInitials ? initialsCanvasRef.current : canvasRef.current;
     if (!canvas) return;
@@ -163,6 +166,7 @@ export default function SignPDFPage() {
     if (!isInitials) setCanUndo(true);
   };
 
+  // Get point from mouse or touch event
   const getPoint = (
     e:
       | React.MouseEvent<HTMLCanvasElement>
@@ -179,14 +183,17 @@ export default function SignPDFPage() {
     let clientX: number, clientY: number, pressure: number;
 
     if ("touches" in e) {
+      // Touch event
       if (e.touches.length === 0) return null;
       clientX = e.touches[0].clientX;
       clientY = e.touches[0].clientY;
+      // Try to get pressure from touch event (if supported)
       pressure = (e.touches[0] as any).force || 0.5;
     } else {
+      // Mouse event
       clientX = e.clientX;
       clientY = e.clientY;
-      pressure = 0.5;
+      pressure = 0.5; // Default pressure for mouse
     }
 
     return {
@@ -197,6 +204,7 @@ export default function SignPDFPage() {
     };
   };
 
+  // Calculate line width based on speed and pressure
   const calculateLineWidth = (
     point: Point,
     lastPoint: Point | null
@@ -209,12 +217,15 @@ export default function SignPDFPage() {
     const timeDelta = point.timestamp - lastPoint.timestamp;
     const speed = timeDelta > 0 ? distance / timeDelta : 0;
 
+    // Faster drawing = thinner line, slower = thicker
+    // Also factor in pressure
     const speedFactor = Math.max(0.3, Math.min(1.5, 1 - speed * 0.5));
     const pressureFactor = point.pressure;
 
     return penSize * speedFactor * pressureFactor;
   };
 
+  // Draw smooth curve using quadratic bezier
   const drawSmoothCurve = (ctx: CanvasRenderingContext2D, points: Point[]) => {
     if (points.length < 2) return;
 
@@ -223,13 +234,16 @@ export default function SignPDFPage() {
 
     for (let i = 1; i < points.length; i++) {
       const currentPoint = points[i];
+      const previousPoint = points[i - 1];
       const nextPoint = points[i + 1];
 
       if (nextPoint) {
+        // Use quadratic curve for smooth transitions
         const midX = (currentPoint.x + nextPoint.x) / 2;
         const midY = (currentPoint.y + nextPoint.y) / 2;
         ctx.quadraticCurveTo(currentPoint.x, currentPoint.y, midX, midY);
       } else {
+        // Last point, draw to it
         ctx.lineTo(currentPoint.x, currentPoint.y);
       }
     }
@@ -281,6 +295,7 @@ export default function SignPDFPage() {
 
     pointsRef.current.push(point);
 
+    // Draw smooth curves every few points for better performance
     if (pointsRef.current.length >= 3) {
       const lineWidth = calculateLineWidth(point, lastPointRef.current);
 
@@ -289,8 +304,10 @@ export default function SignPDFPage() {
       ctx.lineJoin = "round";
       ctx.strokeStyle = "#000000";
 
+      // Draw the smooth curve
       drawSmoothCurve(ctx, pointsRef.current.slice(-3));
 
+      // Keep only last few points for smooth continuation
       if (pointsRef.current.length > 5) {
         pointsRef.current = pointsRef.current.slice(-3);
       }
@@ -304,6 +321,12 @@ export default function SignPDFPage() {
       setIsDrawing(false);
       pointsRef.current = [];
       lastPointRef.current = null;
+
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.beginPath();
     }
   };
 
@@ -386,6 +409,7 @@ export default function SignPDFPage() {
     }
   };
 
+  // Drag and drop handlers for signature
   const handleDragStart = (e: React.DragEvent) => {
     if (!signatureImage) return;
     setIsDraggingNewSignature(true);
@@ -417,7 +441,6 @@ export default function SignPDFPage() {
     e.preventDefault();
     if (!signatureImage || !pdfContainerRef.current) return;
 
-    // Find the actual image element to get its position
     const container = pdfContainerRef.current;
     const imgElement = container.querySelector("img") as HTMLImageElement;
     if (!imgElement) return;
@@ -425,19 +448,15 @@ export default function SignPDFPage() {
     const containerRect = container.getBoundingClientRect();
     const imgRect = imgElement.getBoundingClientRect();
 
-    // Calculate drop position relative to the image, not the container
     const dropX = e.clientX - imgRect.left;
     const dropY = e.clientY - imgRect.top;
 
-    // Get image dimensions
     const imgWidth = imgRect.width;
     const imgHeight = imgRect.height;
 
-    // Signature dimensions
-    const sigWidth = 0.15; // 15% of image width
-    const sigHeight = 0.1; // 10% of image height
+    const sigWidth = 0.15;
+    const sigHeight = 0.1;
 
-    // Calculate position as percentage of image (center signature on drop point)
     const normalizedX = Math.max(
       0,
       Math.min(1 - sigWidth, dropX / imgWidth - sigWidth / 2)
@@ -447,7 +466,6 @@ export default function SignPDFPage() {
       Math.min(1 - sigHeight, dropY / imgHeight - sigHeight / 2)
     );
 
-    // If we're moving an existing signature, update its position
     if (draggedSignatureIndex !== null) {
       const updatedPositions = [...signaturePositions];
       updatedPositions[draggedSignatureIndex] = {
@@ -458,7 +476,6 @@ export default function SignPDFPage() {
       };
       setSignaturePositions(updatedPositions);
     } else {
-      // Create a new signature at the drop position
       const newPosition: SignaturePosition = {
         x: normalizedX,
         y: normalizedY,
@@ -487,11 +504,14 @@ export default function SignPDFPage() {
     try {
       setIsLoading(true);
 
+      // Load the original PDF
       const arrayBuffer = await pdfFile.arrayBuffer();
       const pdfDoc = await PDFDocument.load(arrayBuffer);
 
+      // Load the signature image
       let signatureBytes: ArrayBuffer;
       if (signatureImage.startsWith("data:")) {
+        // Handle data URL
         const response = await fetch(signatureImage);
         signatureBytes = await response.arrayBuffer();
       } else {
@@ -501,19 +521,24 @@ export default function SignPDFPage() {
       }
       const signatureImagePdf = await pdfDoc.embedPng(signatureBytes);
 
+      // Create signed images for each page
       const signedImages: { [pageNum: number]: string } = {};
 
+      // Process each page that has signatures
       for (const position of signaturePositions) {
         const pageNum = position.pageNumber;
-        if (signedImages[pageNum]) continue;
+        if (signedImages[pageNum]) continue; // Already processed
 
+        // Get the original page image
         const pageImage = pageImageRefs.current[pageNum];
         if (!pageImage) continue;
 
+        // Create a canvas to draw the page image with signatures
         const canvas = document.createElement("canvas");
         const ctx = canvas.getContext("2d");
         if (!ctx) continue;
 
+        // Wait for image to load
         await new Promise((resolve) => {
           if (pageImage.complete) {
             resolve(null);
@@ -525,40 +550,49 @@ export default function SignPDFPage() {
         canvas.width = pageImage.width;
         canvas.height = pageImage.height;
 
+        // Draw the page image
         ctx.drawImage(pageImage, 0, 0);
 
+        // Draw all signatures for this page
         const pageSignatures = signaturePositions.filter(
           (pos) => pos.pageNumber === pageNum
         );
 
         for (const sigPos of pageSignatures) {
+          // Load signature image
           const sigImg = new Image();
           await new Promise((resolve) => {
             sigImg.onload = () => resolve(null);
             sigImg.src = signatureImage;
           });
 
+          // Calculate signature size and position on canvas
           const sigWidth = canvas.width * sigPos.width;
           const sigHeight = canvas.height * sigPos.height;
           const sigX = canvas.width * sigPos.x;
           const sigY = canvas.height * sigPos.y;
 
+          // Draw signature
           ctx.drawImage(sigImg, sigX, sigY, sigWidth, sigHeight);
         }
 
+        // Convert canvas to image data URL
         signedImages[pageNum] = canvas.toDataURL("image/png", 1.0);
       }
 
+      // Now embed the signed images back into the PDF
       for (let pageNum = 1; pageNum <= pdfPages; pageNum++) {
         const page = pdfDoc.getPage(pageNum - 1);
         const { width: pageWidth, height: pageHeight } = page.getSize();
 
         if (signedImages[pageNum]) {
+          // Use the signed image
           const signedImageData = signedImages[pageNum];
           const response = await fetch(signedImageData);
           const imageBytes = await response.arrayBuffer();
           const signedImagePdf = await pdfDoc.embedPng(imageBytes);
 
+          // Remove existing content and draw the signed image
           page.drawImage(signedImagePdf, {
             x: 0,
             y: 0,
@@ -566,6 +600,7 @@ export default function SignPDFPage() {
             height: pageHeight,
           });
         } else {
+          // Keep original page, but add any signatures that might be on it
           const pageSignatures = signaturePositions.filter(
             (pos) => pos.pageNumber === pageNum
           );
@@ -574,7 +609,7 @@ export default function SignPDFPage() {
             const signatureWidth = pageWidth * position.width;
             const signatureHeight = pageHeight * position.height;
             const x = pageWidth * position.x;
-            const y = pageHeight * (1 - position.y) - signatureHeight;
+            const y = pageHeight * (1 - position.y) - signatureHeight; // PDF coordinates are bottom-up
 
             page.drawImage(signatureImagePdf, {
               x,
@@ -586,12 +621,14 @@ export default function SignPDFPage() {
         }
       }
 
+      // Save the PDF
       const pdfBytes = await pdfDoc.save();
       const blob = new Blob([pdfBytes as BlobPart], {
         type: "application/pdf",
       });
       const url = URL.createObjectURL(blob);
 
+      // Download
       const link = document.createElement("a");
       link.href = url;
       link.download = pdfFile.name.replace(".pdf", "_signed.pdf");
@@ -625,8 +662,9 @@ export default function SignPDFPage() {
             </button>
             {pdfFile && (
               <select
-                value={pdfFile.name}
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500"
+                defaultValue={pdfFile.name}
+                disabled
+                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-default"
               >
                 <option>{pdfFile.name}</option>
               </select>
@@ -866,7 +904,7 @@ export default function SignPDFPage() {
                   <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <HiOutlinePencil
+                        <HiPencilOutline
                           className="text-gray-500 dark:text-gray-400"
                           size={18}
                         />
@@ -887,12 +925,18 @@ export default function SignPDFPage() {
                       )}
                     </div>
                     {signatureImage ? (
-                      <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[60px] flex items-center justify-center">
+                      <div
+                        ref={signaturePreviewRef}
+                        draggable
+                        onDragStart={handleDragStart}
+                        onDragEnd={handleDragEnd}
+                        className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[60px] flex items-center justify-center cursor-move hover:border-red-500 transition"
+                      >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={signatureImage}
                           alt="Signature"
-                          className="max-h-12 max-w-full"
+                          className="max-h-12 max-w-full pointer-events-none"
                         />
                       </div>
                     ) : (

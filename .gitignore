@@ -23,3 +23,6 @@ Thumbs.db
 # Build artifacts
 /build
 /dist
+
+
+saas.pem

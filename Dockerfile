@@ -1,9 +1,13 @@
 # Build stage
-FROM node:20-alpine AS builder
+FROM node:25-bullseye AS builder
 WORKDIR /app
 
 # Install build dependencies
-RUN apk add --no-cache python3 make g++ cairo-dev jpeg-dev pango-dev
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    build-essential \
+    python3 \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Copy and install dependencies
 COPY package.json package-lock.json* ./
@@ -15,7 +19,7 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 
 # Production stage
-FROM node:20-alpine
+FROM node:25-bullseye
 WORKDIR /app
 
 ENV NODE_ENV=production
@@ -24,7 +28,9 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Install runtime dependencies
-RUN apk add --no-cache cairo jpeg pango
+RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
+    && apt-get -y install --no-install-recommends \
+    && apt-get autoremove -y && apt-get clean -y && rm -rf /var/lib/apt/lists/*
 
 # Copy built application
 COPY --from=builder /app/public ./public

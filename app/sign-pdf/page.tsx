@@ -101,24 +101,32 @@ export default function SignPDFPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch("/api/convert-pdf", {
+      const response = await fetch(`/fast-api/v1/pdf-to-image`, {
         method: "POST",
         body: formData,
       });
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to convert PDF");
+        throw new Error(
+          errorData.detail || errorData.error || "Failed to convert PDF"
+        );
       }
 
       const data = await response.json();
 
-      if (data.success && data.images) {
-        setPdfPages(data.numPages);
-        setPdfPageImages(data.images);
+      if (data.pages && Array.isArray(data.pages)) {
+        setPdfPages(data.total_pages);
+
+        // Extract images from pages array
+        const images = data.pages
+          .sort((a: any, b: any) => a.page_number - b.page_number)
+          .map((page: any) => page.image);
+
+        setPdfPageImages(images);
 
         // Store image references for later use
-        data.images.forEach((imageDataUrl: string, index: number) => {
+        images.forEach((imageDataUrl: string, index: number) => {
           const img = new Image();
           img.src = imageDataUrl;
           pageImageRefs.current[index + 1] = img;

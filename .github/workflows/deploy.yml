@@ -51,12 +51,12 @@ jobs:
             docker pull ${{ secrets.DOCKER_USERNAME }}/${{ env.IMAGE_NAME }}:latest
 
             # Stop and remove existing container
-            docker stop saas-app || true
-            docker rm saas-app || true
+            docker stop ${{ env.IMAGE_NAME }}-container || true
+            docker rm ${{ env.IMAGE_NAME }}-container || true
 
             # Run new container
             docker run -d \
-              --name saas-app \
+              --name ${{ env.IMAGE_NAME }}-container  \
               --restart unless-stopped \
               -p 80:3000 \
               -e NODE_ENV=production \

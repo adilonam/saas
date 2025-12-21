@@ -15,6 +15,11 @@ RUN npm ci
 
 # Copy app and build
 COPY . .
+
+# Accept build argument for backend URL
+ARG FAST_API_URL
+ENV FAST_API_URL=$FAST_API_URL
+
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN npm run build
 

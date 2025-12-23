@@ -65,7 +65,7 @@ export default function SignPDFPage() {
   const [isDraggingNewSignature, setIsDraggingNewSignature] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pdfPages, setPdfPages] = useState(1);
-  const [penSize, setPenSize] = useState(3);
+  const [penSize, setPenSize] = useState(5);
   const [canUndo, setCanUndo] = useState(false);
   const [showSignatureCanvas, setShowSignatureCanvas] = useState(false);
   const [showInitialsCanvas, setShowInitialsCanvas] = useState(false);
@@ -93,6 +93,26 @@ export default function SignPDFPage() {
       }
     };
   }, [pdfPageImages, signatureImage]);
+
+  // Initialize canvas with white background when modal opens
+  useEffect(() => {
+    const initializeCanvas = (canvas: HTMLCanvasElement | null, isInitials = false) => {
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      
+      // Fill canvas with white background
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    };
+
+    if (showSignatureCanvas && canvasRef.current) {
+      initializeCanvas(canvasRef.current, false);
+    }
+    if (showInitialsCanvas && initialsCanvasRef.current) {
+      initializeCanvas(initialsCanvasRef.current, true);
+    }
+  }, [showSignatureCanvas, showInitialsCanvas]);
 
   // Convert PDF to images using API
   const convertPdfToImages = async (file: File) => {
@@ -353,7 +373,9 @@ export default function SignPDFPage() {
     if (previousState) {
       ctx.putImageData(previousState, 0, 0);
     } else {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Fill with white background instead of clearing
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     if (!isInitials) setCanUndo(history.current.length > 0);
@@ -365,7 +387,9 @@ export default function SignPDFPage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     saveState(isInitials);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    // Fill with white background instead of clearing
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     if (isInitials) {
       setInitialsImage(null);
@@ -424,6 +448,19 @@ export default function SignPDFPage() {
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", "");
+    
+    // Create and set custom drag image (small contour)
+    const dragImg = document.createElement("div");
+    dragImg.style.width = "60px";
+    dragImg.style.height = "40px";
+    dragImg.style.border = "2px solid #ef4444";
+    dragImg.style.borderRadius = "4px";
+    dragImg.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+    dragImg.style.position = "absolute";
+    dragImg.style.top = "-1000px";
+    document.body.appendChild(dragImg);
+    e.dataTransfer.setDragImage(dragImg, 30, 20);
+    setTimeout(() => document.body.removeChild(dragImg), 0);
   };
 
   const handleSignatureDragStart = (e: React.DragEvent, index: number) => {
@@ -432,6 +469,19 @@ export default function SignPDFPage() {
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", `signature-${index}`);
+    
+    // Create and set custom drag image (small contour)
+    const dragImg = document.createElement("div");
+    dragImg.style.width = "60px";
+    dragImg.style.height = "40px";
+    dragImg.style.border = "2px solid #ef4444";
+    dragImg.style.borderRadius = "4px";
+    dragImg.style.backgroundColor = "rgba(239, 68, 68, 0.1)";
+    dragImg.style.position = "absolute";
+    dragImg.style.top = "-1000px";
+    document.body.appendChild(dragImg);
+    e.dataTransfer.setDragImage(dragImg, 30, 20);
+    setTimeout(() => document.body.removeChild(dragImg), 0);
   };
 
   const handleDragEnd = () => {
@@ -801,7 +851,11 @@ export default function SignPDFPage() {
                             handleSignatureDragStart(e, originalIndex)
                           }
                           onDragEnd={handleDragEnd}
-                          className="absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition"
+                          className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition ${
+                            draggedSignatureIndex === originalIndex && isDragging
+                              ? "opacity-30 scale-95"
+                              : ""
+                          }`}
                           style={{
                             left: `${position.x * 100}%`,
                             top: `${position.y * 100}%`,
@@ -958,143 +1012,6 @@ export default function SignPDFPage() {
                   </div>
                 </div>
               </div>
-
-              {/* Optional Fields */}
-              <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Optional Fields
-                </h3>
-                <div className="space-y-3">
-                  {/* Initials */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                    <div className="flex items-center justify-between mb-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          AC
-                        </span>
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                          Initials
-                        </span>
-                      </div>
-                      {initialsImage && (
-                        <button
-                          onClick={() => setShowInitialsCanvas(true)}
-                          className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
-                        >
-                          <HiPencil
-                            size={16}
-                            className="text-gray-500 dark:text-gray-400"
-                          />
-                        </button>
-                      )}
-                    </div>
-                    {initialsImage ? (
-                      <div className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[40px] flex items-center justify-center">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={initialsImage}
-                          alt="Initials"
-                          className="max-h-8 max-w-full"
-                        />
-                      </div>
-                    ) : (
-                      <button
-                        onClick={() => setShowInitialsCanvas(true)}
-                        className="w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 text-sm text-gray-600 dark:text-gray-400 transition"
-                      >
-                        Click to add initials
-                      </button>
-                    )}
-                  </div>
-
-                  {/* Name */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <HiOutlineUser
-                        className="text-gray-500 dark:text-gray-400"
-                        size={18}
-                      />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Name
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter name"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                  </div>
-
-                  {/* Date */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <HiOutlineCalendar
-                        className="text-gray-500 dark:text-gray-400"
-                        size={18}
-                      />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Date
-                      </span>
-                    </div>
-                    <input
-                      type="date"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                  </div>
-
-                  {/* Text */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <HiOutlineDocumentText
-                        className="text-gray-500 dark:text-gray-400"
-                        size={18}
-                      />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Text
-                      </span>
-                    </div>
-                    <input
-                      type="text"
-                      value={text}
-                      onChange={(e) => setText(e.target.value)}
-                      placeholder="Enter text"
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                  </div>
-
-                  {/* Company Stamp */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
-                    <div className="flex items-center gap-2 mb-2">
-                      <FaStamp
-                        className="text-gray-500 dark:text-gray-400"
-                        size={18}
-                      />
-                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
-                        Company Stamp
-                      </span>
-                    </div>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) {
-                          const reader = new FileReader();
-                          reader.onload = (e) => {
-                            setCompanyStamp(e.target?.result as string);
-                          };
-                          reader.readAsDataURL(file);
-                        }
-                      }}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
-                    />
-                  </div>
-                </div>
-              </div>
             </div>
 
             {/* Sign Button */}
@@ -1149,7 +1066,7 @@ export default function SignPDFPage() {
                   {penSize}px
                 </span>
               </div>
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-900">
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-100">
                 <canvas
                   ref={canvasRef}
                   width={800}
@@ -1161,7 +1078,7 @@ export default function SignPDFPage() {
                   onTouchStart={(e) => startDrawing(e, false)}
                   onTouchMove={(e) => draw(e, false)}
                   onTouchEnd={stopDrawing}
-                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair w-full touch-none"
+                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair w-full touch-none bg-white"
                 />
               </div>
               <div className="flex gap-2">
@@ -1222,7 +1139,7 @@ export default function SignPDFPage() {
                   {penSize}px
                 </span>
               </div>
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-900">
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-100">
                 <canvas
                   ref={initialsCanvasRef}
                   width={400}
@@ -1234,7 +1151,7 @@ export default function SignPDFPage() {
                   onTouchStart={(e) => startDrawing(e, true)}
                   onTouchMove={(e) => draw(e, true)}
                   onTouchEnd={stopDrawing}
-                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair w-full touch-none"
+                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair w-full touch-none bg-white"
                 />
               </div>
               <div className="flex gap-2">

@@ -11,7 +11,7 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Cryptit.pro - PDF Encryption & File Management",
+  title: "Managepdf.site - PDF Encryption & File Management",
   description:
     "Secure PDF encryption, signing, and file management tools. Sign PDFs manually, encrypt documents, and manage your files with ease.",
 };

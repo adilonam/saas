@@ -1,7 +1,13 @@
+"use client";
+
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import ThemeSwitch from "./ThemeSwitch";
+import UserMenu from "./UserMenu";
 
 export default function Header() {
+  const { data: session } = useSession();
+
   return (
     <header className="bg-white dark:bg-black shadow-sm dark:border-b dark:border-gray-800">
       <div className="container mx-auto px-4 py-4 flex justify-between items-center">
@@ -30,6 +36,11 @@ export default function Header() {
             </li>
           </ul>
           <ThemeSwitch />
+          {session?.user && (
+            <div className="ml-2">
+              <UserMenu user={session.user} />
+            </div>
+          )}
         </nav>
       </div>
     </header>

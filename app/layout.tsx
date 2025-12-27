@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter_Tight } from "next/font/google";
 import { ThemeProvider } from "next-themes";
 import Script from "next/script";
+import { Providers } from "components/Providers";
 
 import "styles/globals.css";
 
@@ -52,7 +53,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
           />
         </noscript>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          {children}
+          <Providers>{children}</Providers>
         </ThemeProvider>
       </body>
     </html>

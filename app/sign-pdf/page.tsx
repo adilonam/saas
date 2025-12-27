@@ -2,6 +2,7 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import Header from "components/Header";
 import Footer from "components/Footer";
 import {
@@ -40,6 +41,7 @@ interface Point {
 
 export default function SignPDFPage() {
   const router = useRouter();
+  const { data: session, status } = useSession();
   const [pdfFile, setPdfFile] = useState<File | null>(null);
   const [pdfPageImages, setPdfPageImages] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,11 +98,14 @@ export default function SignPDFPage() {
 
   // Initialize canvas with white background when modal opens
   useEffect(() => {
-    const initializeCanvas = (canvas: HTMLCanvasElement | null, isInitials = false) => {
+    const initializeCanvas = (
+      canvas: HTMLCanvasElement | null,
+      isInitials = false
+    ) => {
       if (!canvas) return;
       const ctx = canvas.getContext("2d");
       if (!ctx) return;
-      
+
       // Fill canvas with white background
       ctx.fillStyle = "#ffffff";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -448,7 +453,7 @@ export default function SignPDFPage() {
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", "");
-    
+
     // Create and set custom drag image (small contour)
     const dragImg = document.createElement("div");
     dragImg.style.width = "60px";
@@ -469,7 +474,7 @@ export default function SignPDFPage() {
     setIsDragging(true);
     e.dataTransfer.effectAllowed = "move";
     e.dataTransfer.setData("text/plain", `signature-${index}`);
-    
+
     // Create and set custom drag image (small contour)
     const dragImg = document.createElement("div");
     dragImg.style.width = "60px";
@@ -554,6 +559,12 @@ export default function SignPDFPage() {
   };
 
   const downloadSignedPDF = async () => {
+    // Check if user is authenticated
+    if (status === "unauthenticated" || !session) {
+      router.push("/signin");
+      return;
+    }
+
     if (!pdfFile || !signatureImage || signaturePositions.length === 0) {
       alert("Please upload a PDF, create a signature, and place it on the PDF");
       return;
@@ -852,7 +863,8 @@ export default function SignPDFPage() {
                           }
                           onDragEnd={handleDragEnd}
                           className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition ${
-                            draggedSignatureIndex === originalIndex && isDragging
+                            draggedSignatureIndex === originalIndex &&
+                            isDragging
                               ? "opacity-30 scale-95"
                               : ""
                           }`}

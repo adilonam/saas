@@ -4,7 +4,7 @@
   "description": "Nextjs Saas Starter Template",
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint .",
     "db:generate": "prisma generate",

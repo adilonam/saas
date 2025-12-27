@@ -4,9 +4,7 @@
 const nextConfig = {
   output: "standalone",
   async rewrites() {
-    console.log("rewrites");
     const backendUrl = process.env.FAST_API_URL;
-    console.log("backendUrl", backendUrl);
     if (!backendUrl) {
       return [];
     }

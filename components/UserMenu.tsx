@@ -9,8 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "components/components/ui/dropdown-menu";
-import { Button } from "components/components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 
 interface UserMenuProps {
   user: {
@@ -61,4 +61,3 @@ export default function UserMenu({ user }: UserMenuProps) {
     </DropdownMenu>
   );
 }
-

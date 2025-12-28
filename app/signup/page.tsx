@@ -3,9 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { Button } from "components/components/ui/button";
-import { Input } from "components/components/ui/input";
-import { Label } from "components/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Card,
   CardContent,
@@ -13,7 +13,7 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "components/components/ui/card";
+} from "@/components/ui/card";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -74,9 +74,7 @@ export default function SignUpPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Sign Up</CardTitle>
-          <CardDescription>
-            Create a new account to get started
-          </CardDescription>
+          <CardDescription>Create a new account to get started</CardDescription>
         </CardHeader>
         <form onSubmit={handleSubmit}>
           <CardContent className="space-y-4">
@@ -151,4 +149,3 @@ export default function SignUpPage() {
     </div>
   );
 }
-

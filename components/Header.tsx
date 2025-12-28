@@ -13,6 +13,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "components/components/ui/navigation-menu";
+import { cn } from "components/lib/utils";
 import ThemeSwitch from "./ThemeSwitch";
 import UserMenu from "./UserMenu";
 
@@ -22,9 +23,9 @@ export default function Header() {
 
   return (
     <header className="bg-white dark:bg-black shadow-sm dark:border-b dark:border-gray-800 sticky top-0 z-50">
-      <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl dark:text-gray-100 font-semibold">
+      <div className="container mx-auto px-2 sm:px-4 py-3 sm:py-4 flex justify-between items-center">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 min-w-0">
+          <Link href="/" className="text-base sm:text-xl dark:text-gray-100 font-semibold truncate">
             Managepdf.site
           </Link>
           <NavigationMenu viewport={isMobile}>
@@ -32,7 +33,10 @@ export default function Header() {
               <NavigationMenuItem>
                 <NavigationMenuLink
                   asChild
-                  className={navigationMenuTriggerStyle()}
+                  className={cn(
+                    navigationMenuTriggerStyle(),
+                    "text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 h-7 sm:h-9"
+                  )}
                 >
                   <Link href="/sign-pdf">Sign PDF</Link>
                 </NavigationMenuLink>
@@ -40,10 +44,10 @@ export default function Header() {
             </NavigationMenuList>
           </NavigationMenu>
         </div>
-        <nav className="flex items-center gap-4">
+        <nav className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
           <ThemeSwitch />
           {session?.user && (
-            <div className="ml-2">
+            <div className="ml-1 sm:ml-2">
               <UserMenu user={session.user} />
             </div>
           )}

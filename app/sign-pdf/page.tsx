@@ -65,6 +65,11 @@ export default function SignPDFPage() {
     number | null
   >(null);
   const [isDraggingNewSignature, setIsDraggingNewSignature] = useState(false);
+  const [touchStartPos, setTouchStartPos] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [isTouchDragging, setIsTouchDragging] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [pdfPages, setPdfPages] = useState(1);
   const [penSize, setPenSize] = useState(5);
@@ -81,6 +86,8 @@ export default function SignPDFPage() {
   const initialsHistoryRef = useRef<ImageData[]>([]);
   const signaturePreviewRef = useRef<HTMLDivElement>(null);
   const pageImageRefs = useRef<{ [key: number]: HTMLImageElement }>({});
+  const isTouchDraggingRef = useRef(false);
+  const isDraggingNewSignatureRef = useRef(false);
 
   useEffect(() => {
     return () => {
@@ -558,6 +565,289 @@ export default function SignPDFPage() {
     setSignaturePositions(signaturePositions.filter((_, i) => i !== index));
   };
 
+  // Touch handlers for mobile drag and drop
+  const handleTouchStart = (e: React.TouchEvent) => {
+    if (!signatureImage || !pdfContainerRef.current) return;
+
+    const touch = e.touches[0];
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setIsTouchDragging(true);
+    setIsDraggingNewSignature(true);
+    isTouchDraggingRef.current = true;
+    isDraggingNewSignatureRef.current = true;
+    e.preventDefault(); // Prevent default to avoid conflicts
+
+    // Add global touch move listener to prevent scrolling
+    const handleGlobalTouchMove = (globalEvent: TouchEvent) => {
+      if (isTouchDraggingRef.current && isDraggingNewSignatureRef.current) {
+        globalEvent.preventDefault();
+      }
+    };
+
+    // Add global touch end listener to catch drop anywhere
+    const handleGlobalTouchEnd = (globalEvent: TouchEvent) => {
+      // Cleanup touch move listener
+      document.removeEventListener("touchmove", handleGlobalTouchMove);
+
+      if (!isTouchDraggingRef.current || !isDraggingNewSignatureRef.current) {
+        document.removeEventListener("touchend", handleGlobalTouchEnd);
+        return;
+      }
+
+      const touch = globalEvent.changedTouches[0];
+      if (!touch || !pdfContainerRef.current) {
+        setIsTouchDragging(false);
+        setTouchStartPos(null);
+        setIsDraggingNewSignature(false);
+        isTouchDraggingRef.current = false;
+        isDraggingNewSignatureRef.current = false;
+        document.removeEventListener("touchend", handleGlobalTouchEnd);
+        return;
+      }
+
+      const container = pdfContainerRef.current;
+      const imgElement = container.querySelector("img") as HTMLImageElement;
+
+      if (!imgElement) {
+        setIsTouchDragging(false);
+        setTouchStartPos(null);
+        setIsDraggingNewSignature(false);
+        isTouchDraggingRef.current = false;
+        isDraggingNewSignatureRef.current = false;
+        document.removeEventListener("touchend", handleGlobalTouchEnd);
+        return;
+      }
+
+      const imgRect = imgElement.getBoundingClientRect();
+      const dropX = touch.clientX - imgRect.left;
+      const dropY = touch.clientY - imgRect.top;
+
+      // Check if touch ended within the PDF image bounds
+      if (
+        dropX >= 0 &&
+        dropX <= imgRect.width &&
+        dropY >= 0 &&
+        dropY <= imgRect.height
+      ) {
+        const imgWidth = imgRect.width;
+        const imgHeight = imgRect.height;
+
+        const sigWidth = 0.15;
+        const sigHeight = 0.1;
+
+        const normalizedX = Math.max(
+          0,
+          Math.min(1 - sigWidth, dropX / imgWidth - sigWidth / 2)
+        );
+        const normalizedY = Math.max(
+          0,
+          Math.min(1 - sigHeight, dropY / imgHeight - sigHeight / 2)
+        );
+
+        const newPosition: SignaturePosition = {
+          x: normalizedX,
+          y: normalizedY,
+          pageNumber: currentPage,
+          width: sigWidth,
+          height: sigHeight,
+        };
+        setSignaturePositions((prev) => [...prev, newPosition]);
+      }
+
+      setIsTouchDragging(false);
+      setTouchStartPos(null);
+      setIsDraggingNewSignature(false);
+      isTouchDraggingRef.current = false;
+      isDraggingNewSignatureRef.current = false;
+      document.removeEventListener("touchend", handleGlobalTouchEnd);
+    };
+
+    document.addEventListener("touchmove", handleGlobalTouchMove, {
+      passive: false,
+    });
+    document.addEventListener("touchend", handleGlobalTouchEnd, { once: true });
+  };
+
+  const handleTouchMove = (e: React.TouchEvent) => {
+    if (
+      !isTouchDraggingRef.current ||
+      !touchStartPos ||
+      !pdfContainerRef.current
+    ) {
+      return;
+    }
+    // Prevent scrolling while dragging
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    // Only handle if we're dragging a new signature (not repositioning existing one)
+    if (
+      !isTouchDragging ||
+      !touchStartPos ||
+      !signatureImage ||
+      !pdfContainerRef.current ||
+      !isDraggingNewSignature ||
+      draggedSignatureIndex !== null
+    ) {
+      // Only reset if we were dragging a new signature
+      if (isDraggingNewSignature) {
+        setIsTouchDragging(false);
+        setTouchStartPos(null);
+        setIsDraggingNewSignature(false);
+      }
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    const container = pdfContainerRef.current;
+    const imgElement = container.querySelector("img") as HTMLImageElement;
+
+    if (!imgElement) {
+      setIsTouchDragging(false);
+      setTouchStartPos(null);
+      setIsDraggingNewSignature(false);
+      return;
+    }
+
+    const imgRect = imgElement.getBoundingClientRect();
+    const dropX = touch.clientX - imgRect.left;
+    const dropY = touch.clientY - imgRect.top;
+
+    // Check if touch ended within the PDF image bounds
+    if (
+      dropX >= 0 &&
+      dropX <= imgRect.width &&
+      dropY >= 0 &&
+      dropY <= imgRect.height
+    ) {
+      const imgWidth = imgRect.width;
+      const imgHeight = imgRect.height;
+
+      const sigWidth = 0.15;
+      const sigHeight = 0.1;
+
+      const normalizedX = Math.max(
+        0,
+        Math.min(1 - sigWidth, dropX / imgWidth - sigWidth / 2)
+      );
+      const normalizedY = Math.max(
+        0,
+        Math.min(1 - sigHeight, dropY / imgHeight - sigHeight / 2)
+      );
+
+      const newPosition: SignaturePosition = {
+        x: normalizedX,
+        y: normalizedY,
+        pageNumber: currentPage,
+        width: sigWidth,
+        height: sigHeight,
+      };
+      setSignaturePositions([...signaturePositions, newPosition]);
+    }
+    // If touch ended outside PDF, just cancel the drag (no signature placed)
+
+    setIsTouchDragging(false);
+    setTouchStartPos(null);
+    setIsDraggingNewSignature(false);
+  };
+
+  // Cancel touch drag if released on signature preview itself
+  const handleSignaturePreviewTouchEnd = (e: React.TouchEvent) => {
+    if (isTouchDragging && isDraggingNewSignature) {
+      // Cancel the drag if released on the preview itself
+      setIsTouchDragging(false);
+      setTouchStartPos(null);
+      setIsDraggingNewSignature(false);
+    }
+  };
+
+  // Touch handlers for repositioning existing signatures
+  const handleSignatureTouchStart = (e: React.TouchEvent, index: number) => {
+    e.stopPropagation();
+    const touch = e.touches[0];
+    setTouchStartPos({ x: touch.clientX, y: touch.clientY });
+    setDraggedSignatureIndex(index);
+    setIsTouchDragging(true);
+    e.preventDefault();
+  };
+
+  const handleSignatureTouchMove = (e: React.TouchEvent) => {
+    if (
+      !isTouchDragging ||
+      draggedSignatureIndex === null ||
+      !pdfContainerRef.current
+    )
+      return;
+    e.preventDefault();
+  };
+
+  const handleSignatureTouchEnd = (e: React.TouchEvent) => {
+    if (
+      !isTouchDragging ||
+      draggedSignatureIndex === null ||
+      !touchStartPos ||
+      !pdfContainerRef.current
+    ) {
+      setIsTouchDragging(false);
+      setTouchStartPos(null);
+      setDraggedSignatureIndex(null);
+      return;
+    }
+
+    const touch = e.changedTouches[0];
+    const container = pdfContainerRef.current;
+    const imgElement = container.querySelector("img") as HTMLImageElement;
+
+    if (!imgElement) {
+      setIsTouchDragging(false);
+      setTouchStartPos(null);
+      setDraggedSignatureIndex(null);
+      return;
+    }
+
+    const imgRect = imgElement.getBoundingClientRect();
+    const dropX = touch.clientX - imgRect.left;
+    const dropY = touch.clientY - imgRect.top;
+
+    // Check if touch ended within the PDF image bounds
+    if (
+      dropX >= 0 &&
+      dropX <= imgRect.width &&
+      dropY >= 0 &&
+      dropY <= imgRect.height
+    ) {
+      const imgWidth = imgRect.width;
+      const imgHeight = imgRect.height;
+
+      const sigWidth = 0.15;
+      const sigHeight = 0.1;
+
+      const normalizedX = Math.max(
+        0,
+        Math.min(1 - sigWidth, dropX / imgWidth - sigWidth / 2)
+      );
+      const normalizedY = Math.max(
+        0,
+        Math.min(1 - sigHeight, dropY / imgHeight - sigHeight / 2)
+      );
+
+      const updatedPositions = [...signaturePositions];
+      updatedPositions[draggedSignatureIndex] = {
+        ...updatedPositions[draggedSignatureIndex],
+        x: normalizedX,
+        y: normalizedY,
+        pageNumber: currentPage,
+      };
+      setSignaturePositions(updatedPositions);
+    }
+
+    setIsTouchDragging(false);
+    setTouchStartPos(null);
+    setDraggedSignatureIndex(null);
+  };
+
   const downloadSignedPDF = async () => {
     // Check if user is authenticated
     if (status === "unauthenticated" || !session) {
@@ -718,8 +1008,8 @@ export default function SignPDFPage() {
       <Header />
       <main className="grow flex flex-col overflow-hidden">
         {/* Top Bar */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 sm:gap-0 px-3 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950">
+          <div className="flex items-center gap-2 sm:gap-4 w-full sm:w-auto">
             <button
               onClick={() => router.back()}
               className="p-2 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-lg transition"
@@ -733,14 +1023,14 @@ export default function SignPDFPage() {
               <select
                 defaultValue={pdfFile.name}
                 disabled
-                className="px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-default"
+                className="flex-1 sm:flex-none px-3 sm:px-4 py-2 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-700 rounded-lg text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-red-500 cursor-default truncate"
               >
                 <option>{pdfFile.name}</option>
               </select>
             )}
           </div>
           {pdfPages > 1 && pdfFile && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 w-full sm:w-auto justify-end sm:justify-start">
               <button
                 onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                 disabled={currentPage === 1}
@@ -751,7 +1041,7 @@ export default function SignPDFPage() {
                   className="text-gray-600 dark:text-gray-400"
                 />
               </button>
-              <span className="text-sm font-medium text-gray-700 dark:text-gray-300 px-3">
+              <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 px-2 sm:px-3">
                 {currentPage} / {pdfPages}
               </span>
               <button
@@ -771,12 +1061,12 @@ export default function SignPDFPage() {
         </div>
 
         {/* Main Content */}
-        <div className="flex-1 flex overflow-hidden">
+        <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
           {/* Left Panel - PDF Viewer */}
           <div className="flex-1 flex overflow-hidden bg-gray-100 dark:bg-gray-900">
             {/* Thumbnails Sidebar */}
             {pdfPageImages.length > 0 && (
-              <div className="w-24 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
+              <div className="hidden lg:block w-24 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
                 <div className="p-2 space-y-2">
                   {pdfPageImages.map((image, index) => (
                     <button
@@ -806,7 +1096,7 @@ export default function SignPDFPage() {
             {/* Main PDF View */}
             <div className="flex-1 flex flex-col overflow-hidden">
               {!pdfFile ? (
-                <div className="flex-1 flex items-center justify-center">
+                <div className="flex-1 flex items-center justify-center p-4">
                   <div className="text-center">
                     <input
                       ref={fileInputRef}
@@ -815,20 +1105,20 @@ export default function SignPDFPage() {
                       onChange={handleFileChange}
                       className="hidden"
                     />
-                    <p className="text-gray-600 dark:text-gray-400 mb-4">
+                    <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 px-4">
                       Drag and drop a PDF file here, or click to select
                     </p>
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="bg-red-600 hover:bg-red-700 text-white px-6 py-3 rounded-lg font-semibold transition"
+                      className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm sm:text-base"
                     >
                       Select PDF File
                     </button>
                   </div>
                 </div>
               ) : isLoading ? (
-                <div className="flex-1 flex items-center justify-center">
-                  <p className="text-gray-600 dark:text-gray-400">
+                <div className="flex-1 flex items-center justify-center p-4">
+                  <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
                     Converting PDF to images...
                   </p>
                 </div>
@@ -837,7 +1127,12 @@ export default function SignPDFPage() {
                   ref={pdfContainerRef}
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
-                  className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-800 p-4"
+                  onTouchMove={(e) => {
+                    if (isTouchDraggingRef.current) {
+                      e.preventDefault();
+                    }
+                  }}
+                  className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-800 p-2 sm:p-4"
                 >
                   <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-lg relative">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -862,9 +1157,16 @@ export default function SignPDFPage() {
                             handleSignatureDragStart(e, originalIndex)
                           }
                           onDragEnd={handleDragEnd}
-                          className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition ${
-                            draggedSignatureIndex === originalIndex &&
-                            isDragging
+                          onTouchStart={(e) =>
+                            handleSignatureTouchStart(e, originalIndex)
+                          }
+                          onTouchMove={handleSignatureTouchMove}
+                          onTouchEnd={handleSignatureTouchEnd}
+                          className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition touch-none ${
+                            (draggedSignatureIndex === originalIndex &&
+                              (isDragging || isTouchDragging)) ||
+                            (isTouchDragging &&
+                              draggedSignatureIndex === originalIndex)
                               ? "opacity-30 scale-95"
                               : ""
                           }`}
@@ -901,55 +1203,55 @@ export default function SignPDFPage() {
           </div>
 
           {/* Right Panel - Signature Options */}
-          <div className="w-96 border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex flex-col overflow-hidden">
-            <div className="p-6 border-b border-gray-200 dark:border-gray-800">
-              <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
-                Signature Options
+          <div className="w-full lg:w-96 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex flex-col overflow-hidden max-h-[50vh] lg:max-h-none">
+            <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800">
+              <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
+                Options de signature
               </h2>
             </div>
 
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 sm:space-y-6">
               {/* Signature Type Selection */}
               <div>
-                <div className="flex gap-3 mb-4">
+                <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4">
                   <button
                     onClick={() => setSignatureType("simple")}
-                    className={`flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition ${
+                    className={`flex-1 flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-lg border-2 transition ${
                       signatureType === "simple"
                         ? "border-red-500 bg-red-50 dark:bg-red-900/20"
                         : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
                     }`}
                   >
                     <HiPencil
-                      size={24}
-                      className={
+                      size={20}
+                      className={`sm:w-6 sm:h-6 ${
                         signatureType === "simple"
                           ? "text-red-500"
                           : "text-gray-400"
-                      }
+                      }`}
                     />
                     <span
-                      className={`text-sm font-medium ${
+                      className={`text-xs sm:text-sm font-medium ${
                         signatureType === "simple"
                           ? "text-red-600 dark:text-red-400"
                           : "text-gray-600 dark:text-gray-400"
                       }`}
                     >
-                      Simple Signature
+                      Signature simple
                     </span>
                   </button>
                   <button
                     onClick={() => {}}
                     disabled
-                    className="flex-1 flex flex-col items-center gap-2 p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed relative"
+                    className="flex-1 flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-lg border-2 border-gray-200 dark:border-gray-700 opacity-50 cursor-not-allowed relative"
                   >
-                    <div className="absolute top-2 right-2">
-                      <span className="text-xs bg-yellow-500 text-white px-1.5 py-0.5 rounded">
+                    <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
+                      <span className="text-[10px] sm:text-xs bg-yellow-500 text-white px-1 sm:px-1.5 py-0.5 rounded">
                         Premium
                       </span>
                     </div>
                     <svg
-                      className="w-6 h-6 text-gray-400"
+                      className="w-5 h-5 sm:w-6 sm:h-6 text-gray-400"
                       fill="none"
                       stroke="currentColor"
                       viewBox="0 0 24 24"
@@ -961,8 +1263,8 @@ export default function SignPDFPage() {
                         d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                       />
                     </svg>
-                    <span className="text-sm font-medium text-gray-600 dark:text-gray-400">
-                      Digital Signature
+                    <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
+                      Signature numérique
                     </span>
                   </button>
                 </div>
@@ -970,19 +1272,20 @@ export default function SignPDFPage() {
 
               {/* Required Fields */}
               <div>
-                <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">
-                  Required Fields
+                <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
+                  Champs de saisie obligatoires
                 </h3>
-                <div className="space-y-3">
+                <div className="space-y-2 sm:space-y-3">
                   {/* Signature Field */}
-                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-3">
+                  <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-2 sm:p-3">
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <HiPencilOutline
                           className="text-gray-500 dark:text-gray-400"
-                          size={18}
+                          size={16}
+                          style={{ width: "16px", height: "16px" }}
                         />
-                        <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                        <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
                           Signature
                         </span>
                       </div>
@@ -992,7 +1295,7 @@ export default function SignPDFPage() {
                           className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
                         >
                           <HiPencil
-                            size={16}
+                            size={14}
                             className="text-gray-500 dark:text-gray-400"
                           />
                         </button>
@@ -1004,21 +1307,27 @@ export default function SignPDFPage() {
                         draggable
                         onDragStart={handleDragStart}
                         onDragEnd={handleDragEnd}
-                        className="bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[60px] flex items-center justify-center cursor-move hover:border-red-500 transition"
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        className={`bg-white dark:bg-gray-800 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[50px] sm:min-h-[60px] flex items-center justify-center cursor-move hover:border-red-500 transition touch-none ${
+                          isTouchDragging && isDraggingNewSignature
+                            ? "opacity-50 border-red-500"
+                            : ""
+                        }`}
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={signatureImage}
                           alt="Signature"
-                          className="max-h-12 max-w-full pointer-events-none"
+                          className="max-h-10 sm:max-h-12 max-w-full pointer-events-none"
                         />
                       </div>
                     ) : (
                       <button
                         onClick={() => setShowSignatureCanvas(true)}
-                        className="w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-4 text-sm text-gray-600 dark:text-gray-400 transition"
+                        className="w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 transition"
                       >
-                        Click to add signature
+                        Cliquez pour ajouter une signature
                       </button>
                     )}
                   </div>
@@ -1027,7 +1336,7 @@ export default function SignPDFPage() {
             </div>
 
             {/* Sign Button */}
-            <div className="p-6 border-t border-gray-200 dark:border-gray-800">
+            <div className="p-4 sm:p-6 border-t border-gray-200 dark:border-gray-800">
               <button
                 onClick={downloadSignedPDF}
                 disabled={
@@ -1036,10 +1345,10 @@ export default function SignPDFPage() {
                   signaturePositions.length === 0 ||
                   isLoading
                 }
-                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg flex items-center justify-center gap-2 transition"
+                className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2 transition text-sm sm:text-base"
               >
-                <span>Sign</span>
-                <HiChevronRight size={20} />
+                <span>Signer</span>
+                <HiChevronRight size={18} className="sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
@@ -1048,10 +1357,10 @@ export default function SignPDFPage() {
 
       {/* Signature Canvas Modal */}
       {showSignatureCanvas && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                 Draw Signature
               </h3>
               <button
@@ -1061,9 +1370,9 @@ export default function SignPDFPage() {
                 <HiX size={20} className="text-gray-600 dark:text-gray-400" />
               </button>
             </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                   Pen Size:
                 </label>
                 <input
@@ -1074,11 +1383,11 @@ export default function SignPDFPage() {
                   onChange={(e) => setPenSize(Number(e.target.value))}
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400 w-8">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 w-8 sm:w-10 text-right">
                   {penSize}px
                 </span>
               </div>
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-100">
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-4 bg-white dark:bg-gray-100">
                 <canvas
                   ref={canvasRef}
                   width={800}
@@ -1096,22 +1405,25 @@ export default function SignPDFPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => saveSignatureAsImage(false)}
-                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                  className="flex-1 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => undo(false)}
                   disabled={!canUndo}
-                  className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  <AiOutlineUndo size={18} />
+                  <AiOutlineUndo
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px]"
+                  />
                 </button>
                 <button
                   onClick={() => clearSignature(false)}
-                  className="flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                  className="flex items-center justify-center gap-1 sm:gap-2 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
                 >
-                  <HiTrash size={18} />
+                  <HiTrash size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </div>
             </div>
@@ -1121,10 +1433,10 @@ export default function SignPDFPage() {
 
       {/* Initials Canvas Modal */}
       {showInitialsCanvas && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-2 sm:p-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-4 sm:p-6 max-w-2xl w-full max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white">
                 Draw Initials
               </h3>
               <button
@@ -1134,9 +1446,9 @@ export default function SignPDFPage() {
                 <HiX size={20} className="text-gray-600 dark:text-gray-400" />
               </button>
             </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-4">
-                <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+            <div className="space-y-3 sm:space-y-4">
+              <div className="flex items-center gap-2 sm:gap-4">
+                <label className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 whitespace-nowrap">
                   Pen Size:
                 </label>
                 <input
@@ -1147,11 +1459,11 @@ export default function SignPDFPage() {
                   onChange={(e) => setPenSize(Number(e.target.value))}
                   className="flex-1"
                 />
-                <span className="text-sm text-gray-600 dark:text-gray-400 w-8">
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 w-8 sm:w-10 text-right">
                   {penSize}px
                 </span>
               </div>
-              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-4 bg-white dark:bg-gray-100">
+              <div className="border-2 border-gray-300 dark:border-gray-600 rounded-lg p-2 sm:p-4 bg-white dark:bg-gray-100">
                 <canvas
                   ref={initialsCanvasRef}
                   width={400}
@@ -1169,22 +1481,25 @@ export default function SignPDFPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => saveSignatureAsImage(true)}
-                  className="flex-1 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                  className="flex-1 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition text-sm sm:text-base"
                 >
                   Save
                 </button>
                 <button
                   onClick={() => undo(true)}
                   disabled={initialsHistoryRef.current.length === 0}
-                  className="flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
+                  className="flex items-center justify-center gap-1 sm:gap-2 bg-gray-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
                 >
-                  <AiOutlineUndo size={18} />
+                  <AiOutlineUndo
+                    size={16}
+                    className="sm:w-[18px] sm:h-[18px]"
+                  />
                 </button>
                 <button
                   onClick={() => clearSignature(true)}
-                  className="flex items-center justify-center gap-2 bg-red-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
+                  className="flex items-center justify-center gap-1 sm:gap-2 bg-red-600 text-white px-3 sm:px-4 py-2 rounded-lg font-semibold hover:bg-red-700 transition"
                 >
-                  <HiTrash size={18} />
+                  <HiTrash size={16} className="sm:w-[18px] sm:h-[18px]" />
                 </button>
               </div>
             </div>

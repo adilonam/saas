@@ -18,62 +18,63 @@ const Features = () => {
       description:
         "Sign PDF documents manually using your mouse or convert text to signature. Draw your signature or type it out.",
       href: "/sign-pdf",
+      comingSoon: false,
     },
     {
       icon: FaLock,
       title: "Encrypt PDF",
       description:
         "Protect your PDF documents with strong encryption. Secure sensitive files with password protection.",
-      href: "/encrypt-pdf",
+      comingSoon: true,
     },
     {
       icon: FaUnlock,
       title: "Decrypt PDF",
       description:
         "Remove encryption from PDF files. Unlock password-protected documents with ease.",
-      href: "/decrypt-pdf",
+      comingSoon: true,
     },
     {
       icon: FaFilePdf,
       title: "Merge PDFs",
       description:
         "Combine multiple PDF files into one document. Merge, organize, and rearrange pages effortlessly.",
-      href: "/merge-pdf",
+      comingSoon: true,
     },
     {
       icon: HiDocumentText,
       title: "Split PDF",
       description:
         "Split large PDF files into smaller documents. Extract specific pages or divide by page ranges.",
-      href: "/split-pdf",
+      comingSoon: true,
     },
     {
       icon: FaShieldAlt,
       title: "PDF Watermark",
       description:
         "Add watermarks to your PDF documents. Protect your content with custom text or image watermarks.",
-      href: "/watermark-pdf",
+      comingSoon: true,
     },
     {
       icon: FaKey,
       title: "Password Protect",
       description:
         "Add password protection to your PDF files. Control access with strong encryption algorithms.",
-      href: "/password-protect",
+      comingSoon: true,
     },
     {
       icon: FaFileArchive,
       title: "Compress PDF",
       description:
         "Reduce PDF file sizes without losing quality. Optimize documents for faster sharing and storage.",
-      href: "/compress-pdf",
+      comingSoon: true,
     },
     {
       icon: FaLock,
       title: "Secure File Storage",
       description:
         "Store and manage your encrypted files securely. Access your documents from anywhere with confidence.",
-      href: "/storage",
+      comingSoon: true,
     },
   ];
 
@@ -86,7 +87,7 @@ const Features = () => {
           </h2>
           <p className="mt-8 text-xl text-gray-600 dark:text-gray-300 font-light">
             Powerful PDF tools and encryption features to secure and manage your
-            documents. Click on any feature to get started.
+            documents. More features coming soon.
           </p>
         </div>
         <div className="mt-10">

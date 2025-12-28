@@ -40,18 +40,18 @@ const AccordionItem: React.FC<AccordionItemProps> = ({ title, content, isOpen, t
 
 const defaultAccordionItems = [
   {
-    title: "Sign up for free",
-    content: "Start your journey with a 34-day trial. It's easy no credit card or commitment.",
+    title: "Secure PDF Encryption",
+    content: "Protect your sensitive documents with military-grade encryption. Our advanced security ensures your PDFs remain confidential and safe from unauthorized access.",
   },
   {
-    title: "Easy to use",
+    title: "Easy PDF Signing",
     content:
-      "Our app is designed to be user-friendly and easy to use. We want to provide a seamless experience for your users so that you can focus on what matters.",
+      "Sign PDF documents quickly and securely. Draw your signature manually or convert text to signature. No need for expensive software or complicated processes.",
   },
   {
-    title: "Focus on what matters",
+    title: "Complete PDF Management",
     content:
-      "With better financial management, you can reduce money-related stress and focus on what matters most. More to come.",
+      "Merge, split, compress, and watermark your PDFs all in one place. Streamline your document workflow with our comprehensive set of PDF tools.",
   },
 ];
 

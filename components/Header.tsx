@@ -12,6 +12,7 @@ import {
   NavigationMenuTrigger,
   navigationMenuTriggerStyle,
 } from "@/components/ui/navigation-menu";
+import { Button } from "@/components/ui/button";
 import { cn } from "components/lib/utils";
 import ThemeSwitch from "./ThemeSwitch";
 import UserMenu from "./UserMenu";
@@ -46,12 +47,30 @@ export default function Header() {
           </NavigationMenu>
         </div>
         <nav className="flex items-center gap-2 sm:gap-4 flex-shrink-0">
-          <ThemeSwitch />
-          {session?.user && (
+          {session?.user ? (
             <div className="ml-1 sm:ml-2">
               <UserMenu user={session.user} />
             </div>
+          ) : (
+            <div className="flex items-center gap-2 sm:gap-3 ml-1 sm:ml-2">
+              <Button
+                asChild
+                variant="ghost"
+                size="sm"
+                className="text-xs sm:text-sm"
+              >
+                <Link href="/signin">Sign In</Link>
+              </Button>
+              <Button
+                asChild
+                size="sm"
+                className="text-xs sm:text-sm"
+              >
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </div>
           )}
+          <ThemeSwitch />
         </nav>
       </div>
     </header>

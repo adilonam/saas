@@ -9,9 +9,18 @@ import {
   FaKey,
 } from "react-icons/fa";
 import { HiDocumentText, HiPencil } from "react-icons/hi";
+import { IconType } from "react-icons";
+
+interface Feature {
+  icon: IconType;
+  title: string;
+  description: string;
+  href?: string;
+  comingSoon: boolean;
+}
 
 const Features = () => {
-  const features = [
+  const features: Feature[] = [
     {
       icon: HiPencil,
       title: "Manual Sign PDF",

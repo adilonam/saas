@@ -1,7 +1,16 @@
 import React from "react";
 import Link from "next/link";
+import { IconType } from "react-icons";
 
-const FeatureCard = ({ icon: Icon, title, description, href, comingSoon }) => {
+interface FeatureCardProps {
+  icon: IconType;
+  title: string;
+  description: string;
+  href?: string;
+  comingSoon: boolean;
+}
+
+const FeatureCard = ({ icon: Icon, title, description, href, comingSoon }: FeatureCardProps) => {
   const content = (
     <div className={`bg-white dark:bg-gray-800 p-6 rounded-lg shadow-md transition-colors duration-200 h-full flex flex-col relative ${
       comingSoon ? 'opacity-75' : 'hover:shadow-lg cursor-pointer'

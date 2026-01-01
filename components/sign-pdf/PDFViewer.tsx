@@ -4,6 +4,7 @@ import { useRef } from "react";
 import { HiX } from "react-icons/hi";
 import { SignaturePosition } from "./types";
 import { useDragAndDrop } from "./hooks/useDragAndDrop";
+import { useResize } from "./hooks/useResize";
 
 interface PDFViewerProps {
   pdfFile: File | null;
@@ -52,6 +53,13 @@ export default function PDFViewer({
     handleSignatureTouchMove,
     handleSignatureTouchEnd,
   } = useDragAndDrop(signatureImage, currentPage, onPositionUpdate, signaturePositions);
+
+  const {
+    isResizing,
+    resizingIndex,
+    resizeHandle,
+    handleResizeStart,
+  } = useResize(pdfContainerRef, currentPage, onPositionUpdate, signaturePositions);
 
   return (
     <div className="flex-1 flex overflow-hidden bg-gray-100 dark:bg-gray-900">
@@ -143,29 +151,39 @@ export default function PDFViewer({
                 .map(({ position, originalIndex }) => (
                   <div
                     key={originalIndex}
-                    draggable
-                    onDragStart={(e) =>
-                      handleSignatureDragStart(e, originalIndex)
-                    }
+                    draggable={!isResizing}
+                    onDragStart={(e) => {
+                      if (!isResizing) {
+                        handleSignatureDragStart(e, originalIndex);
+                      }
+                    }}
                     onDragEnd={handleDragEnd}
-                    onTouchStart={(e) =>
-                      handleSignatureTouchStart(e, originalIndex)
-                    }
+                    onTouchStart={(e) => {
+                      if (!isResizing) {
+                        handleSignatureTouchStart(e, originalIndex);
+                      }
+                    }}
                     onTouchMove={handleSignatureTouchMove}
                     onTouchEnd={handleSignatureTouchEnd}
-                    className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded cursor-move hover:bg-red-500 hover:bg-opacity-30 transition touch-none ${
+                    className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded transition touch-none group ${
                       (draggedSignatureIndex === originalIndex &&
                         (isDragging || isTouchDragging)) ||
                       (isTouchDragging &&
-                        draggedSignatureIndex === originalIndex)
+                        draggedSignatureIndex === originalIndex) ||
+                      (isResizing && resizingIndex === originalIndex)
                         ? "opacity-30 scale-95"
-                        : ""
+                        : "hover:bg-red-500 hover:bg-opacity-30"
                     }`}
                     style={{
                       left: `${position.x * 100}%`,
                       top: `${position.y * 100}%`,
                       width: `${position.width * 100}%`,
                       height: `${position.height * 100}%`,
+                      cursor: isResizing && resizingIndex === originalIndex
+                        ? (resizeHandle === "se" ? "se-resize" : 
+                           resizeHandle === "sw" ? "sw-resize" : 
+                           resizeHandle === "nw" ? "nw-resize" : "move")
+                        : "move",
                     }}
                   >
                     <button
@@ -177,6 +195,64 @@ export default function PDFViewer({
                     >
                       <HiX size={14} />
                     </button>
+                    {/* Invisible resize handles - all corners except top-right */}
+                    {/* Bottom-right */}
+                    <div
+                      onMouseDown={(e) => handleResizeStart(e, originalIndex, "se")}
+                      onTouchStart={(e) => handleResizeStart(e, originalIndex, "se")}
+                      onMouseEnter={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "se-resize";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "move";
+                        }
+                      }}
+                      className="absolute bottom-0 right-0 w-6 h-6 z-20"
+                      style={{ touchAction: "none", cursor: "se-resize" }}
+                    />
+                    {/* Bottom-left */}
+                    <div
+                      onMouseDown={(e) => handleResizeStart(e, originalIndex, "sw")}
+                      onTouchStart={(e) => handleResizeStart(e, originalIndex, "sw")}
+                      onMouseEnter={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "sw-resize";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "move";
+                        }
+                      }}
+                      className="absolute bottom-0 left-0 w-6 h-6 z-20"
+                      style={{ touchAction: "none", cursor: "sw-resize" }}
+                    />
+                    {/* Top-left */}
+                    <div
+                      onMouseDown={(e) => handleResizeStart(e, originalIndex, "nw")}
+                      onTouchStart={(e) => handleResizeStart(e, originalIndex, "nw")}
+                      onMouseEnter={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "nw-resize";
+                        }
+                      }}
+                      onMouseLeave={(e) => {
+                        if (!isResizing && resizingIndex !== originalIndex) {
+                          const parent = e.currentTarget.parentElement as HTMLElement;
+                          if (parent) parent.style.cursor = "move";
+                        }
+                      }}
+                      className="absolute top-0 left-0 w-6 h-6 z-20"
+                      style={{ touchAction: "none", cursor: "nw-resize" }}
+                    />
                     {signatureImage && (
                       // eslint-disable-next-line @next/next/no-img-element
                       <img

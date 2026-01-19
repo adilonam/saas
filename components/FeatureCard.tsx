@@ -24,13 +24,13 @@ const FeatureCard = ({ icon: Icon, title, description, href, comingSoon }: Featu
       <h3 className="text-xl font-semibold mb-2 text-gray-800 dark:text-white">
         {title}
       </h3>
-      <p className="text-gray-600 dark:text-gray-300 font-light flex-grow">
+      <p className="text-gray-600 dark:text-gray-300 font-light grow">
         {description}
       </p>
     </div>
   );
 
-  if (href && !comingSoon) {
+  if (href) {
     return (
       <Link href={href} className="block h-full">
         {content}

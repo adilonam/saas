@@ -34,6 +34,7 @@ export default function Header() {
 
   const navigationItems = [
     { title: "Sign PDF", href: "/sign-pdf" },
+    { title: "Merge PDF", href: "/merge-pdf" },
   ];
 
   return (
@@ -61,11 +62,22 @@ export default function Header() {
                     <Link href="/sign-pdf">Sign PDF</Link>
                   </NavigationMenuLink>
                 </NavigationMenuItem>
+                <NavigationMenuItem>
+                  <NavigationMenuLink
+                    asChild
+                    className={cn(
+                      navigationMenuTriggerStyle(),
+                      "text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 h-7 sm:h-9"
+                    )}
+                  >
+                    <Link href="/merge-pdf">Merge PDF</Link>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
               </NavigationMenuList>
             </NavigationMenu>
           </div>
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center gap-2 sm:gap-4 flex-shrink-0">
+          <nav className="hidden md:flex items-center gap-2 sm:gap-4 shrink-0">
             {session?.user ? (
               <div className="ml-1 sm:ml-2 flex items-center gap-2">
                 <UserMenu user={session.user} />

@@ -48,7 +48,8 @@ const Features = () => {
       title: "Merge PDFs",
       description:
         "Combine multiple PDF files into one document. Merge, organize, and rearrange pages effortlessly.",
-      comingSoon: true,
+      href: "/merge-pdf",
+      comingSoon: false,
     },
     {
       icon: HiDocumentText,

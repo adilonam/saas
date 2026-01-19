@@ -45,6 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
+          balance: user.balance,
         };
       },
     }),
@@ -95,6 +96,16 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
+        token.balance = (user as any).balance ?? 0;
+      } else if (token.id) {
+        // Refresh balance from database on each request
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { balance: true },
+        });
+        if (dbUser) {
+          token.balance = dbUser.balance;
+        }
       }
       return token;
     },
@@ -103,6 +114,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
+        session.user.balance = (token.balance as number) ?? 0;
       }
       return session;
     },

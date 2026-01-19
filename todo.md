@@ -1,2 +1,2 @@
 - [ ] remove rewrites backendUrl http://54.146.65.138:8000
-- [ ] 
+- [ ] sign up must go directly

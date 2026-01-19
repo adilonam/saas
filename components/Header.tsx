@@ -65,8 +65,11 @@ export default function Header() {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2 sm:gap-4 flex-shrink-0">
             {session?.user ? (
-              <div className="ml-1 sm:ml-2">
+              <div className="ml-1 sm:ml-2 flex items-center gap-2">
                 <UserMenu user={session.user} />
+                <div className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">
+                  Balance: {session.user.balance ?? 0}
+                </div>
               </div>
             ) : (
               <div className="flex items-center gap-2 sm:gap-3 ml-1 sm:ml-2">
@@ -120,6 +123,9 @@ export default function Header() {
                             {session.user.email}
                           </p>
                         )}
+                        <p className="text-xs leading-none text-muted-foreground mt-1">
+                          Balance: {session.user.balance ?? 0}
+                        </p>
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />

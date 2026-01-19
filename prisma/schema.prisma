@@ -11,16 +11,17 @@ datasource db {
 }
 
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
+  id            String        @id @default(cuid())
+  email         String        @unique
   password      String?
   name          String?
-  balance       Int       @default(0)
+  tokens        Int           @default(0)
   emailVerified DateTime?
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
   accounts      Account[]
   sessions      Session[]
+  transactions  Transaction[]
 }
 
 model Account {
@@ -58,6 +59,26 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model LicenseKey {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  amount    Int
+  used      Boolean  @default(false)
+  usedBy    String?
+  usedAt    DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Transaction {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String   // "deposit" or "cost"
+  amount    Int      // positive for deposit, negative for cost
+  description String?
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 
 enum Color {
   RED

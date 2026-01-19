@@ -10,13 +10,14 @@ import PDFViewer from "components/sign-pdf/PDFViewer";
 import SignatureOptionsPanel from "components/sign-pdf/SignatureOptionsPanel";
 import SignatureCanvasModal from "components/sign-pdf/SignatureCanvasModal";
 import InitialsCanvasModal from "components/sign-pdf/InitialsCanvasModal";
+import DepositDialog from "components/DepositDialog";
 import { usePDFConversion } from "components/sign-pdf/hooks/usePDFConversion";
 import { signPDF } from "components/sign-pdf/utils/pdfSigning";
 import { SignaturePosition } from "components/sign-pdf/types";
 
 export default function SignPDFPage() {
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status, update } = useSession();
   const [signatureType, setSignatureType] = useState<"simple" | "digital">(
     "simple"
   );
@@ -28,6 +29,7 @@ export default function SignPDFPage() {
   const [showSignatureCanvas, setShowSignatureCanvas] = useState(false);
   const [showInitialsCanvas, setShowInitialsCanvas] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
   const {
     pdfFile,
@@ -63,8 +65,16 @@ export default function SignPDFPage() {
   };
 
   const downloadSignedPDF = async () => {
+    // Check authentication
     if (status === "unauthenticated" || !session) {
       router.push("/signin");
+      return;
+    }
+
+    // Check if user has tokens
+    const userTokens = session.user.tokens ?? 0;
+    if (userTokens <= 0) {
+      setDepositDialogOpen(true);
       return;
     }
 
@@ -75,6 +85,30 @@ export default function SignPDFPage() {
 
     try {
       setIsLoading(true);
+
+      // Deduct 1 token before signing
+      const tokenResponse = await fetch("/api/sign", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const tokenData = await tokenResponse.json();
+
+      if (!tokenResponse.ok) {
+        if (tokenResponse.status === 400 && tokenData.error === "Insufficient tokens") {
+          setDepositDialogOpen(true);
+          setIsLoading(false);
+          return;
+        }
+        throw new Error(tokenData.error || "Failed to deduct token");
+      }
+
+      // Update session to reflect new token balance
+      await update();
+
+      // Proceed with PDF signing
       const blob = await signPDF(
         pdfFile,
         signatureImage,
@@ -170,6 +204,15 @@ export default function SignPDFPage() {
         onSave={(imageData) => {
           // Handle initials save if needed
           console.log("Initials saved:", imageData);
+        }}
+      />
+
+      <DepositDialog
+        open={depositDialogOpen}
+        onOpenChange={setDepositDialogOpen}
+        onSuccess={async () => {
+          // Update session after deposit
+          await update();
         }}
       />
 

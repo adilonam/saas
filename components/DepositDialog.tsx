@@ -15,6 +15,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+// Declare dataLayer for TypeScript
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
 interface DepositDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -59,6 +66,18 @@ export default function DepositDialog({
 
       setSuccess(`Successfully added ${data.amount} tokens to your account!`);
       setLicenseKey("");
+      
+      // Trigger Google Tag Manager event for deposit
+      if (typeof window !== "undefined" && window.dataLayer) {
+        window.dataLayer.push({
+          event: "deposit",
+          eventCategory: "Token",
+          eventAction: "Deposit",
+          eventLabel: "License Key Redeemed",
+          value: data.amount,
+          tokens: data.amount,
+        });
+      }
       
       // Update session to reflect new token balance
       await update();

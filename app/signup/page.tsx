@@ -16,6 +16,13 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
+// Declare dataLayer for TypeScript
+declare global {
+  interface Window {
+    dataLayer: any[];
+  }
+}
+
 function GoogleIcon() {
   return (
     <svg className="w-5 h-5" viewBox="0 0 24 24">
@@ -84,6 +91,17 @@ export default function SignUpPage() {
         return;
       }
 
+      // Trigger Google Tag Manager event for sign up
+      if (typeof window !== "undefined" && window.dataLayer) {
+        window.dataLayer.push({
+          event: "sign_up",
+          eventCategory: "User",
+          eventAction: "Sign Up",
+          eventLabel: "Email Sign Up",
+          method: "email",
+        });
+      }
+
       // Redirect to sign in page after successful signup
       router.push("/signin?registered=true");
     } catch (err) {
@@ -96,6 +114,18 @@ export default function SignUpPage() {
   const handleGoogleSignUp = async () => {
     setError("");
     setLoading(true);
+    
+    // Trigger Google Tag Manager event for Google sign up initiation
+    if (typeof window !== "undefined" && window.dataLayer) {
+      window.dataLayer.push({
+        event: "sign_up",
+        eventCategory: "User",
+        eventAction: "Sign Up",
+        eventLabel: "Google Sign Up",
+        method: "google",
+      });
+    }
+    
     try {
       await signIn("google", { callbackUrl: "/" });
     } catch (err) {

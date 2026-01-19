@@ -35,31 +35,9 @@ export async function POST(request: Request) {
       );
     }
 
-    if (license.used) {
-      return NextResponse.json(
-        { error: "This license key has already been used" },
-        { status: 400 }
-      );
-    }
-
-    // Check if user already used this key
-    if (license.usedBy === session.user.id) {
-      return NextResponse.json(
-        { error: "You have already used this license key" },
-        { status: 400 }
-      );
-    }
-
-    // Update the license key as used, add tokens to user, and create transaction
+    // Temporarily allow reuse - only check if key exists
+    // Add tokens to user and create transaction without marking key as used
     await prisma.$transaction([
-      prisma.licenseKey.update({
-        where: { id: license.id },
-        data: {
-          used: true,
-          usedBy: session.user.id,
-          usedAt: new Date(),
-        },
-      }),
       prisma.user.update({
         where: { id: session.user.id },
         data: {

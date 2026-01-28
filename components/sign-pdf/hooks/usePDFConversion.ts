@@ -13,7 +13,7 @@ export function usePDFConversion() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const response = await fetch(`/fast-api/v1/pdf-to-image`, {
+      const response = await fetch(`/api/pdf-to-image`, {
         method: "POST",
         body: formData,
       });

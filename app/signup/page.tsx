@@ -102,8 +102,21 @@ export default function SignUpPage() {
         });
       }
 
-      // Redirect to sign in page after successful signup
-      router.push("/signin?registered=true");
+      // Automatically sign in the user after successful signup
+      const signInResult = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (signInResult?.error) {
+        // Fallback: if auto sign-in fails, send user to sign-in page
+        router.push("/signin?registered=true");
+        return;
+      }
+
+      // Redirect to home page after successful auto sign-in
+      router.push("/");
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {

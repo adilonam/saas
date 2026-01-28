@@ -12,3 +12,4 @@
 
 5. **Use Prisma v7** - Prisma v7 is used for ORM and database support. Use @prisma/client and prisma package version 7.x in your backend and database logic. Refer to the [Prisma v7 docs](https://www.prisma.io/docs/) for usage details.
 
+6. the website is in english

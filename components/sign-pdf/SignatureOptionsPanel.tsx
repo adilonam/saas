@@ -34,7 +34,7 @@ export default function SignatureOptionsPanel({
     <div className="w-full lg:w-96 border-t lg:border-t-0 lg:border-l border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 flex flex-col overflow-hidden max-h-[50vh] lg:max-h-none">
       <div className="p-4 sm:p-6 border-b border-gray-200 dark:border-gray-800">
         <h2 className="text-lg sm:text-xl font-semibold text-gray-900 dark:text-white">
-          Options de signature
+          Signature options
         </h2>
       </div>
 
@@ -65,7 +65,7 @@ export default function SignatureOptionsPanel({
                     : "text-gray-600 dark:text-gray-400"
                 }`}
               >
-                Signature simple
+                Simple signature
               </span>
             </button>
             <button
@@ -92,7 +92,7 @@ export default function SignatureOptionsPanel({
                 />
               </svg>
               <span className="text-xs sm:text-sm font-medium text-gray-600 dark:text-gray-400">
-                Signature numérique
+                Digital signature
               </span>
             </button>
           </div>
@@ -101,7 +101,7 @@ export default function SignatureOptionsPanel({
         {/* Required Fields */}
         <div>
           <h3 className="text-xs sm:text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2 sm:mb-3">
-            Champs de saisie obligatoires
+            Required fields
           </h3>
           <div className="space-y-2 sm:space-y-3">
             <SignaturePreview
@@ -124,7 +124,7 @@ export default function SignatureOptionsPanel({
           disabled={!canSign}
           className="w-full bg-red-600 hover:bg-red-700 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-2.5 sm:py-3 px-4 sm:px-6 rounded-lg flex items-center justify-center gap-2 transition text-sm sm:text-base"
         >
-          <span>Signer</span>
+          <span>Sign</span>
           <HiChevronRight size={18} className="sm:w-5 sm:h-5" />
         </button>
       </div>

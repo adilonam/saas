@@ -51,19 +51,6 @@ export default function MergePDFPage() {
   };
 
   const handleMerge = async () => {
-    // Check authentication
-    if (status === "unauthenticated" || !session) {
-      router.push("/signup");
-      return;
-    }
-
-    // Check if user has tokens
-    const userTokens = session.user.tokens ?? 0;
-    if (userTokens <= 0) {
-      setDepositDialogOpen(true);
-      return;
-    }
-
     if (selectedFiles.length < 2) {
       setError("Please select at least 2 PDF files to merge");
       return;
@@ -73,29 +60,6 @@ export default function MergePDFPage() {
     setError(null);
 
     try {
-      // Deduct 1 token before merging
-      const tokenResponse = await fetch("/api/merge", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      const tokenData = await tokenResponse.json();
-
-      if (!tokenResponse.ok) {
-        if (tokenResponse.status === 400 && tokenData.error === "Insufficient tokens") {
-          setDepositDialogOpen(true);
-          setIsMerging(false);
-          return;
-        }
-        throw new Error(tokenData.error || "Failed to deduct token");
-      }
-
-      // Update session to reflect new token balance
-      await update();
-
-      // Proceed with PDF merging
       const formData = new FormData();
       selectedFiles.forEach(({ file }) => {
         formData.append("files", file);
@@ -107,13 +71,26 @@ export default function MergePDFPage() {
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({
-          error: "Failed to merge PDFs",
-        }));
-        setError(errorData.error || "Failed to merge PDFs");
+        try {
+          const errorData = await response.json();
+          if (
+            response.status === 400 &&
+            errorData.error === "Insufficient tokens"
+          ) {
+            setDepositDialogOpen(true);
+            setIsMerging(false);
+            return;
+          }
+          setError(errorData.error || "Failed to merge PDFs");
+        } catch {
+          setError("Failed to merge PDFs");
+        }
         setIsMerging(false);
         return;
       }
+
+      // Update session to reflect new token balance
+      await update();
 
       // Download the merged PDF
       const blob = await response.blob();

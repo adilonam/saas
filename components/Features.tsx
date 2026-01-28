@@ -53,6 +53,14 @@ const Features = () => {
     },
     {
       icon: HiDocumentText,
+      title: "PDF to Word",
+      description:
+        "Convert your PDF documents into editable Word files (.docx) in seconds.",
+      href: "/pdf-to-word",
+      comingSoon: false,
+    },
+    {
+      icon: HiDocumentText,
       title: "Split PDF",
       description:
         "Split large PDF files into smaller documents. Extract specific pages or divide by page ranges.",

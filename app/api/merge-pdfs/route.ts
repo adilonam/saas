@@ -1,7 +1,18 @@
 import { NextResponse } from "next/server";
+import { auth } from "@/auth";
+import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
+    const session = await auth();
+
+    if (!session?.user?.id) {
+      return NextResponse.json(
+        { error: "Unauthorized" },
+        { status: 401 }
+      );
+    }
+
     const formData = await request.formData();
     const files = formData.getAll("files") as File[];
 
@@ -21,6 +32,47 @@ export async function POST(request: Request) {
         );
       }
     }
+
+    // Get current user with tokens
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { tokens: true },
+    });
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "User not found" },
+        { status: 404 }
+      );
+    }
+
+    // Check if user has tokens
+    if (user.tokens <= 0) {
+      return NextResponse.json(
+        { error: "Insufficient tokens", tokens: user.tokens },
+        { status: 400 }
+      );
+    }
+
+    // Deduct 1 token and create transaction in a single transaction
+    await prisma.$transaction([
+      prisma.user.update({
+        where: { id: session.user.id },
+        data: {
+          tokens: {
+            decrement: 1,
+          },
+        },
+      }),
+      prisma.transaction.create({
+        data: {
+          userId: session.user.id,
+          type: "cost",
+          amount: -1,
+          description: "PDF merge cost",
+        },
+      }),
+    ]);
 
     // Get the FastAPI URL from environment
     const fastApiUrl = process.env.FAST_API_URL;
@@ -44,18 +96,35 @@ export async function POST(request: Request) {
     });
 
     if (!response.ok) {
+      const contentType = response.headers.get("content-type") || "";
+
+      if (contentType.includes("application/json")) {
+        const errorData = await response.json();
+        return NextResponse.json(
+          {
+            error:
+              errorData.detail ||
+              errorData.error ||
+              "Failed to merge PDFs on backend",
+          },
+          { status: response.status }
+        );
+      }
+
       const errorText = await response.text();
       return NextResponse.json(
-        { error: errorText || "Failed to merge PDFs" },
+        { error: errorText || "Failed to merge PDFs on backend" },
         { status: response.status }
       );
     }
 
-    // Get the merged PDF as a blob
-    const mergedPdfBlob = await response.blob();
+    // Get the merged PDF as a binary response
+    const mergedPdfArrayBuffer = await response.arrayBuffer();
+    const mergedPdfBuffer = Buffer.from(mergedPdfArrayBuffer);
 
     // Return the merged PDF
-    return new NextResponse(mergedPdfBlob, {
+    return new NextResponse(mergedPdfBuffer, {
+      status: 200,
       headers: {
         "Content-Type": "application/pdf",
         "Content-Disposition": 'attachment; filename="merged.pdf"',

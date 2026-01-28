@@ -35,6 +35,7 @@ export default function Header() {
   const navigationItems = [
     { title: "Sign PDF", href: "/sign-pdf" },
     { title: "Merge PDF", href: "/merge-pdf" },
+    { title: "PDF to Word", href: "/pdf-to-word" },
   ];
 
   return (
@@ -51,28 +52,19 @@ export default function Header() {
             {/* Desktop Navigation */}
             <NavigationMenu className="hidden md:block">
               <NavigationMenuList>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    asChild
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      "text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 h-7 sm:h-9"
-                    )}
-                  >
-                    <Link href="/sign-pdf">Sign PDF</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-                <NavigationMenuItem>
-                  <NavigationMenuLink
-                    asChild
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      "text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 h-7 sm:h-9"
-                    )}
-                  >
-                    <Link href="/merge-pdf">Merge PDF</Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
+                {navigationItems.map((item) => (
+                  <NavigationMenuItem key={item.href}>
+                    <NavigationMenuLink
+                      asChild
+                      className={cn(
+                        navigationMenuTriggerStyle(),
+                        "text-xs sm:text-sm px-2 sm:px-4 py-1.5 sm:py-2 h-7 sm:h-9"
+                      )}
+                    >
+                      <Link href={item.href}>{item.title}</Link>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                ))}
               </NavigationMenuList>
             </NavigationMenu>
           </div>

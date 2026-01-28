@@ -1,3 +1,4 @@
 - [ ] remove rewrites backendUrl http://54.146.65.138:8000
-- [ ] sign up must go directly
+- [x] sign up must go directly
 - [ ] sign in and up middleware
+- [ ] merge pdf use toke join merge and merge pdfs

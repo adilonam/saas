@@ -42,6 +42,7 @@ function GoogleIcon() {
 function SignInForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -69,7 +70,7 @@ function SignInForm() {
       if (result?.error) {
         setError("Invalid email or password");
       } else {
-        router.push("/");
+        router.push(callbackUrl);
         router.refresh();
       }
     } catch (err) {
@@ -83,7 +84,7 @@ function SignInForm() {
     setError("");
     setLoading(true);
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { callbackUrl });
     } catch (err) {
       setError("An error occurred. Please try again.");
       setLoading(false);
@@ -162,7 +163,10 @@ function SignInForm() {
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Don&apos;t have an account?{" "}
-              <Link href="/signup" className="text-primary hover:underline">
+              <Link
+                href={callbackUrl === "/" ? "/signup" : `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                className="text-primary hover:underline"
+              >
                 Sign up
               </Link>
             </div>

@@ -36,6 +36,7 @@ export default function Header() {
     { title: "Sign PDF", href: "/sign-pdf" },
     { title: "Merge PDF", href: "/merge-pdf" },
     { title: "PDF to Word", href: "/pdf-to-word" },
+    { title: "Summarize PDF", href: "/summarize-pdf" },
   ];
 
   return (

@@ -61,6 +61,14 @@ const Features = () => {
     },
     {
       icon: HiDocumentText,
+      title: "Summarize PDF",
+      description:
+        "Extract text from PDFs and get AI-generated summaries for each document.",
+      href: "/summarize-pdf",
+      comingSoon: false,
+    },
+    {
+      icon: HiDocumentText,
       title: "Split PDF",
       description:
         "Split large PDF files into smaller documents. Extract specific pages or divide by page ranges.",

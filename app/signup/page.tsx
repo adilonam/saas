@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -48,6 +48,8 @@ function GoogleIcon() {
 
 export default function SignUpPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const callbackUrl = searchParams.get("callbackUrl") || "/";
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -111,12 +113,12 @@ export default function SignUpPage() {
 
       if (signInResult?.error) {
         // Fallback: if auto sign-in fails, send user to sign-in page
-        router.push("/signin?registered=true");
+        router.push("/signin?registered=true&callbackUrl=" + encodeURIComponent(callbackUrl));
         return;
       }
 
-      // Redirect to home page after successful auto sign-in
-      router.push("/");
+      // Redirect to callback URL or home after successful auto sign-in
+      router.push(callbackUrl);
     } catch (err) {
       setError("An error occurred. Please try again.");
     } finally {
@@ -140,7 +142,7 @@ export default function SignUpPage() {
     }
     
     try {
-      await signIn("google", { callbackUrl: "/" });
+      await signIn("google", { callbackUrl });
     } catch (err) {
       setError("An error occurred. Please try again.");
       setLoading(false);
@@ -237,7 +239,10 @@ export default function SignUpPage() {
             </Button>
             <div className="text-center text-sm text-muted-foreground">
               Already have an account?{" "}
-              <Link href="/signin" className="text-primary hover:underline">
+              <Link
+                href={`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
+                className="text-primary hover:underline"
+              >
                 Sign in
               </Link>
             </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Header from "components/Header";
 import Footer from "components/Footer";
@@ -17,6 +17,7 @@ import { SignaturePosition } from "components/sign-pdf/types";
 
 export default function SignPDFPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status, update } = useSession();
   const [signatureType, setSignatureType] = useState<"simple" | "digital">(
     "simple"
@@ -65,9 +66,10 @@ export default function SignPDFPage() {
   };
 
   const downloadSignedPDF = async () => {
-    // Check authentication
+    // Check authentication — send to signup with callback so they can sign up or sign in and return here
     if (status === "unauthenticated" || !session) {
-      router.push("/signin");
+      const callbackUrl = pathname || "/sign-pdf";
+      router.push(`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`);
       return;
     }
 

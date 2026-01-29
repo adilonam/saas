@@ -9,15 +9,15 @@
     "lint": "eslint .",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
-    "db:studio": "prisma studio",
-    "db:generate:migrate": "prisma generate && prisma migrate dev"
+    "db:studio": "prisma studio --port 5555",
+    "db:update": "prisma generate && prisma migrate dev"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@heroicons/react": "^2.2.0",
-    "@prisma/adapter-pg": "^7.2.0",
-    "@prisma/client": "^7.2.0",
+    "@prisma/adapter-pg": "^7.3.0",
+    "@prisma/client": "^7.3.0",
     "@radix-ui/react-dialog": "^1.1.15",
     "@radix-ui/react-dropdown-menu": "^2.1.16",
     "@radix-ui/react-label": "^2.1.8",
@@ -32,7 +32,6 @@
     "next-auth": "^5.0.0-beta.30",
     "next-themes": "^0.4.6",
     "pdf-lib": "^1.17.1",
-    "prisma": "^7.2.0",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
     "react-icons": "^5.3.0",
@@ -48,6 +47,7 @@
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.8",
     "postcss": "^8.4.47",
+    "prisma": "^7.3.0",
     "tailwindcss": "^4.1.17",
     "typescript": "^5.7.2"
   }

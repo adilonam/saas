@@ -1,17 +1,27 @@
 "use client";
 
 import { useState, useRef } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import Header from "components/Header";
 import Footer from "components/Footer";
+import DepositDialog from "components/DepositDialog";
 import { Button } from "@/components/ui/button";
-import { ArrowDownTrayIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowDownTrayIcon,
+  DocumentTextIcon,
+} from "@heroicons/react/24/outline";
 import { Upload, Loader2 } from "lucide-react";
 
 export default function PDFToWordPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status, update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -50,6 +60,21 @@ export default function PDFToWordPage() {
   };
 
   const handleConvert = async () => {
+    // Check authentication
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-word")}`,
+      );
+      return;
+    }
+
+    // Check token balance
+    const userTokens = session.user.tokens ?? 0;
+    if (userTokens <= 0) {
+      setDepositDialogOpen(true);
+      return;
+    }
+
     if (!selectedFile) {
       setError("Please select a PDF file to convert.");
       return;
@@ -68,26 +93,37 @@ export default function PDFToWordPage() {
       });
 
       if (!response.ok) {
-        let message = "Failed to convert PDF to Word.";
         try {
           const errorData = await response.json();
-          message =
+          if (
+            response.status === 400 &&
+            errorData.error === "Insufficient tokens"
+          ) {
+            setDepositDialogOpen(true);
+            setIsConverting(false);
+            return;
+          }
+          setError(
             errorData.error ||
-            errorData.detail ||
-            "Failed to convert PDF to Word.";
+              errorData.detail ||
+              "Failed to convert PDF to Word.",
+          );
         } catch {
-          // ignore JSON parse errors
+          setError("Failed to convert PDF to Word.");
         }
-        setError(message);
         setIsConverting(false);
         return;
       }
+
+      // Update session to reflect new token balance
+      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      link.download = (selectedFile.name.replace(/\.pdf$/i, "") || "document") + ".docx";
+      link.download =
+        (selectedFile.name.replace(/\.pdf$/i, "") || "document") + ".docx";
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -113,7 +149,8 @@ export default function PDFToWordPage() {
               Convert PDF to Word
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Upload a PDF file and convert it to an editable Word document (.docx).
+              Upload a PDF file and convert it to an editable Word document
+              (.docx).
             </p>
           </div>
         </div>
@@ -216,8 +253,14 @@ export default function PDFToWordPage() {
           </ol>
         </div>
       </main>
+      <DepositDialog
+        open={depositDialogOpen}
+        onOpenChange={setDepositDialogOpen}
+        onSuccess={async () => {
+          await update();
+        }}
+      />
       <Footer />
     </div>
   );
 }
-

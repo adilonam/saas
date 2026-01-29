@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
 import Header from "components/Header";
 import Footer from "components/Footer";
@@ -17,9 +17,10 @@ import { SignaturePosition } from "components/sign-pdf/types";
 
 export default function SignPDFPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status, update } = useSession();
   const [signatureType, setSignatureType] = useState<"simple" | "digital">(
-    "simple"
+    "simple",
   );
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
   const [signaturePositions, setSignaturePositions] = useState<
@@ -67,7 +68,9 @@ export default function SignPDFPage() {
   const downloadSignedPDF = async () => {
     // Check authentication
     if (status === "unauthenticated" || !session) {
-      router.push("/signin");
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/sign-pdf")}`,
+      );
       return;
     }
 
@@ -97,7 +100,10 @@ export default function SignPDFPage() {
       const tokenData = await tokenResponse.json();
 
       if (!tokenResponse.ok) {
-        if (tokenResponse.status === 400 && tokenData.error === "Insufficient tokens") {
+        if (
+          tokenResponse.status === 400 &&
+          tokenData.error === "Insufficient tokens"
+        ) {
           setDepositDialogOpen(true);
           setIsLoading(false);
           return;
@@ -114,7 +120,7 @@ export default function SignPDFPage() {
         signatureImage,
         signaturePositions,
         pdfPages,
-        pageImageRefs.current
+        pageImageRefs.current,
       );
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

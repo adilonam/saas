@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import Header from "components/Header";
 import Footer from "components/Footer";
 import DepositDialog from "components/DepositDialog";
@@ -16,6 +16,7 @@ interface SelectedFile {
 
 export default function MergePDFPage() {
   const router = useRouter();
+  const pathname = usePathname();
   const { data: session, status, update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
@@ -51,6 +52,21 @@ export default function MergePDFPage() {
   };
 
   const handleMerge = async () => {
+    // Check authentication
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/merge-pdf")}`,
+      );
+      return;
+    }
+
+    // Check token balance
+    const userTokens = session.user.tokens ?? 0;
+    if (userTokens <= 0) {
+      setDepositDialogOpen(true);
+      return;
+    }
+
     if (selectedFiles.length < 2) {
       setError("Please select at least 2 PDF files to merge");
       return;

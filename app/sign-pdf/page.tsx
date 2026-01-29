@@ -20,7 +20,7 @@ export default function SignPDFPage() {
   const pathname = usePathname();
   const { data: session, status, update } = useSession();
   const [signatureType, setSignatureType] = useState<"simple" | "digital">(
-    "simple"
+    "simple",
   );
   const [signatureImage, setSignatureImage] = useState<string | null>(null);
   const [signaturePositions, setSignaturePositions] = useState<
@@ -99,7 +99,10 @@ export default function SignPDFPage() {
       const tokenData = await tokenResponse.json();
 
       if (!tokenResponse.ok) {
-        if (tokenResponse.status === 400 && tokenData.error === "Insufficient tokens") {
+        if (
+          tokenResponse.status === 400 &&
+          tokenData.error === "Insufficient tokens"
+        ) {
           setDepositDialogOpen(true);
           setIsLoading(false);
           return;
@@ -116,7 +119,7 @@ export default function SignPDFPage() {
         signatureImage,
         signaturePositions,
         pdfPages,
-        pageImageRefs.current
+        pageImageRefs.current,
       );
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");

@@ -4,7 +4,7 @@
   "service": "app",
   "workspaceFolder": "/workspaces/saas",
   "features": {},
-  "forwardPorts": [3000, 5432],
+  "forwardPorts": [3000, 5432, 5555],
   "portsAttributes": {
     "3000": {
       "label": "Next.js Dev Server",
@@ -12,6 +12,10 @@
     },
     "5432": {
       "label": "PostgreSQL",
+      "onAutoForward": "notify"
+    },
+    "5555": {
+      "label": "Prisma Studio",
       "onAutoForward": "notify"
     }
   },

@@ -4,17 +4,10 @@ import { useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
+import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 // Declare dataLayer for TypeScript
 declare global {
@@ -25,7 +18,7 @@ declare global {
 
 function GoogleIcon() {
   return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24">
+    <svg className="size-5" viewBox="0 0 24 24">
       <path
         fill="currentColor"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -93,7 +86,6 @@ function SignUpForm() {
         return;
       }
 
-      // Trigger Google Tag Manager event for sign up
       if (typeof window !== "undefined" && window.dataLayer) {
         window.dataLayer.push({
           event: "sign_up",
@@ -104,7 +96,6 @@ function SignUpForm() {
         });
       }
 
-      // Automatically sign in the user after successful signup
       const signInResult = await signIn("credentials", {
         redirect: false,
         email,
@@ -112,12 +103,10 @@ function SignUpForm() {
       });
 
       if (signInResult?.error) {
-        // Fallback: if auto sign-in fails, send user to sign-in page
         router.push("/signin?registered=true&callbackUrl=" + encodeURIComponent(callbackUrl));
         return;
       }
 
-      // Redirect to callback URL or home after successful auto sign-in
       router.push(callbackUrl);
     } catch (err) {
       setError("An error occurred. Please try again.");
@@ -130,7 +119,6 @@ function SignUpForm() {
     setError("");
     setLoading(true);
 
-    // Trigger Google Tag Manager event for Google sign up initiation
     if (typeof window !== "undefined" && window.dataLayer) {
       window.dataLayer.push({
         event: "sign_up",
@@ -149,22 +137,32 @@ function SignUpForm() {
     }
   };
 
+  const inputClass =
+    "rounded-xl bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-dashboard-primary/20 h-11";
+  const labelClass = "text-slate-700 dark:text-slate-300";
+
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign Up</CardTitle>
-          <CardDescription>Create a new account to get started</CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+    <DashboardLayout>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 p-8 shadow-xl">
+          <div className="space-y-2 mb-6">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              Sign Up
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Create a new account to get started
+            </p>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="name">Name (Optional)</Label>
+              <Label htmlFor="name" className={labelClass}>
+                Name (Optional)
+              </Label>
               <Input
                 id="name"
                 type="text"
@@ -172,10 +170,13 @@ function SignUpForm() {
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 disabled={loading}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className={labelClass}>
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -184,10 +185,13 @@ function SignUpForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className={labelClass}>
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -197,10 +201,13 @@ function SignUpForm() {
                 required
                 disabled={loading}
                 minLength={6}
+                className={inputClass}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword" className={labelClass}>
+                Confirm Password
+              </Label>
               <Input
                 id="confirmPassword"
                 type="password"
@@ -210,19 +217,22 @@ function SignUpForm() {
                 required
                 disabled={loading}
                 minLength={6}
+                className={inputClass}
               />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white h-11 font-semibold"
+              disabled={loading}
+            >
               {loading ? "Creating account..." : "Sign Up"}
             </Button>
-            <div className="relative">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-slate-200 dark:border-slate-700" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
+              <div className="relative flex justify-center">
+                <span className="bg-white dark:bg-slate-900/50 px-3 text-xs uppercase text-slate-500 dark:text-slate-400">
                   Or continue with
                 </span>
               </div>
@@ -230,26 +240,26 @@ function SignUpForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full rounded-xl border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-11 gap-2"
               onClick={handleGoogleSignUp}
               disabled={loading}
             >
               <GoogleIcon />
-              <span className="ml-2">Sign up with Google</span>
+              Sign up with Google
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 pt-2">
               Already have an account?{" "}
               <Link
                 href={`/signin?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                className="text-primary hover:underline"
+                className="font-medium text-dashboard-primary hover:underline"
               >
                 Sign in
               </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+            </p>
+          </form>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }
 
@@ -257,14 +267,18 @@ export default function SignUpPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Sign Up</CardTitle>
-              <CardDescription>Loading...</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+        <DashboardLayout>
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 p-8">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                Sign Up
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Loading...
+              </p>
+            </div>
+          </div>
+        </DashboardLayout>
       }
     >
       <SignUpForm />

@@ -2,13 +2,12 @@
 
 import { useEffect, useState, startTransition } from "react";
 import { useTheme } from "next-themes";
-import { AiOutlineSun, AiOutlineMoon } from "react-icons/ai";
+import { SunIcon, MoonIcon } from "@heroicons/react/24/outline";
 
 const ThemeSwitch = () => {
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme, resolvedTheme } = useTheme();
 
-  // When mounted on client, now we can show the UI
   useEffect(() => {
     startTransition(() => {
       setMounted(true);
@@ -19,20 +18,19 @@ const ThemeSwitch = () => {
     return null;
   }
 
+  const isDark = theme === "dark" || resolvedTheme === "dark";
+
   return (
     <button
-      onClick={() =>
-        setTheme(
-          theme === "dark" || resolvedTheme === "dark" ? "light" : "dark"
-        )
-      }
-      className="p-2 text-gray-800 dark:text-gray-200 bg-transparent dark:bg-black"
+      type="button"
+      onClick={() => setTheme(isDark ? "light" : "dark")}
+      className="size-11 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
       aria-label="Toggle Dark Mode"
     >
-      {theme === "dark" || resolvedTheme === "dark" ? (
-        <AiOutlineSun size={20} />
+      {isDark ? (
+        <SunIcon className="size-5" />
       ) : (
-        <AiOutlineMoon size={20} />
+        <MoonIcon className="size-5" />
       )}
     </button>
   );

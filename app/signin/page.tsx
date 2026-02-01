@@ -4,21 +4,14 @@ import { useState, useEffect, Suspense } from "react";
 import { signIn } from "next-auth/react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
+import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 
 function GoogleIcon() {
   return (
-    <svg className="w-5 h-5" viewBox="0 0 24 24">
+    <svg className="size-5" viewBox="0 0 24 24">
       <path
         fill="currentColor"
         d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -93,28 +86,32 @@ function SignInForm() {
   };
 
   return (
-    <div className="flex min-h-screen items-center justify-center p-4">
-      <Card className="w-full max-w-md">
-        <CardHeader>
-          <CardTitle>Sign In</CardTitle>
-          <CardDescription>
-            Enter your credentials to access your account
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+    <DashboardLayout>
+      <div className="flex min-h-[60vh] items-center justify-center">
+        <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 p-8 shadow-xl">
+          <div className="space-y-2 mb-6">
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+              Sign In
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Enter your credentials to access your account
+            </p>
+          </div>
+          <form onSubmit={handleSubmit} className="space-y-4">
             {success && (
-              <div className="rounded-md bg-green-500/15 p-3 text-sm text-green-600 dark:text-green-400">
+              <div className="rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 p-3 text-sm text-green-600 dark:text-green-400">
                 {success}
               </div>
             )}
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive">
+              <div className="rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 p-3 text-sm text-red-600 dark:text-red-400">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email" className="text-slate-700 dark:text-slate-300">
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -123,10 +120,13 @@ function SignInForm() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 disabled={loading}
+                className="rounded-xl bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-dashboard-primary/20 h-11"
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
+                Password
+              </Label>
               <Input
                 id="password"
                 type="password"
@@ -135,19 +135,22 @@ function SignInForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 disabled={loading}
+                className="rounded-xl bg-slate-100 dark:bg-slate-800 border-slate-200 dark:border-slate-700 focus-visible:ring-dashboard-primary/20 h-11"
               />
             </div>
-          </CardContent>
-          <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full" disabled={loading}>
+            <Button
+              type="submit"
+              className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white h-11 font-semibold"
+              disabled={loading}
+            >
               {loading ? "Signing in..." : "Sign In"}
             </Button>
-            <div className="relative">
+            <div className="relative py-2">
               <div className="absolute inset-0 flex items-center">
-                <span className="w-full border-t" />
+                <span className="w-full border-t border-slate-200 dark:border-slate-700" />
               </div>
-              <div className="relative flex justify-center text-xs uppercase">
-                <span className="bg-card px-2 text-muted-foreground">
+              <div className="relative flex justify-center">
+                <span className="bg-white dark:bg-slate-900/50 px-3 text-xs uppercase text-slate-500 dark:text-slate-400">
                   Or continue with
                 </span>
               </div>
@@ -155,26 +158,26 @@ function SignInForm() {
             <Button
               type="button"
               variant="outline"
-              className="w-full"
+              className="w-full rounded-xl border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-800 h-11 gap-2"
               onClick={handleGoogleSignIn}
               disabled={loading}
             >
               <GoogleIcon />
-              <span className="ml-2">Sign in with Google</span>
+              Sign in with Google
             </Button>
-            <div className="text-center text-sm text-muted-foreground">
+            <p className="text-center text-sm text-slate-500 dark:text-slate-400 pt-2">
               Don&apos;t have an account?{" "}
               <Link
                 href={callbackUrl === "/" ? "/signup" : `/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`}
-                className="text-primary hover:underline"
+                className="font-medium text-dashboard-primary hover:underline"
               >
                 Sign up
               </Link>
-            </div>
-          </CardFooter>
-        </form>
-      </Card>
-    </div>
+            </p>
+          </form>
+        </div>
+      </div>
+    </DashboardLayout>
   );
 }
 
@@ -182,14 +185,18 @@ export default function SignInPage() {
   return (
     <Suspense
       fallback={
-        <div className="flex min-h-screen items-center justify-center p-4">
-          <Card className="w-full max-w-md">
-            <CardHeader>
-              <CardTitle>Sign In</CardTitle>
-              <CardDescription>Loading...</CardDescription>
-            </CardHeader>
-          </Card>
-        </div>
+        <DashboardLayout>
+          <div className="flex min-h-[60vh] items-center justify-center">
+            <div className="w-full max-w-md rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 p-8">
+              <h1 className="text-2xl font-bold text-slate-900 dark:text-white">
+                Sign In
+              </h1>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Loading...
+              </p>
+            </div>
+          </div>
+        </DashboardLayout>
       }
     >
       <SignInForm />

@@ -68,38 +68,40 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-background-dark">
-        <header className="h-20 shrink-0 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 sm:gap-6 px-4 sm:px-10">
-          <Search />
-          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        <header className="h-16 sm:h-20 shrink-0 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 sm:gap-6 px-3 sm:px-10">
+          <div className="flex-1 min-w-0 flex items-center">
+            <Search />
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             <ThemeSwitch />
             <button
               type="button"
-              className="size-11 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+              className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
               aria-label="Notifications"
             >
-              <BellIcon className="size-5" />
+              <BellIcon className="size-4 sm:size-5" />
             </button>
-            <div className="h-6 w-px bg-slate-200 dark:bg-slate-800 mx-2" />
-            <div className="flex items-center gap-3">
+            <div className="h-5 sm:h-6 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 sm:mx-2" />
+            <div className="flex items-center gap-2 sm:gap-3">
               {session?.user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <button
                       type="button"
-                      className="flex items-center gap-3 rounded-2xl p-1 pr-2 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors text-left"
+                      className="flex items-center gap-2 sm:gap-3 rounded-xl sm:rounded-2xl p-1 pr-1.5 sm:pr-2 hover:bg-slate-100 dark:hover:bg-slate-800/50 transition-colors text-left min-w-0"
                       aria-label="User menu"
                     >
-                      <div className="text-right">
-                        <p className="text-sm font-bold">
+                      <div className="text-right hidden sm:block min-w-0">
+                        <p className="text-xs sm:text-sm font-bold truncate">
                           {session.user.name || "User"}
                         </p>
-                        <p className="text-[11px] text-slate-500 uppercase tracking-tighter">
+                        <p className="text-[10px] sm:text-[11px] text-slate-500 uppercase tracking-tighter">
                           {session.user.tokens != null
                             ? `${session.user.tokens} Tokens`
                             : "0 Tokens"}
                         </p>
                       </div>
-                      <div className="size-11 rounded-2xl border-2 border-dashboard-primary/10 bg-slate-700 flex items-center justify-center text-white font-bold text-sm overflow-hidden shrink-0">
+                      <div className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border-2 border-dashboard-primary/10 bg-slate-700 flex items-center justify-center text-white font-bold text-xs sm:text-sm overflow-hidden shrink-0">
                         {(session.user.name || session.user.email || "U")
                           .charAt(0)
                           .toUpperCase()}
@@ -135,11 +137,11 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <div className="flex items-center gap-2">
-                  <Button asChild variant="ghost" size="sm">
+                <div className="flex items-center gap-1.5 sm:gap-2">
+                  <Button asChild variant="ghost" size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
                     <Link href="/signin">Sign In</Link>
                   </Button>
-                  <Button asChild size="sm">
+                  <Button asChild size="sm" className="text-xs sm:text-sm px-2 sm:px-3">
                     <Link href="/signup">Sign Up</Link>
                   </Button>
                 </div>

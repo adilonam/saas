@@ -40,28 +40,38 @@ export default function Sidebar({
       }`}
     >
       <div
-        className={`flex items-center shrink-0 h-20 border-b border-slate-200 dark:border-slate-800 ${
+        className={`flex items-center shrink-0 border-b border-slate-200 dark:border-slate-800 ${
           collapsed ? "justify-center gap-0 p-3" : "justify-between gap-2 p-4 pr-3"
-        }`}
+        } ${showCollapseToggle ? "h-20" : "h-16"}`}
       >
         <Link
           href="/"
           className={`flex items-center text-slate-900 dark:text-white hover:opacity-90 transition-opacity ${
-            collapsed ? "flex-1 justify-center ml-3" : "gap-3 min-w-0 flex-1"
+            collapsed
+              ? showCollapseToggle
+                ? "flex-1 justify-center ml-3"
+                : "flex-1 justify-center"
+              : "gap-3 min-w-0 flex-1"
           }`}
           title={collapsed ? "Manage PDF" : undefined}
         >
           <div
             className={`rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-white dark:bg-slate-800 ${
-              collapsed ? "size-7" : "size-9"
+              collapsed ? (showCollapseToggle ? "size-7" : "size-6 sm:size-7") : "size-9"
             }`}
           >
             <Image
               src="/images/logo.png"
               alt="Manage PDF"
-              width={collapsed ? 28 : 36}
-              height={collapsed ? 28 : 36}
-              className={collapsed ? "size-7 object-contain" : "size-9 object-contain"}
+              width={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
+              height={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
+              className={
+                collapsed
+                  ? showCollapseToggle
+                    ? "size-7 object-contain"
+                    : "size-6 sm:size-7 object-contain"
+                  : "size-9 object-contain"
+              }
             />
           </div>
           {!collapsed && (

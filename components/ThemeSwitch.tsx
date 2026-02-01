@@ -24,13 +24,13 @@ const ThemeSwitch = () => {
     <button
       type="button"
       onClick={() => setTheme(isDark ? "light" : "dark")}
-      className="size-11 rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
+      className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
       aria-label="Toggle Dark Mode"
     >
       {isDark ? (
-        <SunIcon className="size-5" />
+        <SunIcon className="size-4 sm:size-5" />
       ) : (
-        <MoonIcon className="size-5" />
+        <MoonIcon className="size-4 sm:size-5" />
       )}
     </button>
   );

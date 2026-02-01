@@ -3,15 +3,16 @@
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
-import Header from "components/Header";
-import Footer from "components/Footer";
+import DashboardLayout from "components/DashboardLayout";
 import DepositDialog from "components/DepositDialog";
 import { Button } from "@/components/ui/button";
 import {
-  ArrowDownTrayIcon,
+  PhotoIcon,
   DocumentTextIcon,
+  ArrowUpTrayIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import { Upload, Loader2 } from "lucide-react";
+import { Loader2 } from "lucide-react";
 
 export default function PDFToWordPage() {
   const router = useRouter();
@@ -60,7 +61,6 @@ export default function PDFToWordPage() {
   };
 
   const handleConvert = async () => {
-    // Check authentication
     if (status === "unauthenticated" || !session) {
       router.push(
         `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-word")}`,
@@ -68,7 +68,6 @@ export default function PDFToWordPage() {
       return;
     }
 
-    // Check token balance
     const userTokens = session.user.tokens ?? 0;
     if (userTokens <= 0) {
       setDepositDialogOpen(true);
@@ -115,7 +114,6 @@ export default function PDFToWordPage() {
         return;
       }
 
-      // Update session to reflect new token balance
       await update();
 
       const blob = await response.blob();
@@ -137,130 +135,127 @@ export default function PDFToWordPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <main className="flex-1 container mx-auto px-4 py-8 max-w-3xl">
-        <div className="mb-8 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
-            <DocumentTextIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-              Convert PDF to Word
-            </h1>
-            <p className="text-gray-600 dark:text-gray-400">
-              Upload a PDF file and convert it to an editable Word document
-              (.docx).
-            </p>
-          </div>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
-          </div>
-        )}
-
-        <div
-          className="mb-6 border-2 border-dashed border-gray-300 dark:border-gray-700 rounded-lg p-8 text-center hover:border-gray-400 dark:hover:border-gray-600 transition-colors"
-          onDragOver={handleDragOver}
-          onDrop={handleDrop}
-        >
-          <Upload className="h-12 w-12 mx-auto mb-4 text-gray-400 dark:text-gray-500" />
-          <p className="text-gray-600 dark:text-gray-400 mb-2">
-            Drag and drop a PDF file here, or
-          </p>
-          <Button
-            onClick={() => fileInputRef.current?.click()}
-            variant="outline"
-            disabled={isConverting}
-          >
-            Select PDF File
-          </Button>
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="application/pdf"
-            onChange={handleFileSelect}
-            className="hidden"
-            disabled={isConverting}
-          />
-        </div>
-
-        {selectedFile && (
-          <div className="mb-6 p-4 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <DocumentTextIcon className="h-6 w-6 text-red-600 dark:text-red-400" />
-              <div>
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {selectedFile.name}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => setSelectedFile(null)}
-              disabled={isConverting}
-            >
-              Clear
-            </Button>
-          </div>
-        )}
-
-        <div className="flex gap-4">
-          <Button
-            onClick={handleConvert}
-            disabled={!selectedFile || isConverting}
-            className="flex items-center gap-2"
-            size="lg"
-          >
-            {isConverting ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Converting...
-              </>
-            ) : (
-              <>
-                <ArrowDownTrayIcon className="h-5 w-5" />
-                Convert to Word
-              </>
-            )}
-          </Button>
-          {selectedFile && (
-            <Button
-              variant="outline"
-              onClick={() => setSelectedFile(null)}
-              disabled={isConverting}
-            >
-              Remove File
-            </Button>
-          )}
-        </div>
-
-        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-          <h3 className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-            How to convert PDF to Word:
-          </h3>
-          <ol className="text-sm text-blue-800 dark:text-blue-400 list-decimal list-inside space-y-1">
-            <li>Select or drag and drop a PDF file.</li>
-            <li>Review the selected file details.</li>
-            <li>Click &quot;Convert to Word&quot; to start the conversion.</li>
-            <li>Your .docx file will be downloaded automatically.</li>
-          </ol>
-        </div>
-      </main>
+    <DashboardLayout>
       <DepositDialog
         open={depositDialogOpen}
         onOpenChange={setDepositDialogOpen}
-        onSuccess={async () => {
-          await update();
-        }}
+        onSuccess={async () => await update()}
       />
-      <Footer />
-    </div>
+
+      <div className="mb-12">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="size-10 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600">
+            <PhotoIcon className="size-5" />
+          </div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Convert PDF to Word
+          </h1>
+        </div>
+        <p className="text-slate-500 dark:text-slate-400 text-lg">
+          Upload a PDF file and convert it to an editable Word document (.docx).
+        </p>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl">
+          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+        </div>
+      )}
+
+      <div
+        className="mb-8 border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-2xl p-10 text-center hover:border-slate-400 dark:hover:border-slate-600 transition-colors bg-slate-50/50 dark:bg-slate-900/40"
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        <ArrowUpTrayIcon className="size-12 mx-auto mb-4 text-slate-400 dark:text-slate-500" />
+        <p className="text-slate-600 dark:text-slate-400 mb-2">
+          Drag and drop a PDF file here, or
+        </p>
+        <Button
+          onClick={() => fileInputRef.current?.click()}
+          variant="outline"
+          disabled={isConverting}
+          className="rounded-xl"
+        >
+          Select PDF File
+        </Button>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="application/pdf"
+          onChange={handleFileSelect}
+          className="hidden"
+          disabled={isConverting}
+        />
+      </div>
+
+      {selectedFile && (
+        <div className="mb-8 p-4 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 rounded-2xl flex items-center justify-between">
+          <div className="flex items-center gap-3 flex-1 min-w-0">
+            <DocumentTextIcon className="size-6 text-red-600 dark:text-red-400 shrink-0" />
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-slate-900 dark:text-white truncate">
+                {selectedFile.name}
+              </p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+              </p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setSelectedFile(null)}
+            disabled={isConverting}
+            className="rounded-xl shrink-0"
+          >
+            Clear
+          </Button>
+        </div>
+      )}
+
+      <div className="flex gap-4 mb-10">
+        <Button
+          onClick={handleConvert}
+          disabled={!selectedFile || isConverting}
+          className="flex items-center gap-2 rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90"
+          size="lg"
+        >
+          {isConverting ? (
+            <>
+              <Loader2 className="size-4 animate-spin" />
+              Converting...
+            </>
+          ) : (
+            <>
+              <ArrowDownTrayIcon className="size-4" />
+              Convert to Word
+            </>
+          )}
+        </Button>
+        {selectedFile && (
+          <Button
+            variant="outline"
+            onClick={() => setSelectedFile(null)}
+            disabled={isConverting}
+            className="rounded-xl"
+          >
+            Remove File
+          </Button>
+        )}
+      </div>
+
+      <div className="p-6 bg-rose-50 dark:bg-rose-900/20 border border-rose-200 dark:border-rose-800 rounded-2xl">
+        <h3 className="text-sm font-semibold text-rose-900 dark:text-rose-300 mb-2">
+          How to convert PDF to Word:
+        </h3>
+        <ol className="text-sm text-rose-800 dark:text-rose-400 list-decimal list-inside space-y-1">
+          <li>Select or drag and drop a PDF file.</li>
+          <li>Review the selected file details.</li>
+          <li>Click &quot;Convert to Word&quot; to start the conversion.</li>
+          <li>Your .docx file will be downloaded automatically.</li>
+        </ol>
+      </div>
+    </DashboardLayout>
   );
 }

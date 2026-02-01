@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { HiPencil, HiOutlinePencil as HiPencilOutline } from "react-icons/hi";
+import { PencilSquareIcon, PencilIcon } from "@heroicons/react/24/outline";
 
 interface SignaturePreviewProps {
   signatureImage: string | null;
@@ -25,27 +25,21 @@ export default function SignaturePreview({
   const signaturePreviewRef = useRef<HTMLDivElement>(null);
 
   return (
-    <div className="border border-gray-200 dark:border-gray-700 rounded-lg p-2 sm:p-3">
+    <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-2 sm:p-3">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <HiPencilOutline
-            className="text-gray-500 dark:text-gray-400"
-            size={16}
-            style={{ width: "16px", height: "16px" }}
-          />
-          <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300">
+          <PencilIcon className="size-4 text-slate-500 dark:text-slate-400" />
+          <span className="text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300">
             Signature
           </span>
         </div>
         {signatureImage && (
           <button
+            type="button"
             onClick={onEdit}
-            className="p-1 hover:bg-gray-100 dark:hover:bg-gray-800 rounded"
+            className="p-1.5 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition"
           >
-            <HiPencil
-              size={14}
-              className="text-gray-500 dark:text-gray-400"
-            />
+            <PencilSquareIcon className="size-4 text-slate-500 dark:text-slate-400" />
           </button>
         )}
       </div>
@@ -57,8 +51,8 @@ export default function SignaturePreview({
           onDragEnd={onDragEnd}
           onTouchStart={onTouchStart}
           onTouchMove={onTouchMove}
-          className={`bg-white dark:bg-gray-200 rounded border border-gray-200 dark:border-gray-700 p-2 min-h-[50px] sm:min-h-[60px] flex items-center justify-center cursor-move hover:border-red-500 transition touch-none ${
-            isDragging ? "opacity-50 border-red-500" : ""
+          className={`bg-white dark:bg-slate-200 rounded-xl border border-slate-200 dark:border-slate-700 p-2 min-h-[50px] sm:min-h-[60px] flex items-center justify-center cursor-move hover:border-dashboard-primary transition touch-none ${
+            isDragging ? "opacity-50 border-dashboard-primary" : ""
           }`}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -70,10 +64,11 @@ export default function SignaturePreview({
         </div>
       ) : (
         <button
+          type="button"
           onClick={onEdit}
-          className="w-full bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-3 sm:p-4 text-xs sm:text-sm text-gray-600 dark:text-gray-400 transition"
+          className="w-full bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-3 sm:p-4 text-xs sm:text-sm text-slate-600 dark:text-slate-400 transition"
         >
-          Cliquez pour ajouter une signature
+          Click to add a signature
         </button>
       )}
     </div>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef } from "react";
-import { HiX } from "react-icons/hi";
+import { XMarkIcon } from "@heroicons/react/24/outline";
 import { SignaturePosition } from "./types";
 import { useDragAndDrop } from "./hooks/useDragAndDrop";
 import { useResize } from "./hooks/useResize";
@@ -62,19 +62,20 @@ export default function PDFViewer({
   } = useResize(pdfContainerRef, currentPage, onPositionUpdate, signaturePositions);
 
   return (
-    <div className="flex-1 flex overflow-hidden bg-gray-100 dark:bg-gray-900">
+    <div className="flex-1 flex overflow-hidden bg-slate-100 dark:bg-slate-900">
       {/* Thumbnails Sidebar */}
       {pdfPageImages.length > 0 && (
-        <div className="hidden lg:block w-24 border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-950 overflow-y-auto">
+        <div className="hidden lg:block w-24 border-r border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 overflow-y-auto">
           <div className="p-2 space-y-2">
             {pdfPageImages.map((image, index) => (
               <button
                 key={index}
+                type="button"
                 onClick={() => onPageChange(index + 1)}
-                className={`w-full aspect-[3/4] relative rounded border-2 overflow-hidden transition ${
+                className={`w-full aspect-[3/4] relative rounded-xl border-2 overflow-hidden transition ${
                   currentPage === index + 1
-                    ? "border-red-500 dark:border-red-500"
-                    : "border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600"
+                    ? "border-dashboard-primary"
+                    : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                 }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -104,12 +105,13 @@ export default function PDFViewer({
                 onChange={onFileChange}
                 className="hidden"
               />
-              <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400 mb-4 px-4">
+              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400 mb-4 px-4">
                 Drag and drop a PDF file here, or click to select
               </p>
               <button
+                type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="bg-red-600 hover:bg-red-700 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg font-semibold transition text-sm sm:text-base"
+                className="bg-dashboard-primary hover:bg-dashboard-primary/90 text-white px-4 sm:px-6 py-2.5 sm:py-3 rounded-xl font-semibold transition text-sm sm:text-base"
               >
                 Select PDF File
               </button>
@@ -117,7 +119,7 @@ export default function PDFViewer({
           </div>
         ) : isLoading ? (
           <div className="flex-1 flex items-center justify-center p-4">
-            <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            <p className="text-sm sm:text-base text-slate-600 dark:text-slate-400">
               Converting PDF to images...
             </p>
           </div>
@@ -131,9 +133,9 @@ export default function PDFViewer({
                 e.preventDefault();
               }
             }}
-            className="flex-1 overflow-auto bg-gray-200 dark:bg-gray-800 p-2 sm:p-4"
+            className="flex-1 overflow-auto bg-slate-200 dark:bg-slate-800 p-2 sm:p-4"
           >
-            <div className="max-w-4xl mx-auto bg-white dark:bg-gray-900 shadow-lg relative">
+            <div className="max-w-4xl mx-auto bg-white dark:bg-slate-900 shadow-lg relative rounded-2xl overflow-hidden">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={pdfPageImages[currentPage - 1]}
@@ -165,14 +167,14 @@ export default function PDFViewer({
                     }}
                     onTouchMove={handleSignatureTouchMove}
                     onTouchEnd={handleSignatureTouchEnd}
-                    className={`absolute border-2 border-red-500 bg-red-500 bg-opacity-20 rounded transition touch-none group ${
+                    className={`absolute border-2 border-dashboard-primary bg-dashboard-primary/20 rounded-xl transition touch-none group ${
                       (draggedSignatureIndex === originalIndex &&
                         (isDragging || isTouchDragging)) ||
                       (isTouchDragging &&
                         draggedSignatureIndex === originalIndex) ||
                       (isResizing && resizingIndex === originalIndex)
                         ? "opacity-30 scale-95"
-                        : "hover:bg-red-500 hover:bg-opacity-30"
+                        : "hover:bg-dashboard-primary/30"
                     }`}
                     style={{
                       left: `${position.x * 100}%`,
@@ -187,13 +189,14 @@ export default function PDFViewer({
                     }}
                   >
                     <button
+                      type="button"
                       onClick={(e) => {
                         e.stopPropagation();
                         onRemoveSignature(originalIndex);
                       }}
-                      className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600 z-10"
+                      className="absolute -top-2 -right-2 bg-dashboard-primary text-white rounded-full p-1 hover:bg-dashboard-primary/90 z-10"
                     >
-                      <HiX size={14} />
+                      <XMarkIcon className="size-3.5" />
                     </button>
                     {/* Invisible resize handles - all corners except top-right */}
                     {/* Bottom-right */}

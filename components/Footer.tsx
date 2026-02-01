@@ -1,49 +1,20 @@
-import {
-  AiOutlineFacebook,
-  AiOutlineX,
-  AiOutlineGithub,
-  AiOutlineLinkedin,
-  AiOutlineInstagram,
-} from "react-icons/ai";
+"use client";
 
-const Footer = () => {
+export default function Footer() {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-white border-t border-gray-100 dark:bg-black shadow-sm text-gray-400 py-6 dark:border-t dark:border-gray-800">
-      <div className="container mx-auto px-4 flex flex-wrap justify-center sm:justify-between items-center text-sm">
-        <div className="ml-4 text-center sm:text-left">
-          <p>
-            &copy; {currentYear} Managepdf.site. All rights reserved.
+    <footer className="shrink-0 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50">
+      <div className="max-w-7xl mx-auto px-6 sm:px-10 py-6">
+        <div className="flex flex-col sm:flex-row flex-wrap items-center justify-center sm:justify-between gap-2 text-sm">
+          <p className="font-medium text-slate-900 dark:text-white">
+            &copy; {currentYear} Manage PDF. All rights reserved.
           </p>
-          <p className="text-xs mt-1">
+          <p className="text-xs text-slate-500 dark:text-slate-500">
             Powered by APEXRISGELYTICS CONSULTING LLC
           </p>
-        </div>
-        <div className="flex space-x-4 mt-2 mr-4 sm:mt-0">
-          <a href="#" aria-label="Facebook" className="hover:text-gray-300">
-            <AiOutlineFacebook className="w-5 h-5" />
-          </a>
-          <a href="#" aria-label="LinkedIn" className="hover:text-gray-300">
-            <AiOutlineLinkedin className="w-5 h-5" />
-          </a>
-          <a href="#" aria-label="Instagram" className="hover:text-gray-300">
-            <AiOutlineInstagram className="w-5 h-5" />
-          </a>
-          <a
-            href="#"
-            aria-label="X (formerly Twitter)"
-            className="hover:text-gray-300"
-          >
-            <AiOutlineX className="w-5 h-5" />
-          </a>
-          <a href="#" aria-label="GitHub" className="hover:text-gray-300">
-            <AiOutlineGithub className="w-5 h-5" />
-          </a>
         </div>
       </div>
     </footer>
   );
-};
-
-export default Footer;
+}

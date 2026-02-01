@@ -3,8 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useSession } from "next-auth/react";
-import Header from "components/Header";
-import Footer from "components/Footer";
+import DashboardLayout from "components/DashboardLayout";
 import TopBar from "components/sign-pdf/TopBar";
 import PDFViewer from "components/sign-pdf/PDFViewer";
 import SignatureOptionsPanel from "components/sign-pdf/SignatureOptionsPanel";
@@ -138,9 +137,14 @@ export default function SignPDFPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 dark:bg-gray-900">
-      <Header />
-      <main className="grow flex flex-col overflow-hidden">
+    <DashboardLayout fullWidth>
+      <div className="flex flex-col h-full min-h-0">
+        <DepositDialog
+          open={depositDialogOpen}
+          onOpenChange={setDepositDialogOpen}
+          onSuccess={async () => await update()}
+        />
+        <main className="flex flex-col flex-1 overflow-hidden min-h-0">
         <TopBar
           pdfFile={pdfFile}
           currentPage={currentPage}
@@ -195,33 +199,23 @@ export default function SignPDFPage() {
             }
           />
         </div>
-      </main>
+        </main>
 
-      <SignatureCanvasModal
-        isOpen={showSignatureCanvas}
-        onClose={() => setShowSignatureCanvas(false)}
-        onSave={handleSignatureSave}
-      />
+        <SignatureCanvasModal
+          isOpen={showSignatureCanvas}
+          onClose={() => setShowSignatureCanvas(false)}
+          onSave={handleSignatureSave}
+        />
 
-      <InitialsCanvasModal
-        isOpen={showInitialsCanvas}
-        onClose={() => setShowInitialsCanvas(false)}
-        onSave={(imageData) => {
-          // Handle initials save if needed
-          console.log("Initials saved:", imageData);
-        }}
-      />
-
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={async () => {
-          // Update session after deposit
-          await update();
-        }}
-      />
-
-      <Footer />
-    </div>
+        <InitialsCanvasModal
+          isOpen={showInitialsCanvas}
+          onClose={() => setShowInitialsCanvas(false)}
+          onSave={(imageData) => {
+            // Handle initials save if needed
+            console.log("Initials saved:", imageData);
+          }}
+        />
+      </div>
+    </DashboardLayout>
   );
 }

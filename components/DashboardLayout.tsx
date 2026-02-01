@@ -16,16 +16,40 @@ import {
 } from "@/components/ui/dropdown-menu";
 import ThemeSwitch from "components/ThemeSwitch";
 import DepositDialog from "components/DepositDialog";
-import { useState } from "react";
+import Footer from "components/Footer";
+import { useIsMobile } from "components/hooks/use-mobile";
+import { useState, useEffect } from "react";
 import { signOut } from "next-auth/react";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
+  fullWidth?: boolean;
 }
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+const SIDEBAR_COLLAPSED_KEY = "managepdf-sidebar-collapsed";
+
+export default function DashboardLayout({ children, fullWidth }: DashboardLayoutProps) {
   const { data: session } = useSession();
+  const isMobile = useIsMobile(); // true = mobile, false = desktop, undefined = not yet known
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
+
+  useEffect(() => {
+    if (isMobile !== false) return; // only restore preference on desktop
+    try {
+      setSidebarCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true");
+    } catch {}
+  }, [isMobile]);
+
+  const handleSidebarToggle = () => {
+    setSidebarCollapsed((prev) => {
+      const next = !prev;
+      try {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+      } catch {}
+      return next;
+    });
+  };
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
@@ -35,13 +59,18 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         onSuccess={() => {}}
       />
 
-      <Sidebar onUpgradeClick={() => setDepositDialogOpen(true)} />
+      <Sidebar
+        collapsed={isMobile === false ? sidebarCollapsed : true}
+        onToggleCollapse={handleSidebarToggle}
+        onUpgradeClick={() => setDepositDialogOpen(true)}
+        showCollapseToggle={isMobile === false}
+      />
 
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0 bg-white dark:bg-background-dark">
-        <header className="h-20 shrink-0 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-10">
+        <header className="h-20 shrink-0 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4 sm:gap-6 px-4 sm:px-10">
           <Search />
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             <ThemeSwitch />
             <button
               type="button"
@@ -119,9 +148,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           </div>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-10 no-scrollbar">
-          <div className="max-w-7xl mx-auto">{children}</div>
-        </main>
+        <div className="flex-1 flex flex-col min-h-0 overflow-hidden">
+          <main className={`flex-1 overflow-y-auto no-scrollbar ${fullWidth ? "p-0" : "p-10"}`}>
+            <div className={fullWidth ? "h-full w-full" : "max-w-7xl mx-auto"}>{children}</div>
+          </main>
+          <Footer />
+        </div>
       </div>
     </div>
   );

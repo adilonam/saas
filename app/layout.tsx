@@ -13,9 +13,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Managepdf.site - PDF Encryption & File Management",
+  title: "Manage PDF – AI-Powered PDF Tools Online",
   description:
-    "Secure PDF encryption, signing, and file management tools. Sign PDFs manually, encrypt documents, and manage your files with ease.",
+    "Manage, convert, sign, and summarize PDFs with AI. Online PDF tools for signing, merging, converting to Word, and AI-powered summarization—all in one place.",
 };
 
 export default function RootLayout({

@@ -45,7 +45,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           id: user.id,
           email: user.email,
           name: user.name,
-          tokens: user.tokens,
+          subscriptionExpiresAt: user.subscriptionExpiresAt,
         };
       },
     }),
@@ -77,7 +77,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               data: {
                 email: user.email!,
                 name: user.name || null,
-                password: null, // OAuth users don't have passwords
+                password: null,
+                subscriptionExpiresAt: null,
               },
             });
             user.id = newUser.id;
@@ -91,20 +92,19 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return true;
     },
-    async jwt({ token, user, account }) {
+    async jwt({ token, user }) {
       if (user) {
         token.id = user.id;
         token.email = user.email;
         token.name = user.name;
-        token.tokens = (user as any).tokens ?? 0;
+        token.subscriptionExpiresAt = (user as any).subscriptionExpiresAt ?? null;
       } else if (token.id) {
-        // Refresh tokens from database on each request
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { tokens: true },
+          select: { subscriptionExpiresAt: true },
         });
         if (dbUser) {
-          token.tokens = dbUser.tokens;
+          token.subscriptionExpiresAt = dbUser.subscriptionExpiresAt;
         }
       }
       return token;
@@ -114,7 +114,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.id = token.id as string;
         session.user.email = token.email as string;
         session.user.name = token.name as string;
-        session.user.tokens = (token.tokens as number) ?? 0;
+        session.user.subscriptionExpiresAt = token.subscriptionExpiresAt
+          ? new Date(token.subscriptionExpiresAt as string)
+          : null;
       }
       return session;
     },

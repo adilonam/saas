@@ -75,7 +75,10 @@ export default function Header() {
               <div className="ml-1 sm:ml-2 flex items-center gap-2">
                 <UserMenu user={session.user} />
                 <div className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Tokens: {session.user.tokens ?? 0}
+                  {session.user.subscriptionExpiresAt &&
+                  new Date(session.user.subscriptionExpiresAt) > new Date()
+                    ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                    : "No subscription"}
                 </div>
                 <Button
                   variant="outline"
@@ -139,7 +142,10 @@ export default function Header() {
                           </p>
                         )}
                         <p className="text-xs leading-none text-muted-foreground mt-1">
-                          Tokens: {session.user.tokens ?? 0}
+                          {session.user.subscriptionExpiresAt &&
+                          new Date(session.user.subscriptionExpiresAt) > new Date()
+                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No subscription"}
                         </p>
                       </div>
                     </DropdownMenuLabel>

@@ -6,7 +6,7 @@ declare module "next-auth" {
       id: string;
       email: string;
       name?: string | null;
-      tokens: number;
+      subscriptionExpiresAt: Date | null;
     };
   }
 
@@ -14,7 +14,7 @@ declare module "next-auth" {
     id: string;
     email: string;
     name?: string | null;
-    tokens?: number;
+    subscriptionExpiresAt?: Date | null;
   }
 }
 
@@ -23,7 +23,7 @@ declare module "next-auth/jwt" {
     id: string;
     email: string;
     name?: string | null;
-    tokens: number;
+    subscriptionExpiresAt: Date | null;
   }
 }
 

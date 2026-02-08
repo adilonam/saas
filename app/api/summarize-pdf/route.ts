@@ -72,18 +72,19 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { tokens: true },
+      select: { subscriptionExpiresAt: true },
     });
 
     if (!user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 });
     }
 
-    const tokensNeeded = files.length;
-    if (user.tokens < tokensNeeded) {
+    const hasActiveSubscription =
+      user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       return NextResponse.json(
-        { error: "Insufficient tokens", tokens: user.tokens },
-        { status: 400 }
+        { error: "Active subscription required", subscriptionExpiresAt: user.subscriptionExpiresAt },
+        { status: 403 }
       );
     }
 
@@ -94,24 +95,6 @@ export async function POST(request: Request) {
         { status: 500 }
       );
     }
-
-    // Deduct tokens and create transactions
-    await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session.user.id },
-        data: { tokens: { decrement: tokensNeeded } },
-      }),
-      ...Array.from({ length: tokensNeeded }, () =>
-        prisma.transaction.create({
-          data: {
-            userId: session.user.id,
-            type: "cost",
-            amount: -1,
-            description: "PDF summarize cost",
-          },
-        })
-      ),
-    ]);
 
     const results: Array<{
       filename: string;

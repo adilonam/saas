@@ -69,8 +69,10 @@ export default function SummarizePDFPage() {
       return;
     }
 
-    const userTokens = session.user.tokens ?? 0;
-    if (userTokens < selectedFiles.length) {
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       setDepositDialogOpen(true);
       return;
     }
@@ -99,8 +101,9 @@ export default function SummarizePDFPage() {
         try {
           const errorData = await response.json();
           if (
-            response.status === 400 &&
-            errorData.error === "Insufficient tokens"
+            (response.status === 400 || response.status === 403) &&
+            (errorData.error === "Insufficient tokens" ||
+              errorData.error === "Active subscription required")
           ) {
             setDepositDialogOpen(true);
             setIsSummarizing(false);

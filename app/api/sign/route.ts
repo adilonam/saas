@@ -13,10 +13,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Get current user with tokens
     const user = await prisma.user.findUnique({
       where: { id: session.user.id },
-      select: { tokens: true },
+      select: { subscriptionExpiresAt: true },
     });
 
     if (!user) {
@@ -26,41 +25,17 @@ export async function POST(request: Request) {
       );
     }
 
-    // Check if user has tokens
-    if (user.tokens <= 0) {
+    const hasActiveSubscription =
+      user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       return NextResponse.json(
-        { error: "Insufficient tokens", tokens: user.tokens },
-        { status: 400 }
+        { error: "Active subscription required", subscriptionExpiresAt: user.subscriptionExpiresAt },
+        { status: 403 }
       );
     }
 
-    // Deduct 1 token and create transaction in a single transaction
-    const result = await prisma.$transaction([
-      prisma.user.update({
-        where: { id: session.user.id },
-        data: {
-          tokens: {
-            decrement: 1,
-          },
-        },
-      }),
-      prisma.transaction.create({
-        data: {
-          userId: session.user.id,
-          type: "cost",
-          amount: -1,
-          description: "PDF signature cost",
-        },
-      }),
-    ]);
-
-    const updatedUser = result[0];
-
     return NextResponse.json(
-      {
-        message: "Token deducted successfully",
-        tokens: updatedUser.tokens,
-      },
+      { message: "OK", subscriptionActive: true },
       { status: 200 }
     );
   } catch (error) {

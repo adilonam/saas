@@ -96,9 +96,10 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
                           {session.user.name || "User"}
                         </p>
                         <p className="text-[10px] sm:text-[11px] text-slate-500 uppercase tracking-tighter">
-                          {session.user.tokens != null
-                            ? `${session.user.tokens} Tokens`
-                            : "0 Tokens"}
+                          {session.user.subscriptionExpiresAt &&
+                          new Date(session.user.subscriptionExpiresAt) > new Date()
+                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No subscription"}
                         </p>
                       </div>
                       <div className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border-2 border-dashboard-primary/10 bg-slate-700 flex items-center justify-center text-white font-bold text-xs sm:text-sm overflow-hidden shrink-0">
@@ -123,7 +124,10 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
                           </p>
                         )}
                         <p className="text-xs leading-none text-slate-500 dark:text-slate-400 mt-1">
-                          {session.user.tokens ?? 0} Tokens
+                          {session.user.subscriptionExpiresAt &&
+                          new Date(session.user.subscriptionExpiresAt) > new Date()
+                            ? `Subscription expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No active subscription"}
                         </p>
                       </div>
                     </DropdownMenuLabel>

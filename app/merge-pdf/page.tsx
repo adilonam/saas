@@ -64,8 +64,10 @@ export default function MergePDFPage() {
       return;
     }
 
-    const userTokens = session.user.tokens ?? 0;
-    if (userTokens <= 0) {
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       setDepositDialogOpen(true);
       return;
     }
@@ -93,8 +95,9 @@ export default function MergePDFPage() {
         try {
           const errorData = await response.json();
           if (
-            response.status === 400 &&
-            errorData.error === "Insufficient tokens"
+            (response.status === 400 || response.status === 403) &&
+            (errorData.error === "Insufficient tokens" ||
+              errorData.error === "Active subscription required")
           ) {
             setDepositDialogOpen(true);
             setIsMerging(false);

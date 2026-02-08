@@ -72,9 +72,10 @@ export default function SignPDFPage() {
       return;
     }
 
-    // Check if user has tokens
-    const userTokens = session.user.tokens ?? 0;
-    if (userTokens <= 0) {
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       setDepositDialogOpen(true);
       return;
     }
@@ -87,30 +88,23 @@ export default function SignPDFPage() {
     try {
       setIsLoading(true);
 
-      // Deduct 1 token before signing
-      const tokenResponse = await fetch("/api/sign", {
+      const signCheckResponse = await fetch("/api/sign", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
       });
 
-      const tokenData = await tokenResponse.json();
-
-      if (!tokenResponse.ok) {
+      if (!signCheckResponse.ok) {
+        const errData = await signCheckResponse.json().catch(() => ({}));
         if (
-          tokenResponse.status === 400 &&
-          tokenData.error === "Insufficient tokens"
+          signCheckResponse.status === 403 &&
+          errData.error === "Active subscription required"
         ) {
           setDepositDialogOpen(true);
           setIsLoading(false);
           return;
         }
-        throw new Error(tokenData.error || "Failed to deduct token");
+        throw new Error(errData.error || "Subscription check failed");
       }
-
-      // Update session to reflect new token balance
-      await update();
 
       // Proceed with PDF signing
       const blob = await signPDF(

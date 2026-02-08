@@ -68,8 +68,10 @@ export default function PDFToWordPage() {
       return;
     }
 
-    const userTokens = session.user.tokens ?? 0;
-    if (userTokens <= 0) {
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
       setDepositDialogOpen(true);
       return;
     }
@@ -95,8 +97,9 @@ export default function PDFToWordPage() {
         try {
           const errorData = await response.json();
           if (
-            response.status === 400 &&
-            errorData.error === "Insufficient tokens"
+            (response.status === 403 || response.status === 400) &&
+            (errorData.error === "Active subscription required" ||
+              errorData.error === "Insufficient tokens")
           ) {
             setDepositDialogOpen(true);
             setIsConverting(false);

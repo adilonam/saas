@@ -24,7 +24,7 @@ export default function PricingPage() {
           Pricing
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">
-          Simple, transparent pricing. Get tokens and use our PDF tools.
+          Simple, transparent pricing. Subscribe monthly to use our PDF tools.
         </p>
       </div>
 
@@ -36,40 +36,40 @@ export default function PricingPage() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
-                10 Tokens
+                Monthly subscription
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                One-time purchase
+                Billed monthly via Gumroad
               </p>
             </div>
           </div>
           <div className="mb-6">
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
-              $1 <span className="text-base font-normal text-slate-500 dark:text-slate-400">USD</span>
+              Monthly <span className="text-base font-normal text-slate-500 dark:text-slate-400">— see Gumroad</span>
             </p>
           </div>
           <ul className="space-y-3 mb-8">
             <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
               <CheckIcon className="size-5 text-green-600 dark:text-green-400 shrink-0" />
-              <span>10 tokens to use across all PDF tools</span>
+              <span>Full access to all PDF tools</span>
             </li>
             <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
               <CheckIcon className="size-5 text-green-600 dark:text-green-400 shrink-0" />
-              <span>1 token per action (sign, merge, convert, summarize)</span>
+              <span>Sign, merge, convert, summarize — unlimited use</span>
             </li>
             <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
               <CheckIcon className="size-5 text-green-600 dark:text-green-400 shrink-0" />
-              <span>Redeem with a license key after purchase</span>
+              <span>Subscribe with Gumroad; use the same email as your account</span>
             </li>
           </ul>
           <Button
             onClick={() => setDepositDialogOpen(true)}
             className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white font-semibold py-3"
           >
-            Proceed
+            Subscribe with Gumroad
           </Button>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-4 text-center">
-            You will receive a license key by email. Enter it in the deposit modal to add tokens to your account.
+            After you subscribe, your account is activated automatically. Cancel anytime from Gumroad.
           </p>
         </div>
       </div>

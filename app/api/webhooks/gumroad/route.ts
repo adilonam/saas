@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
 const MONTHLY_DAYS = 30;
+const ANNUAL_DAYS = 365;
 
 function getEmailFromPayload(payload: Record<string, unknown>): string | null {
   const email =
@@ -59,8 +60,18 @@ export async function POST(request: Request) {
       return NextResponse.json({ received: true, skipped: "refunded" }, { status: 200 });
     }
 
-    const optionalProductId = process.env.GUMROAD_PRODUCT_ID;
-    if (optionalProductId && productId && productId !== optionalProductId) {
+    const productIdMonthly = process.env.GUMROAD_PRODUCT_ID_MONTHLY;
+    const productIdYearly = process.env.GUMROAD_PRODUCT_ID_YEARLY;
+    let daysToAdd: number;
+    let planLabel: string;
+
+    if (productId && productIdMonthly && productId === productIdMonthly) {
+      daysToAdd = MONTHLY_DAYS;
+      planLabel = "monthly";
+    } else if (productId && productIdYearly && productId === productIdYearly) {
+      daysToAdd = ANNUAL_DAYS;
+      planLabel = "annual";
+    } else {
       return NextResponse.json({ received: true, skipped: "product_id_mismatch" }, { status: 200 });
     }
 
@@ -80,7 +91,7 @@ export async function POST(request: Request) {
         ? user.subscriptionExpiresAt
         : now;
     const newExpiresAt = new Date(baseDate);
-    newExpiresAt.setDate(newExpiresAt.getDate() + MONTHLY_DAYS);
+    newExpiresAt.setDate(newExpiresAt.getDate() + daysToAdd);
 
     await prisma.$transaction([
       prisma.user.update({
@@ -91,9 +102,11 @@ export async function POST(request: Request) {
         data: {
           userId: user.id,
           action: user.subscriptionExpiresAt && user.subscriptionExpiresAt > now ? "subscription_renewed" : "subscription_started",
-          description: `Gumroad sale: +${MONTHLY_DAYS} days${productName ? ` (${productName})` : ""}`,
+          description: `Gumroad ${planLabel}: +${daysToAdd} days${productName ? ` (${productName})` : ""}`,
           metadata: {
             source: "gumroad",
+            plan: planLabel,
+            daysAdded: daysToAdd,
             recurrence: recurrence ?? undefined,
             saleId: saleId ?? undefined,
             subscriptionId: subscriptionId ?? undefined,

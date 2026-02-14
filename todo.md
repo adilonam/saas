@@ -2,3 +2,10 @@
 - [x] sign up must go directly
 - [ ] sign in and up middleware
 - [x] merge pdf use toke join merge and merge pdfs
+
+
+- [ ] pdf compressor 
+- [ ] translate pdf
+- [ ] word to pdf
+- [ ] pdf splitter
+- [ ] 

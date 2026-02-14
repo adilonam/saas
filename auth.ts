@@ -3,6 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
+import { sendWelcomeEmail } from "@/lib/resend";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [
@@ -82,6 +83,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
               },
             });
             user.id = newUser.id;
+            console.log("Sending welcome email to", newUser.email);
+            await sendWelcomeEmail(newUser.email, newUser.name);
+            console.log("Welcome email sent to", newUser.email);
           } else {
             user.id = existingUser.id;
           }

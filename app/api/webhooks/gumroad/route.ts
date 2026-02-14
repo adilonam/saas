@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
+import { sendPaymentSuccessEmail } from "@/lib/resend";
 
 const MONTHLY_DAYS = 30;
 const ANNUAL_DAYS = 365;
@@ -77,7 +78,7 @@ export async function POST(request: Request) {
 
     const user = await prisma.user.findUnique({
       where: { email: email.toLowerCase().trim() },
-      select: { id: true, subscriptionExpiresAt: true },
+      select: { id: true, name: true, subscriptionExpiresAt: true },
     });
 
     if (!user) {
@@ -118,6 +119,13 @@ export async function POST(request: Request) {
         },
       }),
     ]);
+
+    try {
+      const displayName = user.name?.trim() || email;
+      await sendPaymentSuccessEmail(email, displayName, planLabel, newExpiresAt);
+    } catch (err) {
+      console.error("Gumroad webhook: payment success email failed", err);
+    }
 
     return NextResponse.json({ received: true }, { status: 200 });
   } catch (e) {

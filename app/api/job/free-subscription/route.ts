@@ -3,6 +3,11 @@ import prisma from "@/lib/prisma";
 import { sendFreeSubscriptionEmail } from "@/lib/resend";
 
 const DAYS_TO_ADD = 10;
+const EMAILS_PER_SECOND = 2;
+
+function delay(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export async function GET(request: Request) {
   const url = new URL(request.url);
@@ -35,10 +40,10 @@ async function runFreeSubscriptionJob() {
       newExpiresAt.setDate(newExpiresAt.getDate() + DAYS_TO_ADD);
 
       await prisma.$transaction([
-        prisma.user.update({
-          where: { id: user.id },
-          data: { subscriptionExpiresAt: newExpiresAt },
-        }),
+        // prisma.user.update({
+        //   where: { id: user.id },
+        //   data: { subscriptionExpiresAt: newExpiresAt },
+        // }),
         prisma.history.create({
           data: {
             userId: user.id,
@@ -57,6 +62,10 @@ async function runFreeSubscriptionJob() {
 
       await sendFreeSubscriptionEmail(user.email, user.name);
       emailsSent += 1;
+
+      if (emailsSent % EMAILS_PER_SECOND === 0) {
+        await delay(1000);
+      }
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
       errors.push(`${user.email}: ${message}`);

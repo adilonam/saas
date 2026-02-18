@@ -47,6 +47,14 @@ function SignInForm() {
     if (searchParams.get("registered") === "true") {
       setSuccess("Account created successfully! Please sign in.");
     }
+    const err = searchParams.get("error");
+    if (err === "invalid_or_expired_token") {
+      setError("Verification link is invalid or has expired. Please sign in and check your email for a new link.");
+    } else if (err === "missing_token") {
+      setError("Verification link is missing. Please use the link from your welcome email.");
+    } else if (err === "user_not_found") {
+      setError("Account not found. Please sign up first.");
+    }
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {

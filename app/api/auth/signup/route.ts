@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail } from "@/lib/resend";
+import crypto from "crypto";
+
+const VERIFY_TOKEN_EXPIRY_HOURS = 24;
 
 export async function POST(request: Request) {
   try {
@@ -30,7 +33,7 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // Create user
+    // Create user (no subscription until email is verified)
     const user = await prisma.user.create({
       data: {
         email,
@@ -45,7 +48,17 @@ export async function POST(request: Request) {
       },
     });
 
-    await sendWelcomeEmail(user.email, user.name);
+    // Create email verification token (one per email; replace any existing)
+    const verifyToken = crypto.randomBytes(32).toString("hex");
+    const expires = new Date();
+    expires.setHours(expires.getHours() + VERIFY_TOKEN_EXPIRY_HOURS);
+
+    await prisma.verificationToken.deleteMany({ where: { identifier: email } });
+    await prisma.verificationToken.create({
+      data: { identifier: email, token: verifyToken, expires },
+    });
+
+    await sendWelcomeEmail(user.email, user.name, verifyToken);
 
     return NextResponse.json(
       { message: "User created successfully", user },

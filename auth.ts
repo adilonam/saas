@@ -73,16 +73,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           });
 
           if (!existingUser) {
-            // Create new user for Google OAuth
+            // Create new user for Google OAuth (email already verified by Google → 1 day free)
+            const now = new Date();
+            const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
             const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
                 name: user.name || null,
                 password: null,
-                subscriptionExpiresAt: null,
+                emailVerified: now,
+                subscriptionExpiresAt: oneDayLater,
               },
             });
             user.id = newUser.id;
+            (user as any).subscriptionExpiresAt = oneDayLater;
             console.log("Sending welcome email to", newUser.email);
             await sendWelcomeEmail(newUser.email, newUser.name);
             console.log("Welcome email sent to", newUser.email);

@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 import {
   SparklesIcon,
   DocumentMagnifyingGlassIcon,
@@ -13,6 +15,7 @@ import {
   PencilIcon,
   CodeBracketSquareIcon,
   ComputerDesktopIcon,
+  CheckCircleIcon,
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 
@@ -78,8 +81,37 @@ const popularTools = [
 ];
 
 export default function HomeDashboard() {
+  const searchParams = useSearchParams();
+  const [showVerifiedBanner, setShowVerifiedBanner] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get("verified") === "1") {
+      setShowVerifiedBanner(true);
+      window.history.replaceState({}, "", window.location.pathname);
+    }
+  }, [searchParams]);
+
   return (
     <DashboardLayout>
+      {showVerifiedBanner && (
+        <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-3 text-emerald-800 dark:text-emerald-200">
+          <CheckCircleIcon className="size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
+          <p className="text-sm font-medium">
+            Email verified. You have 1 day of free subscription to use all PDF tools.
+          </p>
+          <button
+            type="button"
+            onClick={() => setShowVerifiedBanner(false)}
+            className="ml-auto rounded-lg p-1.5 text-emerald-600 hover:bg-emerald-200/50 dark:text-emerald-400 dark:hover:bg-emerald-800/50"
+            aria-label="Dismiss"
+          >
+            <span className="sr-only">Dismiss</span>
+            <svg className="size-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+      )}
       <div className="mb-12">
         <h2 className="text-3xl font-bold tracking-tight">
           PDF Tools Library

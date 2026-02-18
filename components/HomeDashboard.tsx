@@ -85,10 +85,9 @@ export default function HomeDashboard() {
   const [showVerifiedBanner, setShowVerifiedBanner] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get("verified") === "1") {
-      setShowVerifiedBanner(true);
-      window.history.replaceState({}, "", window.location.pathname);
-    }
+    if (searchParams.get("verified") !== "1") return;
+    window.history.replaceState({}, "", window.location.pathname);
+    queueMicrotask(() => setShowVerifiedBanner(true));
   }, [searchParams]);
 
   return (

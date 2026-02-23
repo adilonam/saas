@@ -43,6 +43,7 @@ function SignUpForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const referredBy = searchParams.get("ref") || undefined;
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -76,6 +77,7 @@ function SignUpForm() {
           email,
           password,
           name: name || undefined,
+          referredBy: referredBy || undefined,
         }),
       });
 

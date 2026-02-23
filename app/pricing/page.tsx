@@ -1,18 +1,31 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import DashboardLayout from "components/DashboardLayout";
 import DepositDialog from "components/DepositDialog";
 import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
-import { CurrencyDollarIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { CurrencyDollarIcon, CheckIcon, UserPlusIcon, ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
 export default function PricingPage() {
-  const { update } = useSession();
+  const { data: session, update } = useSession();
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
-
   const [loading, setLoading] = useState<"monthly" | "annual" | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  const inviteUrl =
+    typeof window !== "undefined" && session?.user?.id
+      ? `${window.location.origin}/signup?ref=${session.user.id}`
+      : "";
+
+  const copyInviteLink = () => {
+    if (!inviteUrl) return;
+    navigator.clipboard.writeText(inviteUrl);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   const handleSubscribe = async (plan: "monthly" | "annual") => {
     setLoading(plan);
@@ -44,13 +57,62 @@ export default function PricingPage() {
         onSuccess={async () => await update()}
       />
 
-      <div className="mb-12">
+      <div className="mb-8">
         <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           Pricing
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-2 text-lg">
           Simple, transparent pricing. Subscribe monthly or annually.
         </p>
+      </div>
+
+      {/* Invite friends — recommended for free access (first) */}
+      <div className="mb-12 max-w-2xl rounded-2xl border-2 border-dashboard-primary/30 dark:border-dashboard-primary/40 bg-white dark:bg-slate-900/50 p-6 sm:p-8 shadow-xl relative">
+        <div className="absolute top-4 right-4 text-xs font-bold bg-dashboard-primary/20 text-dashboard-primary dark:text-dashboard-primary px-2 py-1 rounded-lg">
+          Recommended
+        </div>
+        <div className="flex items-center gap-3 mb-3">
+          <div className="size-12 rounded-xl bg-dashboard-primary/10 flex items-center justify-center text-dashboard-primary">
+            <UserPlusIcon className="size-6" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              Invite friends
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Get free access — no payment required
+            </p>
+          </div>
+        </div>
+        <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mb-4">
+          Share your link. When a friend signs up, you move up one spot on the waitlist for exclusive AI for managing PDF and get <strong>1 day of free subscription</strong>. Recommended way to get free access.
+        </p>
+        {session?.user?.id ? (
+          <div className="flex flex-col sm:flex-row gap-2">
+            <input
+              type="text"
+              readOnly
+              value={inviteUrl}
+              className="flex-1 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 truncate"
+            />
+            <Button
+              type="button"
+              variant="outline"
+              className="rounded-xl border-slate-200 dark:border-slate-700 shrink-0 gap-2"
+              onClick={copyInviteLink}
+            >
+              <ClipboardDocumentIcon className="size-5" />
+              {copied ? "Copied!" : "Copy link"}
+            </Button>
+          </div>
+        ) : (
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            <Link href="/signin" className="font-medium text-dashboard-primary hover:underline">
+              Sign in
+            </Link>
+            {" "}to get your invite link and start earning free access.
+          </p>
+        )}
       </div>
 
       <div className="grid gap-6 sm:grid-cols-2 max-w-4xl">

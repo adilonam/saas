@@ -7,6 +7,7 @@ declare module "next-auth" {
       email: string;
       name?: string | null;
       subscriptionExpiresAt: Date | null;
+      waitlistNumber: number | null;
     };
   }
 
@@ -15,6 +16,7 @@ declare module "next-auth" {
     email: string;
     name?: string | null;
     subscriptionExpiresAt?: Date | null;
+    waitlistNumber?: number | null;
   }
 }
 
@@ -24,6 +26,7 @@ declare module "next-auth/jwt" {
     email: string;
     name?: string | null;
     subscriptionExpiresAt: Date | null;
+    waitlistNumber: number | null;
   }
 }
 

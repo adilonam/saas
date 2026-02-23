@@ -74,12 +74,6 @@ export default function Header() {
             {session?.user ? (
               <div className="ml-1 sm:ml-2 flex items-center gap-2">
                 <UserMenu user={session.user} />
-                <div className="px-2 py-1 rounded-md bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300">
-                  {session.user.subscriptionExpiresAt &&
-                  new Date(session.user.subscriptionExpiresAt) > new Date()
-                    ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                    : "No subscription"}
-                </div>
                 <Button
                   variant="outline"
                   size="sm"
@@ -144,8 +138,17 @@ export default function Header() {
                         <p className="text-xs leading-none text-muted-foreground mt-1">
                           {session.user.subscriptionExpiresAt &&
                           new Date(session.user.subscriptionExpiresAt) > new Date()
-                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                            : "No subscription"}
+                            ? session.user.waitlistNumber != null
+                              ? (
+                                  <>
+                                    Expires {new Date(session.user.subscriptionExpiresAt).toLocaleDateString()} ·{" "}
+                                    <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
+                                  </>
+                                )
+                              : `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : session.user.waitlistNumber != null
+                              ? <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
+                              : "No subscription"}
                         </p>
                       </div>
                     </DropdownMenuLabel>

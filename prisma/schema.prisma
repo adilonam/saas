@@ -16,6 +16,7 @@ model User {
   password             String?
   name                 String?
   subscriptionExpiresAt DateTime? // null = no active subscription
+  waitlistNumber       Int       @default(234) // lower = higher priority for exclusive AI
   emailVerified        DateTime?
   createdAt            DateTime  @default(now())
   updatedAt            DateTime  @updatedAt

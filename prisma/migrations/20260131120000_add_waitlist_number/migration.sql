@@ -1,0 +1,2 @@
+-- AlterTable
+ALTER TABLE "User" ADD COLUMN "waitlistNumber" INTEGER NOT NULL DEFAULT 234;

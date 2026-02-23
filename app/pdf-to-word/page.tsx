@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
-import DepositDialog from "components/DepositDialog";
 import { Button } from "@/components/ui/button";
 import {
   PhotoIcon,
@@ -22,7 +21,6 @@ export default function PDFToWordPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -72,7 +70,7 @@ export default function PDFToWordPage() {
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {
-      setDepositDialogOpen(true);
+      router.push("/pricing");
       return;
     }
 
@@ -101,7 +99,7 @@ export default function PDFToWordPage() {
             (errorData.error === "Active subscription required" ||
               errorData.error === "Insufficient tokens")
           ) {
-            setDepositDialogOpen(true);
+            router.push("/pricing");
             setIsConverting(false);
             return;
           }
@@ -139,12 +137,6 @@ export default function PDFToWordPage() {
 
   return (
     <DashboardLayout>
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={async () => await update()}
-      />
-
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-10 rounded-xl bg-rose-50 dark:bg-rose-900/20 flex items-center justify-center text-rose-600">

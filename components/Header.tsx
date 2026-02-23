@@ -26,11 +26,9 @@ import {
 import { cn } from "components/lib/utils";
 import ThemeSwitch from "./ThemeSwitch";
 import UserMenu from "./UserMenu";
-import DepositDialog from "./DepositDialog";
 
 export default function Header() {
   const { data: session } = useSession();
-  const [depositDialogOpen, setDepositDialogOpen] = React.useState(false);
 
   const navigationItems = [
     { title: "Sign PDF", href: "/sign-pdf" },
@@ -77,10 +75,10 @@ export default function Header() {
                 <Button
                   variant="outline"
                   size="sm"
-                  onClick={() => setDepositDialogOpen(true)}
+                  asChild
                   className="text-xs sm:text-sm"
                 >
-                  Deposit
+                  <Link href="/pricing">Pricing</Link>
                 </Button>
               </div>
             ) : (
@@ -153,11 +151,10 @@ export default function Header() {
                       </div>
                     </DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={() => setDepositDialogOpen(true)}
-                      className="cursor-pointer"
-                    >
-                      Deposit
+                    <DropdownMenuItem asChild>
+                      <Link href="/pricing" className="cursor-pointer w-full">
+                        Pricing
+                      </Link>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator />
                     <DropdownMenuItem
@@ -189,13 +186,6 @@ export default function Header() {
           </div>
         </div>
       </div>
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={() => {
-          // Session will be updated via the update() call in DepositDialog
-        }}
-      />
     </header>
   );
 }

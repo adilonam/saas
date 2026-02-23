@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
-import DepositDialog from "components/DepositDialog";
 import { Button } from "@/components/ui/button";
 import {
   Squares2X2Icon,
@@ -28,7 +27,6 @@ export default function MergePDFPage() {
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isMerging, setIsMerging] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || []);
@@ -68,7 +66,7 @@ export default function MergePDFPage() {
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {
-      setDepositDialogOpen(true);
+      router.push("/pricing");
       return;
     }
 
@@ -99,7 +97,7 @@ export default function MergePDFPage() {
             (errorData.error === "Insufficient tokens" ||
               errorData.error === "Active subscription required")
           ) {
-            setDepositDialogOpen(true);
+            router.push("/pricing");
             setIsMerging(false);
             return;
           }
@@ -160,12 +158,6 @@ export default function MergePDFPage() {
 
   return (
     <DashboardLayout>
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={async () => await update()}
-      />
-
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center text-purple-600">

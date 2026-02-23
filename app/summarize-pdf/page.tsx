@@ -4,7 +4,6 @@ import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
-import DepositDialog from "components/DepositDialog";
 import { Button } from "@/components/ui/button";
 import {
   DocumentMagnifyingGlassIcon,
@@ -32,7 +31,6 @@ export default function SummarizePDFPage() {
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isSummarizing, setIsSummarizing] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [results, setResults] = useState<SummaryResult[]>([]);
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,7 +71,7 @@ export default function SummarizePDFPage() {
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {
-      setDepositDialogOpen(true);
+      router.push("/pricing");
       return;
     }
 
@@ -105,7 +103,7 @@ export default function SummarizePDFPage() {
             (errorData.error === "Insufficient tokens" ||
               errorData.error === "Active subscription required")
           ) {
-            setDepositDialogOpen(true);
+            router.push("/pricing");
             setIsSummarizing(false);
             return;
           }
@@ -158,12 +156,6 @@ export default function SummarizePDFPage() {
 
   return (
     <DashboardLayout>
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={async () => await update()}
-      />
-
       <div className="mb-12">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600">

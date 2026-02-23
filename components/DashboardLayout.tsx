@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 import { BellIcon } from "@heroicons/react/24/outline";
 import Sidebar from "components/Sidebar";
 import Search from "components/Search";
@@ -15,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import ThemeSwitch from "components/ThemeSwitch";
-import DepositDialog from "components/DepositDialog";
 import Footer from "components/Footer";
 import { useIsMobile } from "components/hooks/use-mobile";
 import { useState, useEffect } from "react";
@@ -29,9 +29,9 @@ interface DashboardLayoutProps {
 const SIDEBAR_COLLAPSED_KEY = "managepdf-sidebar-collapsed";
 
 export default function DashboardLayout({ children, fullWidth }: DashboardLayoutProps) {
+  const router = useRouter();
   const { data: session } = useSession();
   const isMobile = useIsMobile(); // true = mobile, false = desktop, undefined = not yet known
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
   const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
 
   useEffect(() => {
@@ -53,16 +53,10 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
 
   return (
     <div className="flex h-screen overflow-hidden bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100">
-      <DepositDialog
-        open={depositDialogOpen}
-        onOpenChange={setDepositDialogOpen}
-        onSuccess={() => {}}
-      />
-
       <Sidebar
         collapsed={isMobile === false ? sidebarCollapsed : true}
         onToggleCollapse={handleSidebarToggle}
-        onUpgradeClick={() => setDepositDialogOpen(true)}
+        onUpgradeClick={() => router.push("/pricing")}
         showCollapseToggle={isMobile === false}
       />
 

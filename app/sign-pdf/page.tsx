@@ -9,7 +9,6 @@ import PDFViewer from "components/sign-pdf/PDFViewer";
 import SignatureOptionsPanel from "components/sign-pdf/SignatureOptionsPanel";
 import SignatureCanvasModal from "components/sign-pdf/SignatureCanvasModal";
 import InitialsCanvasModal from "components/sign-pdf/InitialsCanvasModal";
-import DepositDialog from "components/DepositDialog";
 import { usePDFConversion } from "components/sign-pdf/hooks/usePDFConversion";
 import { signPDF } from "components/sign-pdf/utils/pdfSigning";
 import { SignaturePosition } from "components/sign-pdf/types";
@@ -29,7 +28,6 @@ export default function SignPDFPage() {
   const [showSignatureCanvas, setShowSignatureCanvas] = useState(false);
   const [showInitialsCanvas, setShowInitialsCanvas] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
   const {
     pdfFile,
@@ -76,7 +74,7 @@ export default function SignPDFPage() {
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {
-      setDepositDialogOpen(true);
+      router.push("/pricing");
       return;
     }
 
@@ -99,7 +97,7 @@ export default function SignPDFPage() {
           signCheckResponse.status === 403 &&
           errData.error === "Active subscription required"
         ) {
-          setDepositDialogOpen(true);
+          router.push("/pricing");
           setIsLoading(false);
           return;
         }
@@ -133,11 +131,6 @@ export default function SignPDFPage() {
   return (
     <DashboardLayout fullWidth>
       <div className="flex flex-col h-full min-h-0">
-        <DepositDialog
-          open={depositDialogOpen}
-          onOpenChange={setDepositDialogOpen}
-          onSuccess={async () => await update()}
-        />
         <main className="flex flex-col flex-1 overflow-hidden min-h-0">
         <TopBar
           pdfFile={pdfFile}

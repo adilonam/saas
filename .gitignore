@@ -34,3 +34,6 @@ prisma/generated
 
 
 ssh-key/
+
+
+.pnpm-store/

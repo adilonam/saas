@@ -12,12 +12,26 @@ export default function PricingPage() {
   const { update } = useSession();
   const [depositDialogOpen, setDepositDialogOpen] = useState(false);
 
-  const monthlyUrl = process.env.NEXT_PUBLIC_GUMROAD_SUBSCRIPTION_URL || "";
-  const annualUrl = process.env.NEXT_PUBLIC_GUMROAD_ANNUAL_URL || "";
+  const [loading, setLoading] = useState<"monthly" | "annual" | null>(null);
 
-  const handleSubscribe = (url: string) => {
-    if (url) {
-      window.open(url, "_blank");
+  const handleSubscribe = async (plan: "monthly" | "annual") => {
+    setLoading(plan);
+    try {
+      const res = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      throw new Error(data.error || "Failed to start checkout");
+    } catch (e) {
+      console.error(e);
+      setLoading(null);
+    } finally {
       update();
     }
   };
@@ -51,7 +65,7 @@ export default function PricingPage() {
                 Monthly
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Billed monthly via Gumroad
+                Billed monthly via Stripe
               </p>
             </div>
           </div>
@@ -71,11 +85,11 @@ export default function PricingPage() {
             </li>
           </ul>
           <Button
-            onClick={() => handleSubscribe(monthlyUrl)}
-            disabled={!monthlyUrl}
+            onClick={() => handleSubscribe("monthly")}
+            disabled={loading !== null}
             className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white font-semibold py-3 gap-2"
           >
-            Subscribe monthly
+            {loading === "monthly" ? "Redirecting…" : "Subscribe monthly"}
             <ArrowTopRightOnSquareIcon className="size-5" />
           </Button>
         </div>
@@ -94,7 +108,7 @@ export default function PricingPage() {
                 Annual
               </h2>
               <p className="text-sm text-slate-500 dark:text-slate-400">
-                Billed once per year via Gumroad
+                Billed once per year via Stripe
               </p>
             </div>
           </div>
@@ -117,18 +131,18 @@ export default function PricingPage() {
             </li>
           </ul>
           <Button
-            onClick={() => handleSubscribe(annualUrl)}
-            disabled={!annualUrl}
+            onClick={() => handleSubscribe("annual")}
+            disabled={loading !== null}
             className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white font-semibold py-3 gap-2"
           >
-            Subscribe annually
+            {loading === "annual" ? "Redirecting…" : "Subscribe annually"}
             <ArrowTopRightOnSquareIcon className="size-5" />
           </Button>
         </div>
       </div>
 
       <p className="text-sm text-slate-500 dark:text-slate-400 mt-6 text-center max-w-2xl mx-auto">
-        Use the same email as your account so we can activate your subscription automatically. Cancel anytime from Gumroad.
+        Use the same email as your account so we can activate your subscription automatically. Cancel anytime from your Stripe customer portal.
       </p>
     </DashboardLayout>
   );

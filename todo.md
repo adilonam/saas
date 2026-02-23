@@ -8,4 +8,4 @@
 - [ ] translate pdf
 - [ ] word to pdf
 - [ ] pdf splitter
-- [ ] 
+- [ ] stripe

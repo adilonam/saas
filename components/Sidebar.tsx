@@ -56,12 +56,12 @@ export default function Sidebar({
           title={collapsed ? "Anycode" : undefined}
         >
           <div
-            className={`rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-white dark:bg-slate-800 ${
+            className={`rounded-lg flex items-center justify-center overflow-hidden shrink-0 ${
               collapsed ? (showCollapseToggle ? "size-7" : "size-6 sm:size-7") : "size-9"
             }`}
           >
             <Image
-              src="/images/logo.png"
+              src="/images/logo/apple-touch-icon.png"
               alt="Anycode"
               width={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
               height={collapsed ? (showCollapseToggle ? 28 : 24) : 36}

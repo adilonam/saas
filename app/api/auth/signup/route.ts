@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { sendWelcomeEmail } from "@/lib/resend";
+import { sendWelcomeEmail } from "@/lib/smtp";
 import crypto from "crypto";
 
 const VERIFY_TOKEN_EXPIRY_HOURS = 24;

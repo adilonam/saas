@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
-import { sendFreeSubscriptionEmail } from "@/lib/resend";
+import { sendFreeSubscriptionEmail } from "@/lib/smtp";
 
 const DAYS_TO_ADD = 10;
 const EMAILS_PER_SECOND = 2;

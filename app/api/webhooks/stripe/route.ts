@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Stripe from "stripe";
 import prisma from "@/lib/prisma";
-import { sendPaymentSuccessEmail } from "@/lib/resend";
+import { sendPaymentSuccessEmail } from "@/lib/smtp";
 
 const MONTHLY_DAYS = 30;
 const ANNUAL_DAYS = 365;

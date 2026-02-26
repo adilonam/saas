@@ -3,7 +3,7 @@ import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import prisma from "@/lib/prisma";
 import bcrypt from "bcryptjs";
-import { sendWelcomeEmail } from "@/lib/resend";
+import { sendWelcomeEmail } from "@/lib/smtp";
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   providers: [

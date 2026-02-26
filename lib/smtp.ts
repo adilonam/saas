@@ -1,10 +1,25 @@
-import { Resend } from "resend";
+import nodemailer from "nodemailer";
 
-const resend = process.env.RESEND_API_KEY
-  ? new Resend(process.env.RESEND_API_KEY)
-  : null;
+const SMTP_HOST = process.env.SMTP_HOST;
+const SMTP_PORT = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT, 10) : 587;
+const SMTP_SECURE = process.env.SMTP_SECURE === "true";
+const SMTP_USER = process.env.SMTP_USER;
+const SMTP_PASSWORD = process.env.SMTP_PASSWORD;
 
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
+const transporter =
+  SMTP_HOST && SMTP_USER && SMTP_PASSWORD
+    ? nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: SMTP_PORT,
+        secure: SMTP_SECURE,
+        auth: {
+          user: SMTP_USER,
+          pass: SMTP_PASSWORD,
+        },
+      })
+    : null;
+
+const FROM_EMAIL = process.env.SMTP_FROM_EMAIL || process.env.SMTP_USER || "noreply@anycode.it";
 const APP_URL = process.env.NEXTAUTH_URL || "https://anycode.it";
 
 function escapeHtml(s: string): string {
@@ -231,35 +246,35 @@ export async function sendPaymentSuccessEmail(
   planLabel: string,
   newExpiresAt: Date
 ): Promise<void> {
-  if (!resend) return;
+  if (!transporter) return;
 
   const displayName = name?.trim() || "there";
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from: FROM_EMAIL,
       to,
       subject: "Payment successful — Your Anycode subscription is active",
       html: getPaymentSuccessEmailHtml(displayName, planLabel, newExpiresAt),
     });
   } catch (err) {
-    console.error("Resend payment success email error:", err);
+    console.error("SMTP payment success email error:", err);
     throw err;
   }
 }
 
 export async function sendFreeSubscriptionEmail(to: string, name?: string | null): Promise<void> {
-  if (!resend) return;
+  if (!transporter) return;
 
   const displayName = name?.trim() || "there";
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from: FROM_EMAIL,
       to,
       subject: "You won 10 days free subscription — Anycode",
       html: getFreeSubscriptionEmailHtml(displayName),
     });
   } catch (err) {
-    console.error("Resend free subscription email error:", err);
+    console.error("SMTP free subscription email error:", err);
     throw err;
   }
 }
@@ -269,7 +284,7 @@ export async function sendWelcomeEmail(
   name?: string | null,
   verifyToken?: string
 ): Promise<void> {
-  if (!resend) return;
+  if (!transporter) return;
 
   const displayName = name?.trim() || "there";
   const verifyLink =
@@ -277,7 +292,7 @@ export async function sendWelcomeEmail(
     `${APP_URL.replace(/\/$/, "")}/api/auth/verify-email?token=${encodeURIComponent(verifyToken)}`;
 
   try {
-    await resend.emails.send({
+    await transporter.sendMail({
       from: FROM_EMAIL,
       to,
       subject: verifyLink
@@ -286,6 +301,6 @@ export async function sendWelcomeEmail(
       html: getWelcomeEmailHtml(displayName, verifyLink),
     });
   } catch (err) {
-    console.error("Resend welcome email error:", err);
+    console.error("SMTP welcome email error:", err);
   }
 }

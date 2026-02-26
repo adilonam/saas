@@ -80,6 +80,17 @@ const popularTools = [
   },
 ];
 
+const aiImageTools = [
+  {
+    href: "/image-to-prompt",
+    title: "Image to Prompt",
+    description:
+      "Turn any image into AI-ready prompts for Midjourney, Stable Diffusion, Flux, and more.",
+    icon: PhotoIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+];
+
 export default function HomeDashboard() {
   const searchParams = useSearchParams();
   const [showVerifiedBanner, setShowVerifiedBanner] = useState(false);
@@ -96,7 +107,7 @@ export default function HomeDashboard() {
         <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-3 text-emerald-800 dark:text-emerald-200">
           <CheckCircleIcon className="size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <p className="text-sm font-medium">
-            Email verified. You have 1 day of free subscription to use all PDF tools.
+            Email verified. You have 1 day of free subscription to use all productivity tools.
           </p>
           <button
             type="button"
@@ -113,7 +124,7 @@ export default function HomeDashboard() {
       )}
       <div className="mb-12">
         <h2 className="text-3xl font-bold tracking-tight">
-          PDF Tools Library
+          Productivity AI Tools
         </h2>
         <p className="text-slate-500 mt-2 text-lg">
           Manage, convert, and sign your documents with precision.
@@ -179,7 +190,7 @@ export default function HomeDashboard() {
       </section>
 
       {/* Popular Tools */}
-      <section>
+      <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
           <div className="size-10 rounded-xl bg-dashboard-primary/10 flex items-center justify-center text-dashboard-primary">
             <ArrowTrendingUpIcon className="size-5" />
@@ -206,6 +217,40 @@ export default function HomeDashboard() {
               </Link>
             )
           )}
+        </div>
+      </section>
+
+      {/* AI Image Tool */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/20 flex items-center justify-center text-violet-600">
+            <PhotoIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">AI Image Tool</h3>
+          <span className="bg-violet-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
+            Premium
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {aiImageTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

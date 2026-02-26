@@ -37,7 +37,7 @@ export async function GET() {
             currency: "usd",
             product_data: {
               name: "Monthly subscription",
-              description: "Full access to all PDF tools — billed monthly",
+              description: "Full access to all productivity tools — billed monthly",
             },
             unit_amount: monthlyCents,
             recurring: { interval: "month" },

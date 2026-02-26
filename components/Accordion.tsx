@@ -51,7 +51,7 @@ const defaultAccordionItems = [
   {
     title: "Complete PDF Management",
     content:
-      "Merge, split, compress, and watermark your PDFs all in one place. Streamline your document workflow with our comprehensive set of PDF tools.",
+      "Merge, split, compress, and watermark your PDFs all in one place. Streamline your document workflow with our comprehensive productivity tools.",
   },
 ];
 

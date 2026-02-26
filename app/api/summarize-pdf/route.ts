@@ -2,28 +2,28 @@ import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
 
-const GROQ_API_URL = "https://api.groq.com/openai/v1/chat/completions";
+const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const SUMMARIZE_PROMPT = (text: string) =>
   `Summarize the following text concisely. Return only the summary, no preamble.\n\n${text.slice(0, 12000)}`;
 
-async function summarizeWithGroq(text: string): Promise<string> {
-  const apiKey = process.env.GROQ_API_KEY;
+async function summarizeWithOpenAI(text: string): Promise<string> {
+  const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) {
-    throw new Error("GROQ_API_KEY is not configured");
+    throw new Error("OPENAI_API_KEY is not configured");
   }
 
   if (!text || !text.trim()) {
     return "(No text could be extracted from this PDF.)";
   }
 
-  const res = await fetch(GROQ_API_URL, {
+  const res = await fetch(OPENAI_URL, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: process.env.GROQ_MODEL || "llama-3.1-8b-instant",
+      model: process.env.OPENAI_MODEL || "gpt-4o-mini",
       messages: [{ role: "user", content: SUMMARIZE_PROMPT(text) }],
       max_tokens: 1024,
     }),
@@ -31,7 +31,7 @@ async function summarizeWithGroq(text: string): Promise<string> {
 
   if (!res.ok) {
     const err = await res.text();
-    throw new Error(`Groq API error: ${res.status} ${err}`);
+    throw new Error(`OpenAI API error: ${res.status} ${err}`);
   }
 
   const data = (await res.json()) as {
@@ -130,7 +130,7 @@ export async function POST(request: Request) {
 
       let summary: string;
       try {
-        summary = await summarizeWithGroq(text);
+        summary = await summarizeWithOpenAI(text);
       } catch (e) {
         summary =
           e instanceof Error

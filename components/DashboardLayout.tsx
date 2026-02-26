@@ -26,7 +26,7 @@ interface DashboardLayoutProps {
   fullWidth?: boolean;
 }
 
-const SIDEBAR_COLLAPSED_KEY = "managepdf-sidebar-collapsed";
+const SIDEBAR_COLLAPSED_KEY = "anycode-sidebar-collapsed";
 
 export default function DashboardLayout({ children, fullWidth }: DashboardLayoutProps) {
   const router = useRouter();

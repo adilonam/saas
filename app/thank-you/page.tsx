@@ -16,7 +16,7 @@ export default function ThankYouPage() {
           Thank you for your purchase
         </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-3 text-base sm:text-lg">
-          Your payment was successful. You now have access to all PDF tools.
+          Your payment was successful. You now have access to all productivity tools.
         </p>
 
         <div className="mt-8 p-4 sm:p-6 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-start gap-4 text-left">

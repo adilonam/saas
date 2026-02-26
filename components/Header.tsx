@@ -35,6 +35,7 @@ export default function Header() {
     { title: "Merge PDF", href: "/merge-pdf" },
     { title: "PDF to Word", href: "/pdf-to-word" },
     { title: "Summarize PDF", href: "/summarize-pdf" },
+    { title: "Image to Prompt", href: "/image-to-prompt" },
   ];
 
   return (
@@ -46,7 +47,7 @@ export default function Header() {
               href="/"
               className="text-base sm:text-xl dark:text-gray-100 font-semibold truncate"
             >
-              Managepdf.site
+              anycode.it
             </Link>
             {/* Desktop Navigation */}
             <NavigationMenu className="hidden md:block">

@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://www.managepdf.site/sitemap.xml',
+    sitemap: 'https://anycode.it/sitemap.xml',
   }
 }
 

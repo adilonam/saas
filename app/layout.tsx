@@ -13,9 +13,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Manage PDF – AI-Powered PDF Tools Online",
+  title: "Anycode – Productivity Tools Online",
   description:
-    "Manage, convert, sign, and summarize PDFs with AI. Online PDF tools for signing, merging, converting to Word, and AI-powered summarization—all in one place.",
+    "Productivity tools online: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. Anycode.it",
 };
 
 export default function RootLayout({
@@ -58,7 +58,7 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             />
           </noscript>
         )}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="managepdf-theme">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="anycode-theme">
           <Providers>{children}</Providers>
         </ThemeProvider>
       </body>

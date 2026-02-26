@@ -2,6 +2,7 @@ import React from "react";
 import FeatureCard from "./FeatureCard";
 import {
   FaFilePdf,
+  FaImage,
   FaLock,
   FaUnlock,
   FaFileArchive,
@@ -102,6 +103,14 @@ const Features = () => {
         "Store and manage your encrypted files securely. Access your documents from anywhere with confidence.",
       comingSoon: true,
     },
+    {
+      icon: FaImage,
+      title: "Image to Prompt",
+      description:
+        "Turn any image into AI-ready prompts for Midjourney, Stable Diffusion, Flux, and more.",
+      href: "/image-to-prompt",
+      comingSoon: false,
+    },
   ];
 
   return (
@@ -112,8 +121,8 @@ const Features = () => {
             Features
           </h2>
           <p className="mt-8 text-xl text-gray-600 dark:text-gray-300 font-light">
-            Powerful PDF tools and encryption features to secure and manage your
-            documents. More features coming soon.
+            Productivity and document tools with encryption to secure and manage
+            your files. More features coming soon.
           </p>
         </div>
         <div className="mt-10">

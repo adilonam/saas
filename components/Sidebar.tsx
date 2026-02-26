@@ -53,7 +53,7 @@ export default function Sidebar({
                 : "flex-1 justify-center"
               : "gap-3 min-w-0 flex-1"
           }`}
-          title={collapsed ? "Manage PDF" : undefined}
+          title={collapsed ? "Anycode" : undefined}
         >
           <div
             className={`rounded-lg flex items-center justify-center overflow-hidden shrink-0 bg-white dark:bg-slate-800 ${
@@ -62,7 +62,7 @@ export default function Sidebar({
           >
             <Image
               src="/images/logo.png"
-              alt="Manage PDF"
+              alt="Anycode"
               width={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
               height={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
               className={
@@ -75,7 +75,7 @@ export default function Sidebar({
             />
           </div>
           {!collapsed && (
-            <h1 className="text-xl font-bold tracking-tight truncate">Manage PDF</h1>
+            <h1 className="text-xl font-bold tracking-tight truncate">Anycode</h1>
           )}
         </Link>
         {showCollapseToggle && (

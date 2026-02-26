@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-const APP_URL = process.env.NEXTAUTH_URL || "https://managepdf.site";
+const APP_URL = process.env.NEXTAUTH_URL || "https://anycode.it";
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 
 export async function GET(request: Request) {

@@ -52,8 +52,8 @@ export async function POST(request: Request) {
             product_data: {
               name: isAnnual ? "Annual subscription" : "Monthly subscription",
               description: isAnnual
-                ? "Full access to all PDF tools — billed yearly"
-                : "Full access to all PDF tools — billed monthly",
+                ? "Full access to all productivity tools — billed yearly"
+                : "Full access to all productivity tools — billed monthly",
             },
             unit_amount: unitAmountCents,
             recurring: {

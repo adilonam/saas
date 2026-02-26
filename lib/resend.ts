@@ -5,7 +5,7 @@ const resend = process.env.RESEND_API_KEY
   : null;
 
 const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "onboarding@resend.dev";
-const APP_URL = process.env.NEXTAUTH_URL || "https://managepdf.site";
+const APP_URL = process.env.NEXTAUTH_URL || "https://anycode.it";
 
 function escapeHtml(s: string): string {
   return s
@@ -25,7 +25,7 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Manage PDF</title>
+  <title>Welcome to Anycode</title>
 </head>
 <body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f1f5f9;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 40px 20px;">
@@ -34,14 +34,14 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);">
           <tr>
             <td style="background: linear-gradient(135deg, #135bec 0%, #0d47c2 100%); padding: 32px 40px; text-align: center;">
-              <h1 style="margin:0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Manage PDF</h1>
-              <p style="margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">AI tools for PDF</p>
+              <h1 style="margin:0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Anycode</h1>
+              <p style="margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Productivity tools</p>
             </td>
           </tr>
           <tr>
             <td style="padding: 40px 40px 32px;">
               <p style="margin:0 0 20px; color: #0f172a; font-size: 18px; font-weight: 600;">Hi ${safeName},</p>
-              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Welcome to <strong style="color: #135bec;">Manage PDF</strong> — AI tools for PDF. Sign, merge, convert, and summarize PDFs with AI, all in one place.</p>
+              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Welcome to <strong style="color: #135bec;">Anycode</strong> — productivity tools. Sign and merge PDFs, convert to Word, summarize with AI, image to prompt, and more.</p>
               <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">You get <strong style="color: #0f172a;">one day of free subscription</strong> after you verify your email. Click the button below to verify your email and activate it.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 28px auto 0;">
                 <tr>
@@ -55,7 +55,7 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
           </tr>
           <tr>
             <td style="padding: 24px 40px 32px; border-top: 1px solid #e2e8f0;">
-              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks for joining us,<br/><strong style="color: #64748b;">The Manage PDF team</strong></p>
+              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks for joining us,<br/><strong style="color: #64748b;">The Anycode team</strong></p>
             </td>
           </tr>
         </table>
@@ -72,7 +72,7 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Welcome to Manage PDF</title>
+  <title>Welcome to Anycode</title>
 </head>
 <body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f1f5f9;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 40px 20px;">
@@ -81,14 +81,14 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width: 520px; background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -2px rgba(0,0,0,0.1);">
           <tr>
             <td style="background: linear-gradient(135deg, #135bec 0%, #0d47c2 100%); padding: 32px 40px; text-align: center;">
-              <h1 style="margin:0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Manage PDF</h1>
-              <p style="margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">PDF tools powered by AI</p>
+              <h1 style="margin:0; color: #ffffff; font-size: 24px; font-weight: 700; letter-spacing: -0.5px;">Anycode</h1>
+              <p style="margin: 6px 0 0; color: rgba(255,255,255,0.9); font-size: 14px;">Productivity tools</p>
             </td>
           </tr>
           <tr>
             <td style="padding: 40px 40px 32px;">
               <p style="margin:0 0 20px; color: #0f172a; font-size: 18px; font-weight: 600;">Hi ${safeName},</p>
-              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Welcome to <strong style="color: #135bec;">Manage PDF</strong>! Your account is ready. Sign, merge, convert, and summarize PDFs with AI — all in one place.</p>
+              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Welcome to <strong style="color: #135bec;">Anycode</strong>! Your account is ready. Use our productivity tools — PDFs, summarization, image to prompt, and more.</p>
               <p style="margin:0 0 28px; color: #475569; font-size: 16px; line-height: 1.6;">Subscribe when you're ready for full access to all tools.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
                 <tr>
@@ -101,7 +101,7 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
           </tr>
           <tr>
             <td style="padding: 24px 40px 32px; border-top: 1px solid #e2e8f0;">
-              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks for joining us,<br/><strong style="color: #64748b;">The Manage PDF team</strong></p>
+              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks for joining us,<br/><strong style="color: #64748b;">The Anycode team</strong></p>
             </td>
           </tr>
         </table>
@@ -138,7 +138,7 @@ function getFreeSubscriptionEmailHtml(displayName: string): string {
           <tr>
             <td style="padding: 40px 40px 32px;">
               <p style="margin:0 0 20px; color: #0f172a; font-size: 18px; font-weight: 600;">Hi ${safeName},</p>
-              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">We've added <strong style="color: #059669;">10 days of free subscription</strong> to your Manage PDF account. Enjoy full access to all PDF tools — sign, merge, convert, and summarize with AI.</p>
+              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">We've added <strong style="color: #059669;">10 days of free subscription</strong> to your Anycode account. Enjoy full access to all productivity tools.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 28px auto 0;">
                 <tr>
                   <td style="border-radius: 12px; background: linear-gradient(135deg, #135bec 0%, #0d47c2 100%); box-shadow: 0 2px 8px rgba(19, 91, 236, 0.35);">
@@ -150,7 +150,7 @@ function getFreeSubscriptionEmailHtml(displayName: string): string {
           </tr>
           <tr>
             <td style="padding: 24px 40px 32px; border-top: 1px solid #e2e8f0;">
-              <p style="margin:0; color: #94a3b8; font-size: 14px;">Enjoy,<br/><strong style="color: #64748b;">The Manage PDF team</strong></p>
+              <p style="margin:0; color: #94a3b8; font-size: 14px;">Enjoy,<br/><strong style="color: #64748b;">The Anycode team</strong></p>
             </td>
           </tr>
         </table>
@@ -183,7 +183,7 @@ function getPaymentSuccessEmailHtml(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Payment successful — Manage PDF</title>
+  <title>Payment successful — Anycode</title>
 </head>
 <body style="margin:0; padding:0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f1f5f9;">
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="background-color: #f1f5f9; padding: 40px 20px;">
@@ -199,9 +199,9 @@ function getPaymentSuccessEmailHtml(
           <tr>
             <td style="padding: 40px 40px 32px;">
               <p style="margin:0 0 20px; color: #0f172a; font-size: 18px; font-weight: 600;">Hi ${safeName},</p>
-              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Thank you for your payment. Your <strong style="color: #059669;">${escapeHtml(planText)}</strong> subscription to Manage PDF is now active.</p>
+              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Thank you for your payment. Your <strong style="color: #059669;">${escapeHtml(planText)}</strong> subscription to Anycode is now active.</p>
               <p style="margin:0 0 8px; color: #475569; font-size: 14px;">Access runs until <strong style="color: #0f172a;">${escapeHtml(expiresFormatted)}</strong>.</p>
-              <p style="margin:0 0 28px; color: #475569; font-size: 16px; line-height: 1.6;">You have full access to all PDF tools — sign, merge, convert, and summarize with AI.</p>
+              <p style="margin:0 0 28px; color: #475569; font-size: 16px; line-height: 1.6;">You have full access to all productivity tools on anycode.it.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 0 auto;">
                 <tr>
                   <td style="border-radius: 12px; background: linear-gradient(135deg, #135bec 0%, #0d47c2 100%); box-shadow: 0 2px 8px rgba(19, 91, 236, 0.35);">
@@ -213,7 +213,7 @@ function getPaymentSuccessEmailHtml(
           </tr>
           <tr>
             <td style="padding: 24px 40px 32px; border-top: 1px solid #e2e8f0;">
-              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks,<br/><strong style="color: #64748b;">The Manage PDF team</strong></p>
+              <p style="margin:0; color: #94a3b8; font-size: 14px;">Thanks,<br/><strong style="color: #64748b;">The Anycode team</strong></p>
             </td>
           </tr>
         </table>
@@ -238,7 +238,7 @@ export async function sendPaymentSuccessEmail(
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: "Payment successful — Your Manage PDF subscription is active",
+      subject: "Payment successful — Your Anycode subscription is active",
       html: getPaymentSuccessEmailHtml(displayName, planLabel, newExpiresAt),
     });
   } catch (err) {
@@ -255,7 +255,7 @@ export async function sendFreeSubscriptionEmail(to: string, name?: string | null
     await resend.emails.send({
       from: FROM_EMAIL,
       to,
-      subject: "You won 10 days free subscription — Manage PDF",
+      subject: "You won 10 days free subscription — Anycode",
       html: getFreeSubscriptionEmailHtml(displayName),
     });
   } catch (err) {
@@ -281,8 +281,8 @@ export async function sendWelcomeEmail(
       from: FROM_EMAIL,
       to,
       subject: verifyLink
-        ? "Welcome to Manage PDF — Verify your email to get 1 day free"
-        : "Welcome to Manage PDF",
+        ? "Welcome to Anycode — Verify your email to get 1 day free"
+        : "Welcome to Anycode",
       html: getWelcomeEmailHtml(displayName, verifyLink),
     });
   } catch (err) {

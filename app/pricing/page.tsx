@@ -27,7 +27,7 @@ export default function PricingPage() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const inviteMessage = "Get 1 free day and join the waitlist to get AI productivity tools for PDF and image processing. Join me on anycode.it: ";
+  const inviteMessage = "Get 1 free day and join the waitlist to get AI productivity tools for PDF and image processing. Join me on : ";
   const inviteText = inviteUrl ? `${inviteMessage}${inviteUrl}` : "";
 
   const shareWhatsApp = () => {

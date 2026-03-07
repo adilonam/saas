@@ -36,6 +36,7 @@ export default function Header() {
     { title: "PDF to Word", href: "/pdf-to-word" },
     { title: "Summarize PDF", href: "/summarize-pdf" },
     { title: "Image to Prompt", href: "/image-to-prompt" },
+    { title: "Trading Signal", href: "/trading-signal" },
   ];
 
   return (

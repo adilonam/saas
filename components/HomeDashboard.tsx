@@ -13,6 +13,7 @@ import {
   Squares2X2Icon,
   PhotoIcon,
   PencilIcon,
+  ChartBarIcon,
   CodeBracketSquareIcon,
   ComputerDesktopIcon,
   CheckCircleIcon,
@@ -70,6 +71,13 @@ const popularTools = [
     description: "Convert to Word, Excel, or Image formats with high fidelity.",
     icon: PhotoIcon,
     iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/trading-signal",
+    title: "Trading Signal",
+    description: "Upload a chart screenshot and get AI analysis: entry, take profit, stop loss.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
   {
     href: "#",

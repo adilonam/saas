@@ -213,17 +213,16 @@ export default function PDFToWordPage() {
         <Button
           onClick={handleConvert}
           disabled={!selectedFile || isConverting}
-          className="flex items-center gap-2 rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90"
-          size="lg"
+          className="gap-2"
         >
           {isConverting ? (
             <>
-              <Loader2 className="size-4 animate-spin" />
-              Converting...
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Converting…
             </>
           ) : (
             <>
-              <ArrowDownTrayIcon className="size-4" />
+              <ArrowDownTrayIcon className="h-4 w-4" />
               Convert to Word
             </>
           )}

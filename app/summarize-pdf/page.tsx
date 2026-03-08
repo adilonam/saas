@@ -246,17 +246,16 @@ export default function SummarizePDFPage() {
         <Button
           onClick={handleSummarize}
           disabled={selectedFiles.length === 0 || isSummarizing}
-          className="flex items-center gap-2 rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90"
-          size="lg"
+          className="gap-2"
         >
           {isSummarizing ? (
             <>
-              <Loader2 className="size-4 animate-spin" />
-              Summarizing...
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Summarizing…
             </>
           ) : (
             <>
-              <DocumentMagnifyingGlassIcon className="size-4" />
+              <DocumentMagnifyingGlassIcon className="h-4 w-4" />
               Summarize PDFs
             </>
           )}

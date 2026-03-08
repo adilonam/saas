@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import {
   SparklesIcon,
   DocumentMagnifyingGlassIcon,
+  DocumentPlusIcon,
   ChatBubbleLeftRightIcon,
   LanguageIcon,
   ArrowTrendingUpIcon,
@@ -80,11 +81,19 @@ const popularTools = [
     iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
   {
+    href: "/generate-pdf",
+    title: "Generate PDF",
+    description: "Describe your document in plain language; get LaTeX code and compile to PDF.",
+    icon: DocumentPlusIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
     href: "#",
     title: "Edit PDF",
     description: "Edit text, images, and pages within your PDF files.",
     icon: PencilIcon,
     iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+    comingSoon: true,
   },
 ];
 
@@ -207,23 +216,44 @@ export default function HomeDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {popularTools.map(
-            ({ href, title, description, icon: Icon, iconBg }) => (
-              <Link
-                key={title}
-                href={href}
-                className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
-              >
+            ({ href, title, description, icon: Icon, iconBg, comingSoon }) =>
+              comingSoon ? (
                 <div
-                  className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+                  key={title}
+                  className="group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left border border-slate-200 dark:border-slate-700 cursor-not-allowed opacity-90"
                 >
-                  <Icon className="size-8" />
+                  <div
+                    className={`size-14 rounded-2xl flex items-center justify-center mb-6 ${iconBg}`}
+                  >
+                    <Icon className="size-8" />
+                  </div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <p className="font-bold text-lg">{title}</p>
+                    <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 bg-slate-200 dark:bg-slate-700 px-2 py-0.5 rounded-full">
+                      Coming Soon
+                    </span>
+                  </div>
+                  <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                    {description}
+                  </p>
                 </div>
-                <p className="font-bold text-lg">{title}</p>
-                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                  {description}
-                </p>
-              </Link>
-            )
+              ) : (
+                <Link
+                  key={title}
+                  href={href}
+                  className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+                >
+                  <div
+                    className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+                  >
+                    <Icon className="size-8" />
+                  </div>
+                  <p className="font-bold text-lg">{title}</p>
+                  <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                    {description}
+                  </p>
+                </Link>
+              )
           )}
         </div>
       </section>

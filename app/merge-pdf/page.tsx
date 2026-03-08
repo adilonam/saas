@@ -247,17 +247,16 @@ export default function MergePDFPage() {
         <Button
           onClick={handleMerge}
           disabled={selectedFiles.length < 2 || isMerging}
-          className="flex items-center gap-2 rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90"
-          size="lg"
+          className="gap-2"
         >
           {isMerging ? (
             <>
-              <Loader2 className="size-4 animate-spin" />
-              Merging...
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Merging…
             </>
           ) : (
             <>
-              <ArrowDownTrayIcon className="size-4" />
+              <ArrowDownTrayIcon className="h-4 w-4" />
               Merge PDFs
             </>
           )}

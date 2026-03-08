@@ -126,16 +126,16 @@ export default function TradingSignalPage() {
             <Button
               onClick={handlePredict}
               disabled={isAnalyzing || !chartImage}
-              className="w-full rounded-xl bg-dashboard-primary hover:bg-dashboard-primary/90 text-white font-semibold py-3 gap-2"
+              className="w-full gap-2"
             >
               {isAnalyzing ? (
                 <>
-                  <Loader2 className="size-5 animate-spin" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Analyzing…
                 </>
               ) : (
                 <>
-                  <ChartBarIcon className="size-5" />
+                  <ChartBarIcon className="h-4 w-4" />
                   Predict
                 </>
               )}

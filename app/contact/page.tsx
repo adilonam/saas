@@ -3,7 +3,7 @@
 import DashboardLayout from "components/DashboardLayout";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
 
-const CONTACT_EMAIL = "adil.abbadi.1996@gmail.com";
+const CONTACT_EMAIL = "info@anycode.it";
 
 export default function ContactPage() {
   return (

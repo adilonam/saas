@@ -134,7 +134,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.email = token.email as string;
         session.user.name = token.name as string;
         session.user.subscriptionExpiresAt = token.subscriptionExpiresAt
-          ? new Date(token.subscriptionExpiresAt as string)
+          ? new Date(token.subscriptionExpiresAt as unknown as string)
           : null;
         session.user.waitlistNumber = (token.waitlistNumber as number) ?? null;
       }

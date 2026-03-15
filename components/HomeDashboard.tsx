@@ -13,11 +13,15 @@ import {
   PencilSquareIcon,
   Squares2X2Icon,
   PhotoIcon,
+  FilmIcon,
   PencilIcon,
   ChartBarIcon,
   CodeBracketSquareIcon,
   ComputerDesktopIcon,
   CheckCircleIcon,
+  CalculatorIcon,
+  BanknotesIcon,
+  ChartPieIcon,
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 
@@ -105,6 +109,73 @@ const aiImageTools = [
       "Turn any image into AI-ready prompts for Midjourney, Stable Diffusion, Flux, and more.",
     icon: PhotoIcon,
     iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/video-to-prompt",
+    title: "Video to Prompt",
+    description:
+      "Turn any video into AI-ready prompts from key frames — for Flux, Midjourney, Stable Diffusion.",
+    icon: FilmIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+];
+
+const calculatorTools = [
+  {
+    href: "/bmi-calculator",
+    title: "BMI Calculator",
+    description:
+      "Calculate your Body Mass Index from weight and height. See category and healthy range.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/gpa-calculator",
+    title: "GPA Calculator",
+    description:
+      "Calculate your Grade Point Average from letter grades and credit hours. Add courses and see cumulative GPA.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/autoloan-calculator",
+    title: "Auto Loan Calculator",
+    description:
+      "Estimate monthly payment, total interest, and total cost for a car loan.",
+    icon: BanknotesIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/calorie-calculator",
+    title: "Calorie Calculator",
+    description:
+      "Estimate daily calorie needs (TDEE) to maintain, lose, or gain weight.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/time-calculator",
+    title: "Duration Calculator",
+    description:
+      "Calculate duration between two dates and times in days, hours, minutes, and seconds.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/age-calculator",
+    title: "Age Calculator",
+    description:
+      "Calculate age in years, months, and days from birth date. Optional as-of date.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/picker-wheel",
+    title: "Picker Wheel",
+    description:
+      "Add choices with weights and spin the wheel to pick randomly. Default: yes / no.",
+    icon: ChartPieIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
   },
 ];
 
@@ -255,6 +326,37 @@ export default function HomeDashboard() {
                 </Link>
               )
           )}
+        </div>
+      </section>
+
+      {/* Calculator */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/20 flex items-center justify-center text-cyan-600">
+            <CalculatorIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Calculator</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {calculatorTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
         </div>
       </section>
 

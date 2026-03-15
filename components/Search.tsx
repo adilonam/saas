@@ -11,6 +11,15 @@ const SEARCHABLE_FEATURES = [
   { title: "Sign PDF", href: "/sign-pdf", keywords: "sign signature sign pdf" },
   { title: "Merge PDFs", href: "/merge-pdf", keywords: "merge combine pdf multiple" },
   { title: "Convert PDF", href: "/pdf-to-word", keywords: "convert word docx excel image" },
+  { title: "BMI Calculator", href: "/bmi-calculator", keywords: "bmi body mass index weight height calculator" },
+  { title: "GPA Calculator", href: "/gpa-calculator", keywords: "gpa grade point average letter grade credits calculator" },
+  { title: "Auto Loan Calculator", href: "/autoloan-calculator", keywords: "auto loan car loan monthly payment interest calculator" },
+  { title: "Calorie Calculator", href: "/calorie-calculator", keywords: "calorie calories tdee bmr daily intake weight loss gain maintain" },
+  { title: "Duration Calculator", href: "/time-calculator", keywords: "duration between two dates time calculator days hours minutes seconds" },
+  { title: "Age Calculator", href: "/age-calculator", keywords: "age birthday birth date years months days calculator" },
+  { title: "Picker Wheel", href: "/picker-wheel", keywords: "picker wheel spinner random choice weighted spin" },
+  { title: "Image to Prompt", href: "/image-to-prompt", keywords: "image to prompt midjourney flux stable diffusion" },
+  { title: "Video to Prompt", href: "/video-to-prompt", keywords: "video to prompt midjourney flux stable diffusion" },
 ];
 
 function matchQuery(title: string, keywords: string, query: string): boolean {

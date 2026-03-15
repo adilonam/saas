@@ -111,6 +111,14 @@ const Features = () => {
       href: "/image-to-prompt",
       comingSoon: false,
     },
+    {
+      icon: FaImage,
+      title: "Video to Prompt",
+      description:
+        "Turn any video into AI-ready prompts from key frames for Flux, Midjourney, Stable Diffusion.",
+      href: "/video-to-prompt",
+      comingSoon: false,
+    },
   ];
 
   return (

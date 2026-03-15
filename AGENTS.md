@@ -1,19 +1,12 @@
 # Cursor Rules
 
 ## Technology Stack Versions
-
-1. **Use Tailwind CSS v4** - This project uses Tailwind CSS v4.1.17. When working with Tailwind, ensure you're using v4 syntax and features. The configuration uses the new @theme inline syntax in globals.css.
-
-2. **Use shadcn/ui v3** - This project uses shadcn/ui v3.5.1. When adding components, use `npx shadcn@latest add [component-name]`. Components are located in `components/components/ui/` and utilities are in `components/lib/utils.ts`.
-
-3. **Use Next.js v16** - This project uses Next.js v16.0.8 with React 19.2.1. Ensure all Next.js features and patterns follow v16 conventions, including App Router patterns and React Server Components.
-
-4. **Use NextAuth.js v4** - NextAuth.js v4 is supported for authentication. Use next-auth for auth-related features and providers. Refer to the [NextAuth v4 docs](https://next-auth.js.org/getting-started/introduction) for implementation.
-
-5. **Use Prisma v7** - Prisma v7 is used for ORM and database support. Use @prisma/client and prisma package version 7.x in your backend and database logic. Refer to the [Prisma v7 docs](https://www.prisma.io/docs/) for usage details.
-
-6. the website is in english
-
-7. for icons use herocins
-
-9. when new page is added add it to search comp and to sitemap
+- Tailwind CSS v4 is required (follow respective latest conventions).
+- shadcn/ui v3 is required (follow respective latest conventions).
+- Next.js v16 (React 19) is required (follow respective latest conventions).
+- NextAuth.js v4 is required (follow respective latest conventions).
+- Prisma v7 is required (follow respective latest conventions).
+- Use English.
+- Use Heroicons for icons.
+- Add new pages to the search component and sitemap.
+- Use good architecture, components, and functions.

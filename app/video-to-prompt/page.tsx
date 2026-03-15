@@ -1,28 +1,97 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
-import { PhotoIcon, ArrowUpTrayIcon, CheckIcon } from "@heroicons/react/24/outline";
+import { FilmIcon, ArrowUpTrayIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 const PROMPT_TYPES = [
-  { id: "general", label: "General Image Prompt", description: "Natural language description of the image" },
-  { id: "structured", label: "Structured Prompt", description: "Splits into Subject, Environment & Visual Style for remixing" },
-  { id: "graphic_design", label: "Graphic Design", description: "Replicates professional design aesthetics, including typography, layout, and subject details" },
-  { id: "json", label: "JSON", description: "Translates visuals into machine-native JSON code" },
-  { id: "flux", label: "Flux", description: "Optimized for state-of-the-art Flux AI models, concise natural language" },
-  { id: "midjourney", label: "Midjourney", description: "Tailored for Midjourney generation with Midjourney parameters" },
+  { id: "general", label: "General Video Prompt", description: "Natural language description of the video" },
+  { id: "structured", label: "Structured Prompt", description: "Subject, Environment & Visual Style for remixing" },
+  { id: "flux", label: "Flux", description: "Optimized for Flux AI models, concise natural language" },
+  { id: "midjourney", label: "Midjourney", description: "Tailored for Midjourney with parameters" },
   { id: "stable_diffusion", label: "Stable Diffusion", description: "Formatted for Stable Diffusion models" },
 ] as const;
 
-export default function ImageToPromptPage() {
+const NUM_FRAMES = 6;
+
+function extractFramesFromVideo(videoUrl: string): Promise<Blob[]> {
+  return new Promise((resolve, reject) => {
+    const video = document.createElement("video");
+    video.crossOrigin = "anonymous";
+    video.muted = true;
+    video.playsInline = true;
+
+    const canvas = document.createElement("canvas");
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      reject(new Error("Canvas not supported"));
+      return;
+    }
+
+    video.onloadeddata = () => {
+      const duration = video.duration;
+      if (!Number.isFinite(duration) || duration <= 0) {
+        reject(new Error("Could not read video duration"));
+        return;
+      }
+
+      const times: number[] = [];
+      for (let i = 0; i < NUM_FRAMES; i++) {
+        const t = i === NUM_FRAMES - 1 ? Math.max(0, duration - 0.1) : (duration * i) / (NUM_FRAMES - 1);
+        times.push(t);
+      }
+
+      const blobs: Blob[] = [];
+      let index = 0;
+
+      const captureFrame = () => {
+        if (index >= times.length) {
+          resolve(blobs);
+          video.remove();
+          canvas.remove();
+          return;
+        }
+
+        const time = times[index];
+        video.currentTime = time;
+        video.onseeked = () => {
+          try {
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+            canvas.toBlob(
+              (blob) => {
+                if (blob) blobs.push(blob);
+                index++;
+                captureFrame();
+              },
+              "image/jpeg",
+              0.85,
+            );
+          } catch (e) {
+            reject(e);
+          }
+        };
+      };
+
+      captureFrame();
+    };
+
+    video.onerror = () => reject(new Error("Failed to load video"));
+    video.src = videoUrl;
+    video.load();
+  });
+}
+
+export default function VideoToPromptPage() {
   const router = useRouter();
   const { data: session, status } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [promptType, setPromptType] = useState<string>("general");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -33,31 +102,31 @@ export default function ImageToPromptPage() {
     session?.user?.subscriptionExpiresAt &&
     new Date(session.user.subscriptionExpiresAt) > new Date();
 
-  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file || !file.type.startsWith("video/")) return;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setSelectedImage(file);
+    setSelectedVideo(file);
     setPreviewUrl(URL.createObjectURL(file));
     setResult(null);
     setError(null);
     if (fileInputRef.current) fileInputRef.current.value = "";
-  };
+  }, [previewUrl]);
 
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     const file = e.dataTransfer.files?.[0];
-    if (!file || !file.type.startsWith("image/")) return;
+    if (!file || !file.type.startsWith("video/")) return;
     if (previewUrl) URL.revokeObjectURL(previewUrl);
-    setSelectedImage(file);
+    setSelectedVideo(file);
     setPreviewUrl(URL.createObjectURL(file));
     setResult(null);
     setError(null);
-  };
+  }, [previewUrl]);
 
   const handleGenerate = async () => {
     if (status === "unauthenticated" || !session) {
-      router.push("/signup?callbackUrl=" + encodeURIComponent("/image-to-prompt"));
+      router.push("/signup?callbackUrl=" + encodeURIComponent("/video-to-prompt"));
       return;
     }
 
@@ -66,8 +135,8 @@ export default function ImageToPromptPage() {
       return;
     }
 
-    if (!selectedImage) {
-      setError("Please select an image first.");
+    if (!selectedVideo || !previewUrl) {
+      setError("Please select a video first.");
       return;
     }
 
@@ -76,11 +145,18 @@ export default function ImageToPromptPage() {
     setResult(null);
 
     try {
-      const formData = new FormData();
-      formData.append("image", selectedImage);
-      formData.append("promptType", promptType);
+      const frameBlobs = await extractFramesFromVideo(previewUrl);
+      if (frameBlobs.length === 0) {
+        throw new Error("Could not extract frames from video.");
+      }
 
-      const res = await fetch("/api/image-to-prompt", {
+      const formData = new FormData();
+      formData.append("promptType", promptType);
+      frameBlobs.forEach((blob, i) => {
+        formData.append(`frame_${i}`, blob, `frame_${i}.jpg`);
+      });
+
+      const res = await fetch("/api/video-to-prompt", {
         method: "POST",
         body: formData,
       });
@@ -108,14 +184,14 @@ export default function ImageToPromptPage() {
       <div className="mb-10">
         <div className="flex items-center gap-3 mb-2">
           <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400">
-            <PhotoIcon className="size-5" />
+            <FilmIcon className="size-5" />
           </div>
           <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Image to Prompt
+            Video to Prompt
           </h1>
         </div>
         <p className="text-slate-500 dark:text-slate-400 text-lg">
-          Upload an image and get a prompt in the format you need for AI image generation.
+          Upload a video and get a prompt from key frames — for AI image/video generation (Flux, Midjourney, Stable Diffusion).
         </p>
       </div>
 
@@ -129,26 +205,27 @@ export default function ImageToPromptPage() {
         <input
           ref={fileInputRef}
           type="file"
-          accept="image/*"
+          accept="video/*"
           onChange={handleFileSelect}
           className="hidden"
         />
         {previewUrl ? (
           <div className="flex flex-col items-center gap-3">
-            <img
+            <video
               src={previewUrl}
-              alt="Preview"
-              className="max-h-48 rounded-xl object-contain border border-slate-200 dark:border-slate-700"
+              controls
+              className="max-h-48 rounded-xl border border-slate-200 dark:border-slate-700"
+              preload="metadata"
             />
             <p className="text-sm text-slate-600 dark:text-slate-400">
-              {selectedImage?.name} — click or drop another to replace
+              {selectedVideo?.name} — click or drop another to replace
             </p>
           </div>
         ) : (
           <>
             <ArrowUpTrayIcon className="size-12 mx-auto mb-4 text-slate-400 dark:text-slate-500" />
             <p className="text-slate-600 dark:text-slate-400 mb-2">
-              Drag and drop an image here, or click to select
+              Drag and drop a video here, or click to select
             </p>
           </>
         )}
@@ -197,17 +274,17 @@ export default function ImageToPromptPage() {
       <div className="flex gap-4 mb-10">
         <Button
           onClick={handleGenerate}
-          disabled={!selectedImage || isGenerating}
+          disabled={!selectedVideo || isGenerating}
           className="gap-2"
         >
           {isGenerating ? (
             <>
               <Loader2 className="h-4 w-4 animate-spin" />
-              Generating...
+              Extracting frames & generating...
             </>
           ) : (
             <>
-              <PhotoIcon className="h-4 w-4" />
+              <FilmIcon className="h-4 w-4" />
               Generate prompt
             </>
           )}

@@ -9,3 +9,15 @@
 - [ ] word to pdf
 - [ ] pdf splitter
 - [ ] stripe
+
+
+- [ ] maths solver
+
+- [x] mortgage calculator
+- [x] bmi calculator
+- [x] calorie calculator
+- [x] autoloan calculator
+- [x] gpa calculator
+- [ ] payroll calculator
+- [x] time calculator
+- [x] age calculator

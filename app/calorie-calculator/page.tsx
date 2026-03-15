@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { CalculatorIcon } from "@heroicons/react/24/outline";
 
 type Unit = "metric" | "imperial";
@@ -38,6 +41,9 @@ function bmrMifflin(weightKg: number, heightCm: number, age: number, sex: Sex): 
 }
 
 export default function CalorieCalculatorPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [unit, setUnit] = useState<Unit>("metric");
   const [sex, setSex] = useState<Sex>("male");
   const [activity, setActivity] = useState<Activity>("moderate");
@@ -47,6 +53,22 @@ export default function CalorieCalculatorPage() {
   const [weightLb, setWeightLb] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
+  const [resultUnlocked, setResultUnlocked] = useState(false);
+
+  const handleCalculate = () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/calorie-calculator")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
+    setResultUnlocked(true);
+  };
 
   const { bmr, tdee } = useMemo(() => {
     let kg: number;
@@ -249,7 +271,14 @@ export default function CalorieCalculatorPage() {
             </div>
           </div>
 
-          {bmr != null && tdee != null && (
+          <div className="flex gap-4 pt-4">
+            <Button onClick={handleCalculate} className="gap-2">
+              <CalculatorIcon className="h-4 w-4" />
+              Calculate
+            </Button>
+          </div>
+
+          {bmr != null && tdee != null && resultUnlocked && (
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Basal metabolic rate (BMR)</p>

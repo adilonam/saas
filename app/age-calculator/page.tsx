@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { CalendarDaysIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
+import { CalendarDaysIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 
 function parseDate(value: string): Date | null {
   if (!value.trim()) return null;
@@ -42,6 +45,9 @@ function nextBirthday(birth: Date, asOf: Date): Date | null {
 }
 
 export default function AgeCalculatorPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const today = useMemo(() => {
     const d = new Date();
     return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
@@ -50,6 +56,22 @@ export default function AgeCalculatorPage() {
   const [birthDate, setBirthDate] = useState("");
   const [asOfDate, setAsOfDate] = useState(today);
   const [useToday, setUseToday] = useState(true);
+  const [resultUnlocked, setResultUnlocked] = useState(false);
+
+  const handleCalculate = () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/age-calculator")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
+    setResultUnlocked(true);
+  };
 
   const result = useMemo(() => {
     const birth = parseDate(birthDate);
@@ -117,7 +139,14 @@ export default function AgeCalculatorPage() {
             )}
           </div>
 
-          {result && (
+          <div className="flex gap-4 pt-4">
+            <Button onClick={handleCalculate} disabled={!birthDate} className="gap-2">
+              <CalculatorIcon className="h-4 w-4" />
+              Calculate
+            </Button>
+          </div>
+
+          {result && resultUnlocked && (
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
               <p className="text-sm text-slate-500 dark:text-slate-400">Age</p>
               <p className="text-3xl font-bold text-slate-900 dark:text-white">

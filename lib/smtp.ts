@@ -57,7 +57,7 @@ function getWelcomeEmailHtml(displayName: string, verifyLink?: string): string {
             <td style="padding: 40px 40px 32px;">
               <p style="margin:0 0 20px; color: #0f172a; font-size: 18px; font-weight: 600;">Hi ${safeName},</p>
               <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">Welcome to <strong style="color: #135bec;">Anycode</strong> — productivity tools. Sign and merge PDFs, convert to Word, summarize with AI, image to prompt, and more.</p>
-              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">You get <strong style="color: #0f172a;">one day of free subscription</strong> after you verify your email. Click the button below to verify your email and activate it.</p>
+              <p style="margin:0 0 16px; color: #475569; font-size: 16px; line-height: 1.6;">You get <strong style="color: #0f172a;">one day of free subscription</strong> to use all tools — it's active now. Click the button below to verify your email and confirm your account.</p>
               <table role="presentation" cellspacing="0" cellpadding="0" style="margin: 28px auto 0;">
                 <tr>
                   <td style="border-radius: 12px; background: linear-gradient(135deg, #059669 0%, #047857 100%); box-shadow: 0 2px 8px rgba(5, 150, 105, 0.35);">

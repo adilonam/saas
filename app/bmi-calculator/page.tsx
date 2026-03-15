@@ -1,9 +1,12 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { CalculatorIcon } from "@heroicons/react/24/outline";
 
 type Unit = "metric" | "imperial";
@@ -22,12 +25,31 @@ function healthyWeightRange(heightM: number): [number, number] {
 }
 
 export default function BMICalculatorPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [unit, setUnit] = useState<Unit>("metric");
   const [weightKg, setWeightKg] = useState("");
   const [heightCm, setHeightCm] = useState("");
   const [weightLb, setWeightLb] = useState("");
   const [heightFt, setHeightFt] = useState("");
   const [heightIn, setHeightIn] = useState("");
+  const [resultUnlocked, setResultUnlocked] = useState(false);
+
+  const handleCalculate = () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bmi-calculator")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
+    setResultUnlocked(true);
+  };
 
   const { bmi, category, healthyRange, heightM } = useMemo(() => {
     let kg: number;
@@ -175,7 +197,14 @@ export default function BMICalculatorPage() {
             </>
           )}
 
-          {bmi != null && (
+          <div className="flex gap-4 pt-4">
+            <Button onClick={handleCalculate} className="gap-2">
+              <CalculatorIcon className="h-4 w-4" />
+              Calculate
+            </Button>
+          </div>
+
+          {bmi != null && resultUnlocked && (
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
               <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Your BMI</p>
               <p className="text-4xl font-bold text-slate-900 dark:text-white">{bmi}</p>

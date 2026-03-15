@@ -1,10 +1,13 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
+import { BanknotesIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 
 function monthlyPayment(principal: number, annualRatePercent: number, months: number): number {
   if (principal <= 0 || months <= 0) return 0;
@@ -14,9 +17,28 @@ function monthlyPayment(principal: number, annualRatePercent: number, months: nu
 }
 
 export default function AutoLoanCalculatorPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [loanAmount, setLoanAmount] = useState("");
   const [apr, setApr] = useState("");
   const [termYears, setTermYears] = useState("");
+  const [resultUnlocked, setResultUnlocked] = useState(false);
+
+  const handleCalculate = () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/autoloan-calculator")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
+    setResultUnlocked(true);
+  };
 
   const result = useMemo(() => {
     const P = parseFloat(loanAmount.replace(/,/g, "")) || 0;
@@ -92,7 +114,14 @@ export default function AutoLoanCalculatorPage() {
             />
           </div>
 
-          {result && (
+          <div className="flex gap-4 pt-4">
+            <Button onClick={handleCalculate} disabled={!loanAmount || !apr || !termYears} className="gap-2">
+              <CalculatorIcon className="h-4 w-4" />
+              Calculate
+            </Button>
+          </div>
+
+          {result && resultUnlocked && (
             <div className="pt-6 border-t border-slate-200 dark:border-slate-700 space-y-4">
               <div>
                 <p className="text-sm text-slate-500 dark:text-slate-400 mb-1">Monthly payment</p>

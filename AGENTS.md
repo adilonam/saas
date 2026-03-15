@@ -10,3 +10,5 @@
 - Use Heroicons for icons.
 - Add new pages to the search component and sitemap.
 - Use good architecture, components, and functions.
+- for any new page it must have submit btn and have conditions of auth user and subscription like generate-pdf
+- add new page to home / if new category create new category on home

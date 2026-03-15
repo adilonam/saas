@@ -1,6 +1,8 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -52,6 +54,9 @@ function nextColor(index: number): string {
 }
 
 export default function PickerWheelPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
   const [choices, setChoices] = useState<WheelChoice[]>(DEFAULT_CHOICES);
   const [wheelRotation, setWheelRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
@@ -76,6 +81,17 @@ export default function PickerWheelPage() {
   }, [choices, totalWeight]);
 
   const spin = useCallback(() => {
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/picker-wheel")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (choices.length === 0 || spinning) return;
     const idx = weightedRandomIndex(choices);
     const seg = segments[idx];
@@ -91,7 +107,7 @@ export default function PickerWheelPage() {
       setResult(choices[idx].label);
       setSpinning(false);
     }, duration);
-  }, [choices, segments, spinning]);
+  }, [session, status, router, pathname, choices, segments, spinning]);
 
   const addChoice = useCallback(() => {
     const nextId = String(Date.now());

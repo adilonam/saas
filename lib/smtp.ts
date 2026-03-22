@@ -279,6 +279,49 @@ export async function sendFreeSubscriptionEmail(to: string, name?: string | null
   }
 }
 
+/** SMTP health check — sends a simple message to verify outbound mail works. */
+export async function sendSmtpTestEmail(to: string): Promise<void> {
+  if (!transporter) {
+    throw new Error(
+      "SMTP is not configured. Set SMTP_HOST, SMTP_USER, and SMTP_PASSWORD."
+    );
+  }
+
+  const sentAt = new Date().toISOString();
+  const dashboardUrl = APP_URL.replace(/\/$/, "");
+
+  await transporter.sendMail({
+    from: FROM_EMAIL,
+    to,
+    subject: "[eProd] SMTP test — all works fine",
+    text: `Hi Adil,
+
+This is an automated SMTP test from eProd (${dashboardUrl}).
+
+All works fine — the mail server delivered this message successfully.
+
+Sent at (UTC): ${sentAt}
+`,
+    html: `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>SMTP test — eProd</title>
+</head>
+<body style="margin:0; padding:24px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background:#f1f5f9; color:#0f172a;">
+  <div style="max-width:520px; margin:0 auto; background:#fff; border-radius:12px; padding:32px; box-shadow:0 1px 3px rgba(0,0,0,0.08);">
+    <p style="margin:0 0 16px; font-size:18px; font-weight:600;">Hi Adil,</p>
+    <p style="margin:0 0 12px; color:#475569; line-height:1.6;">This is an automated <strong>SMTP test</strong> from <strong style="color:#135bec;">eProd</strong>.</p>
+    <p style="margin:0 0 12px; color:#059669; font-weight:600;">All works fine — the mail server delivered this message successfully.</p>
+    <p style="margin:0; color:#94a3b8; font-size:13px;">Sent at (UTC): ${escapeHtml(sentAt)}</p>
+    <p style="margin:24px 0 0;"><a href="${escapeHtml(dashboardUrl)}" style="color:#135bec;">${escapeHtml(dashboardUrl)}</a></p>
+  </div>
+</body>
+</html>`.trim(),
+  });
+}
+
 export async function sendWelcomeEmail(
   to: string,
   name?: string | null,

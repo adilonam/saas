@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Picker Wheel – Anycode",
+  title: "Picker Wheel – eProd",
   description:
     "Spin a weighted picker wheel. Add choices with weights (default 1), then spin to pick randomly.",
 };

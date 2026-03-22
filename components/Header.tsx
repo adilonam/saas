@@ -49,7 +49,7 @@ export default function Header() {
               href="/"
               className="text-base sm:text-xl dark:text-gray-100 font-semibold truncate"
             >
-              anycode.it
+              eprod.io
             </Link>
             {/* Desktop Navigation */}
             <NavigationMenu className="hidden md:block">

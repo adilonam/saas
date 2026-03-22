@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 
-const APP_URL = process.env.NEXTAUTH_URL || "https://anycode.it";
+const APP_URL = process.env.NEXTAUTH_URL || "https://eprod.io";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);

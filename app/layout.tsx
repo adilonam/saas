@@ -13,9 +13,9 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "Anycode – Productivity Tools Online",
+  title: "eProd – Productivity Tools Online",
   description:
-    "Productivity tools online: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. Anycode.it",
+    "Productivity tools online: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. eprod.io",
 };
 
 export default function RootLayout({
@@ -94,7 +94,7 @@ fbq('track', 'PageView');`,
             />
           </noscript>
         )}
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="anycode-theme">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="eprod-theme">
           <Providers>{children}</Providers>
         </ThemeProvider>
       </body>

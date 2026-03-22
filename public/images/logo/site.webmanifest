@@ -1,6 +1,6 @@
 {
-  "name": "Anycode",
-  "short_name": "Anycode",
+  "name": "eProd",
+  "short_name": "eProd",
   "icons": [
     { "src": "/images/logo/android-chrome-96x96.png", "sizes": "96x96", "type": "image/png" },
     { "src": "/images/logo/apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }

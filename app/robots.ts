@@ -13,7 +13,7 @@ export default function robots(): MetadataRoute.Robots {
         ],
       },
     ],
-    sitemap: 'https://www.anycode.it/sitemap.xml',
+    sitemap: 'https://www.eprod.io/sitemap.xml',
   }
 }
 

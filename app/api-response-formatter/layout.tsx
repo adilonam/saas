@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "API Response Formatter – Anycode",
+  title: "API Response Formatter – eProd",
   description:
     "Format or minify JSON. Pretty-print or compact API responses for readability.",
 };

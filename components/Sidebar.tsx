@@ -53,7 +53,7 @@ export default function Sidebar({
                 : "flex-1 justify-center"
               : "gap-3 min-w-0 flex-1"
           }`}
-          title={collapsed ? "Anycode" : undefined}
+          title={collapsed ? "eProd" : undefined}
         >
           <div
             className={`rounded-lg flex items-center justify-center overflow-hidden shrink-0 ${
@@ -62,7 +62,7 @@ export default function Sidebar({
           >
             <Image
               src="/images/logo/apple-touch-icon.png"
-              alt="Anycode"
+              alt="eProd"
               width={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
               height={collapsed ? (showCollapseToggle ? 28 : 24) : 36}
               className={
@@ -75,7 +75,7 @@ export default function Sidebar({
             />
           </div>
           {!collapsed && (
-            <h1 className="text-xl font-bold tracking-tight truncate">Anycode</h1>
+            <h1 className="text-xl font-bold tracking-tight truncate">eProd</h1>
           )}
         </Link>
         {showCollapseToggle && (

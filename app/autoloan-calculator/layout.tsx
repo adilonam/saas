@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Auto Loan Calculator – Anycode",
+  title: "Auto Loan Calculator – eProd",
   description:
     "Calculate monthly payment, total interest, and total cost for a car loan. Enter loan amount, APR, and term.",
 };

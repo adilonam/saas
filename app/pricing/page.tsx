@@ -101,12 +101,12 @@ export default function PricingPage() {
               Invite friends
             </h2>
             <p className="text-sm font-medium text-dashboard-primary dark:text-dashboard-primary">
-              It&apos;s free — get 1 free day and move up on the waitlist for AI tools on anycode.it
+              It&apos;s free — get 1 free day and move up on the waitlist for AI tools on eprod.io
             </p>
           </div>
         </div>
         <p className="text-slate-600 dark:text-slate-400 text-sm sm:text-base mb-4 relative">
-          Share your link. When a friend signs up, you get <strong className="text-slate-900 dark:text-white">1 day free subscription and move closer on the waitlist </strong>for exclusive AI tools on anycode.it.
+          Share your link. When a friend signs up, you get <strong className="text-slate-900 dark:text-white">1 day free subscription and move closer on the waitlist </strong>for exclusive AI tools on eprod.io.
         </p>
         {session?.user?.id && session.user.waitlistNumber != null && (
           <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-4 relative">

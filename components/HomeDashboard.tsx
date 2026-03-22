@@ -35,6 +35,43 @@ import {
   DocumentArrowDownIcon,
   PencilSquareIcon as AnnotationIcon,
   DocumentIcon,
+  ArrowUturnLeftIcon,
+  ReceiptPercentIcon,
+  PresentationChartLineIcon,
+  ClockIcon,
+  UserGroupIcon,
+  MoonIcon,
+  BeakerIcon,
+  ArrowsRightLeftIcon,
+  WrenchScrewdriverIcon,
+  CalendarDaysIcon,
+  CalendarIcon,
+  CubeIcon,
+  ChatBubbleBottomCenterTextIcon,
+  ScaleIcon,
+  VideoCameraIcon,
+  FaceSmileIcon,
+  BoltIcon,
+  ListBulletIcon,
+  MegaphoneIcon,
+  TagIcon,
+  ShareIcon,
+  LinkIcon,
+  MapIcon,
+  LinkSlashIcon,
+  Cog6ToothIcon,
+  Bars3BottomLeftIcon,
+  BookOpenIcon,
+  QueueListIcon,
+  DocumentDuplicateIcon,
+  ShieldCheckIcon,
+  CpuChipIcon,
+  CircleStackIcon,
+  SignalIcon,
+  SwatchIcon,
+  PaintBrushIcon,
+  QrCodeIcon,
+  CommandLineIcon,
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 
@@ -195,6 +232,303 @@ const aiWritingTools = [
     icon: LightBulbIcon,
     iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
+  {
+    href: "/text-summarizer",
+    title: "Text Summarizer",
+    description: "Paste long text and get a concise summary with key facts preserved.",
+    icon: DocumentMagnifyingGlassIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/sentence-rewriter",
+    title: "Sentence Rewriter",
+    description: "Rewrite for clarity and optional tone while keeping your meaning.",
+    icon: PencilSquareIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/bullet-point-extractor",
+    title: "Bullet Point Extractor",
+    description: "Turn paragraphs into a clean bullet list from your source text.",
+    icon: ListBulletIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/headline-improver",
+    title: "Headline Improver",
+    description: "Generate many headline options from a topic or draft line.",
+    icon: MegaphoneIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
+  {
+    href: "/email-polisher",
+    title: "Email Polisher",
+    description: "Polish grammar, structure, and tone of professional email drafts.",
+    icon: EnvelopeIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/blog-outline-generator",
+    title: "Blog Outline Generator",
+    description: "Turn a topic into a structured outline with sections and subsections.",
+    icon: BookOpenIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/product-description-generator",
+    title: "Product Description Generator",
+    description: "Store-ready product copy from features, benefits, and audience.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/meta-description-generator",
+    title: "Meta Description Generator",
+    description: "SEO-friendly meta descriptions from page title and content summary.",
+    icon: TagIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/cold-email-generator",
+    title: "Cold Email Generator",
+    description: "Short cold outreach drafts with subject line from your context.",
+    icon: ChatBubbleLeftRightIcon,
+    iconBg: "bg-lime-100 dark:bg-lime-900/30 text-lime-700",
+  },
+  {
+    href: "/sql-query-generator",
+    title: "SQL Query Generator",
+    description: "Natural language to SQL with optional schema for accuracy.",
+    icon: CommandLineIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/regex-generator",
+    title: "Regex Generator",
+    description: "Describe a match in English; get a regex pattern and explanation.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/code-explainer",
+    title: "Code Explainer",
+    description: "Paste a snippet and read a clear explanation of behavior and structure.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/keyword-generator",
+    title: "Keyword Generator",
+    description: "Basic SEO-style keyword clusters and questions from a seed topic.",
+    icon: HashtagIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/palette-generator",
+    title: "App Palette Generator",
+    description:
+      "Describe your app; get three UI color palettes with hex codes, roles, and previews.",
+    icon: SwatchIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+];
+
+const qrAndCodeTools = [
+  {
+    href: "/wifi-qr-generator",
+    title: "Wi‑Fi QR Generator",
+    description: "QR code for WPA/WPA2 or open networks using the standard WIFI: format.",
+    icon: QrCodeIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/vcard-qr-generator",
+    title: "vCard QR Generator",
+    description: "Encode contact details as a scannable vCard for phones and events.",
+    icon: QrCodeIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/barcode-generator",
+    title: "Barcode Generator",
+    description: "CODE128, EAN, UPC, and more — render a barcode to copy or save.",
+    icon: QrCodeIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/timezone-overlap-checker",
+    title: "Time Zone Overlap Checker",
+    description: "See when everyone’s local working hours overlap on a chosen date.",
+    icon: GlobeAltIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+];
+
+const creatorTools = [
+  {
+    href: "/youtube-title-length-checker",
+    title: "YouTube Title Length Checker",
+    description:
+      "Count graphemes against the 100-character YouTube title limit, including emoji.",
+    icon: PlayCircleIcon,
+    iconBg: "bg-red-100 dark:bg-red-900/30 text-red-600",
+  },
+  {
+    href: "/youtube-description-length-checker",
+    title: "YouTube Description Length Checker",
+    description:
+      "Check your description against the 5,000-character limit with line and byte stats.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-red-100 dark:bg-red-900/30 text-red-600",
+  },
+  {
+    href: "/hashtag-counter",
+    title: "Hashtag Counter",
+    description: "Count total and unique hashtags in any caption or bio.",
+    icon: HashtagIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/emoji-copy-tool",
+    title: "Emoji Copy Tool",
+    description:
+      "One-tap copy for common emojis used in titles, descriptions, and posts.",
+    icon: FaceSmileIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/caption-formatter",
+    title: "Caption Formatter",
+    description:
+      "Trim lines and collapse extra blank lines for cleaner social captions.",
+    icon: ListBulletIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/hook-generator",
+    title: "Hook Generator",
+    description:
+      "Generate simple fill-in hooks from your topic for short-form content.",
+    icon: BoltIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/template-bio-generator",
+    title: "Template Bio Generator",
+    description:
+      "Build three profile bios from your details using fixed templates (no AI).",
+    icon: UserCircleIcon,
+    iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600",
+  },
+];
+
+const funViralTools = [
+  {
+    href: "/coin-flip",
+    title: "Coin Flip",
+    description:
+      "Instant fair heads or tails — one tap when you need a quick decision.",
+    icon: SparklesIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/dice-roller",
+    title: "Dice Roller",
+    description:
+      "Roll multiple dice with custom sides — great for games and tabletop.",
+    icon: CubeIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/random-name-picker",
+    title: "Random Name Picker",
+    description:
+      "Paste a list of names and pick one winner at random for giveaways or turns.",
+    icon: UserGroupIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/truth-or-dare-generator",
+    title: "Truth or Dare Generator",
+    description:
+      "Generate light party prompts — choose truth, dare, or either.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/would-you-rather-generator",
+    title: "Would You Rather Generator",
+    description:
+      "Random either-or dilemmas for icebreakers, streams, and group chats.",
+    icon: ScaleIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+];
+
+const seoMarketingTools = [
+  {
+    href: "/meta-tag-preview",
+    title: "Meta Tag Preview",
+    description:
+      "Preview title and meta description as an approximate Google search snippet.",
+    icon: TagIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/open-graph-preview",
+    title: "Open Graph Preview",
+    description:
+      "See a link-style card from og:title, description, image, and URL fields.",
+    icon: ShareIcon,
+    iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
+  },
+  {
+    href: "/keyword-density-checker",
+    title: "Keyword Density Checker",
+    description:
+      "Measure how often a keyword or phrase appears versus total word count.",
+    icon: ChartBarIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/slug-generator",
+    title: "Slug Generator",
+    description: "Convert headings or titles into clean, URL-friendly slugs.",
+    icon: LinkIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/utm-builder",
+    title: "UTM Builder",
+    description:
+      "Build campaign URLs with utm_source, medium, campaign, term, and content.",
+    icon: ArrowTrendingUpIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/robots-txt-generator",
+    title: "Robots.txt Generator",
+    description:
+      "Generate a basic robots.txt with allow/disallow rules and sitemap line.",
+    icon: Cog6ToothIcon,
+    iconBg: "bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300",
+  },
+  {
+    href: "/sitemap-validator",
+    title: "Sitemap Validator",
+    description:
+      "Paste XML to check structure, url entries, and loc URLs (basic, offline).",
+    icon: MapIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/canonical-url-checker",
+    title: "Canonical URL Checker",
+    description:
+      "Normalize and compare a page URL to a canonical href or rel=canonical HTML.",
+    icon: LinkSlashIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
 ];
 
 const productivityTools = [
@@ -229,6 +563,65 @@ const productivityTools = [
       "Upload a PDF and convert each page to a PNG image.",
     icon: DocumentIcon,
     iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+];
+
+const textProductivityTools = [
+  {
+    href: "/word-counter",
+    title: "Word Counter",
+    description:
+      "Count words, characters with or without spaces, lines, and paragraphs.",
+    icon: Bars3BottomLeftIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/reading-time-estimator",
+    title: "Reading Time Estimator",
+    description:
+      "Estimate read time from word count and your words-per-minute setting.",
+    icon: BookOpenIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/text-case-converter",
+    title: "Text Case Converter",
+    description:
+      "Switch between uppercase, lowercase, title case, and sentence case.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/remove-duplicate-lines",
+    title: "Remove Duplicate Lines",
+    description:
+      "Drop repeated lines while keeping order and optional trim or case rules.",
+    icon: QueueListIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/text-diff-checker",
+    title: "Text Diff Checker",
+    description:
+      "Compare two texts line by line to see additions, removals, and unchanged lines.",
+    icon: DocumentDuplicateIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/password-generator",
+    title: "Password Generator",
+    description:
+      "Create random passwords with length and character set options.",
+    icon: KeyIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/password-strength-checker",
+    title: "Password Strength Checker",
+    description:
+      "Score password strength and get quick tips to improve security.",
+    icon: ShieldCheckIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
   },
 ];
 
@@ -462,6 +855,116 @@ const calculatorTools = [
   },
 ];
 
+const financeTools = [
+  {
+    href: "/hourly-to-salary",
+    title: "Hourly to Salary",
+    description:
+      "Convert hourly pay to estimated annual and monthly salary from hours per week and weeks per year.",
+    icon: ClockIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/salary-to-hourly",
+    title: "Salary to Hourly",
+    description:
+      "Convert gross annual salary to an equivalent hourly rate for your schedule.",
+    icon: BanknotesIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/discount-reverse-calculator",
+    title: "Reverse Discount Calculator",
+    description:
+      "Find the original list price when you know the sale price and discount percentage.",
+    icon: ArrowUturnLeftIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/tax-calculator-simple",
+    title: "Simple Tax Calculator",
+    description:
+      "Add tax to a subtotal or split a tax-included total into net and tax.",
+    icon: ReceiptPercentIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/profit-margin-calculator",
+    title: "Profit Margin Calculator",
+    description:
+      "Gross profit, margin on revenue, and markup on cost from price and COGS.",
+    icon: PresentationChartLineIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+];
+
+const utilityTools = [
+  {
+    href: "/meeting-cost-calculator",
+    title: "Meeting Cost Calculator",
+    description:
+      "Estimate total cost from hourly rate per person, headcount, and meeting duration.",
+    icon: UserGroupIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/work-hours-calculator",
+    title: "Work Hours Calculator",
+    description:
+      "Net working time from start and end clock times minus unpaid break minutes.",
+    icon: ClockIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/sleep-cycle-calculator",
+    title: "Sleep Cycle Calculator",
+    description:
+      "Suggested bedtimes for 4–6 sleep cycles before your target wake time.",
+    icon: MoonIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/water-intake-calculator",
+    title: "Water Intake Calculator",
+    description:
+      "Daily fluid target from body weight and activity level (~35 ml/kg baseline).",
+    icon: BeakerIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/tip-split-calculator",
+    title: "Tip Split Calculator",
+    description:
+      "Tip amount, bill total with tip, and fair split per person.",
+    icon: ReceiptPercentIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/age-in-days-calculator",
+    title: "Age in Days Calculator",
+    description:
+      "How many days old from birth date to today or a date you choose.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/countdown-timer-generator",
+    title: "Countdown Timer",
+    description:
+      "Set a target date and time and watch a live countdown.",
+    icon: CalendarIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/random-decision-maker",
+    title: "Random Decision Maker",
+    description:
+      "List options one per line and pick one at random — quick tie-breaker.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+];
+
 const developerTools = [
   {
     href: "/json-to-csv",
@@ -502,6 +1005,76 @@ const developerTools = [
       "Paste a JWT to decode header and payload. Signature is not verified.",
     icon: KeyIcon,
     iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/uuid-generator",
+    title: "UUID Generator",
+    description: "Generate RFC 4122 version 4 UUIDs in the browser.",
+    icon: CpuChipIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/timestamp-converter",
+    title: "Timestamp Converter",
+    description: "Convert Unix seconds, milliseconds, and ISO date strings.",
+    icon: ClockIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/base64-encoder-decoder",
+    title: "Base64 Encoder / Decoder",
+    description: "Encode or decode text with UTF-8-safe Base64.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/json-minify-beautify",
+    title: "JSON Minify / Beautify",
+    description: "Pretty-print or minify JSON in one place.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/xml-formatter",
+    title: "XML Formatter",
+    description: "Pretty-print XML with indentation.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/sql-formatter",
+    title: "SQL Formatter",
+    description: "Format SQL for readability with dialect-aware rules.",
+    icon: CircleStackIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/http-status-code-explainer",
+    title: "HTTP Status Code Explainer",
+    description: "Look up and filter common HTTP status codes.",
+    icon: SignalIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/url-encoder-decoder",
+    title: "URL Encoder / Decoder",
+    description: "encodeURIComponent and decodeURIComponent for query-safe strings.",
+    icon: LinkIcon,
+    iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
+  },
+  {
+    href: "/color-converter",
+    title: "Color Converter",
+    description: "Convert between HEX, RGB, and HSL.",
+    icon: SwatchIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+  {
+    href: "/css-gradient-generator",
+    title: "CSS Gradient Generator",
+    description: "Build a two-stop linear gradient and copy the CSS.",
+    icon: PaintBrushIcon,
+    iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600",
   },
 ];
 
@@ -655,6 +1228,37 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Fun & Viral */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/20 flex items-center justify-center text-fuchsia-600">
+            <SparklesIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Fun &amp; Viral</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {funViralTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Calculator */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -665,6 +1269,68 @@ export default function HomeDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {calculatorTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Finance */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
+            <BanknotesIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Finance</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {financeTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Utility */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-fuchsia-100 dark:bg-fuchsia-900/20 flex items-center justify-center text-fuchsia-600">
+            <WrenchScrewdriverIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Utility</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {utilityTools.map(({ href, title, description, icon: Icon, iconBg }) => (
             <Link
               key={title}
               href={href}
@@ -720,6 +1386,98 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Creator tools */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-rose-100 dark:bg-rose-900/20 flex items-center justify-center text-rose-600">
+            <VideoCameraIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Creator tools</h3>
+          <span className="bg-rose-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
+            Premium
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {creatorTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* SEO & Marketing */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
+            <MegaphoneIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">SEO & Marketing</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {seoMarketingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <p className="font-bold text-lg">{title}</p>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* QR & codes */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-900/20 flex items-center justify-center text-sky-600">
+            <QrCodeIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">QR & codes</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {qrAndCodeTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <p className="font-bold text-lg">{title}</p>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Productivity & Utilities */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -744,6 +1502,37 @@ export default function HomeDashboard() {
               <p className="text-sm text-slate-500 mt-2 leading-relaxed">
                 {description}
               </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Text & Productivity */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center text-teal-600">
+            <DocumentTextIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Text & Productivity</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {textProductivityTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
             </Link>
           ))}
         </div>

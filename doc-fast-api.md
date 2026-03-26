@@ -220,6 +220,27 @@ All paths below are prefixed with `/fast-api/v1`.
 
 ---
 
+### `POST /fast-api/v1/image-to-pdf`
+
+**Request**
+
+- **Content-Type:** `multipart/form-data`
+- **Part:** `file` — one image (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.bmp`, `.tif`, `.tiff`)
+- `quality` — optional **1–100** (default **85**), used for JPEG data embedded in the PDF
+- `strip_metadata` — optional string: `true` / `false` / `1` / `0` (default `true`) — best-effort strips EXIF/text metadata by re-decoding
+
+**Success: 200** — binary **PDF**
+
+- **Content-Type:** `application/pdf`
+- **Header:** `Content-Disposition: attachment; filename="<basename>.pdf"`
+
+**Errors**
+
+- **400** — unsupported image upload or invalid `quality`.
+- **500** — conversion error (`detail` explains).
+
+---
+
 ### `POST /fast-api/v1/compress-pdf`
 
 **Request**
@@ -287,6 +308,25 @@ Same prefix as PDF routes: `/fast-api/v1`.
 
 - **400** — unsupported image type or invalid parameters.
 - **500** — conversion error.
+
+---
+
+### `POST /fast-api/v1/compress-image`
+
+**Request** — `multipart/form-data`
+
+- `file` — image (`.png`, `.jpg`, `.jpeg`, `.webp`, `.gif`, `.bmp`, `.tif`, `.tiff`)
+- `output_format` — optional: `png`, `jpeg`, or `webp` (default `jpeg`)
+- `max_width`, `max_height` — optional positive integers (max **8192** each)
+- `quality` — optional **1–100** (default **85**), used for JPEG/WebP
+- `strip_metadata` — optional string: `true` / `false` / `1` / `0` (default `true`) — strips EXIF/metadata via re-decode when true
+
+**Success: 200** — compressed image bytes (`image/png`, `image/jpeg`, or `image/webp`).
+
+**Errors**
+
+- **400** — unsupported image type or invalid parameters.
+- **500** — conversion/compression error.
 
 ---
 
@@ -418,9 +458,11 @@ Same prefix as PDF routes: `/fast-api/v1`.
 | `POST /fast-api/v1/rotate-pdf` | form `file`, `rotation`, optional `pages` | PDF bytes |
 | `POST /fast-api/v1/pdf-metadata` | form `file` | JSON `page_count`, `metadata` |
 | `POST /fast-api/v1/pdf-extract-images` | form `file` | ZIP of images |
+| `POST /fast-api/v1/image-to-pdf` | form `file`, optional `quality`, optional `strip_metadata` | PDF bytes |
 | `POST /fast-api/v1/compress-pdf` | form `file`, optional `pdf_settings` | PDF bytes |
 | `POST /fast-api/v1/latex-to-pdf` | JSON `{ latex }` | PDF bytes |
 | `POST /fast-api/v1/image-convert` | form `file`, `output_format`, optional size/quality | Image bytes |
+| `POST /fast-api/v1/compress-image` | form `file`, optional sizing/quality | Image bytes |
 | `POST /fast-api/v1/qr-generate` | JSON `{ text, box_size?, border? }` | PNG bytes |
 | `POST /fast-api/v1/zip-create` | form `files[]` | ZIP bytes |
 | `POST /fast-api/v1/xlsx-to-json` | form `file`, optional `max_rows` | JSON `{ rows }` |

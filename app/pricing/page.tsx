@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
@@ -9,11 +9,37 @@ import { Button } from "@/components/ui/button";
 import { CurrencyDollarIcon, CheckIcon, UserPlusIcon, ClipboardDocumentIcon, EnvelopeIcon } from "@heroicons/react/24/outline";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
 
+type PricingPayload = {
+  monthlyUsd: number;
+  annualUsd: number;
+  currency: "USD";
+};
+
 export default function PricingPage() {
   const router = useRouter();
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState<"monthly" | "annual" | null>(null);
   const [copied, setCopied] = useState(false);
+  const [prices, setPrices] = useState<PricingPayload | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      try {
+        const res = await fetch("/api/pricing");
+        if (!res.ok) return;
+        const data = (await res.json()) as PricingPayload;
+        if (!cancelled && typeof data.monthlyUsd === "number" && typeof data.annualUsd === "number") {
+          setPrices(data);
+        }
+      } catch {
+        /* keep null; UI falls back */
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const inviteUrl =
     typeof window !== "undefined" && session?.user?.id
@@ -48,6 +74,17 @@ export default function PricingPage() {
     const body = inviteText;
     window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
   };
+
+  const monthlyUsd = prices?.monthlyUsd ?? 10;
+  const annualUsd = prices?.annualUsd ?? 80;
+  const yearlyIfMonthly = monthlyUsd * 12;
+  const savePercent =
+    yearlyIfMonthly > annualUsd
+      ? Math.round((1 - annualUsd / yearlyIfMonthly) * 100)
+      : 0;
+  const annualPerMonth = annualUsd / 12;
+  const annualVsMonthlyMonths =
+    monthlyUsd > 0 ? annualUsd / monthlyUsd : null;
 
   const handleSubscribe = async (plan: "monthly" | "annual") => {
     if (!session?.user) {
@@ -198,7 +235,10 @@ export default function PricingPage() {
           </div>
           <div className="mb-6">
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
-              $10 <span className="text-base font-normal text-slate-500 dark:text-slate-400">USD / month</span>
+              ${monthlyUsd}{" "}
+              <span className="text-base font-normal text-slate-500 dark:text-slate-400">
+                USD / month
+              </span>
             </p>
           </div>
           <ul className="space-y-3 mb-8">
@@ -223,9 +263,11 @@ export default function PricingPage() {
 
         {/* Annual */}
         <div className="rounded-2xl border-2 border-dashboard-primary/30 dark:border-dashboard-primary/40 bg-white dark:bg-slate-900/50 p-8 shadow-xl relative">
-          <div className="absolute top-4 right-4 text-xs font-bold bg-dashboard-primary/20 text-dashboard-primary dark:text-dashboard-primary px-2 py-1 rounded-lg">
-            Save 33%
-          </div>
+          {savePercent > 0 && (
+            <div className="absolute top-4 right-4 text-xs font-bold bg-dashboard-primary/20 text-dashboard-primary dark:text-dashboard-primary px-2 py-1 rounded-lg">
+              Save {savePercent}%
+            </div>
+          )}
           <div className="flex items-center gap-3 mb-6">
             <div className="size-12 rounded-xl bg-dashboard-primary/10 flex items-center justify-center text-dashboard-primary">
               <CurrencyDollarIcon className="size-6" />
@@ -241,10 +283,17 @@ export default function PricingPage() {
           </div>
           <div className="mb-6">
             <p className="text-3xl font-bold text-slate-900 dark:text-white">
-              $80 <span className="text-base font-normal text-slate-500 dark:text-slate-400">USD / year</span>
+              ${annualUsd}{" "}
+              <span className="text-base font-normal text-slate-500 dark:text-slate-400">
+                USD / year
+              </span>
             </p>
             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-              ~$6.67/month
+              ~$
+              {annualPerMonth % 1 === 0
+                ? annualPerMonth.toFixed(0)
+                : annualPerMonth.toFixed(2)}
+              /month
             </p>
           </div>
           <ul className="space-y-3 mb-8">
@@ -254,7 +303,11 @@ export default function PricingPage() {
             </li>
             <li className="flex items-center gap-3 text-slate-700 dark:text-slate-300">
               <CheckIcon className="size-5 text-green-600 dark:text-green-400 shrink-0" />
-              <span>12 months for the price of 8</span>
+              <span>
+                {annualVsMonthlyMonths != null && annualVsMonthlyMonths > 0
+                  ? `12 months for the price of ~${Number.isInteger(annualVsMonthlyMonths) ? annualVsMonthlyMonths : annualVsMonthlyMonths.toFixed(1)} monthly payments`
+                  : "Best value vs paying monthly for a year"}
+              </span>
             </li>
           </ul>
           <Button

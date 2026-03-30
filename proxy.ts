@@ -4,7 +4,7 @@ import type { NextRequest } from "next/server";
 
 const authPages = ["/signin", "/signup"];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const pathname = req.nextUrl.pathname;
 
   if (authPages.some((path) => pathname === path || pathname.startsWith(path + "/"))) {

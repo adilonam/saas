@@ -142,6 +142,20 @@ const popularTools = [
     iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
   },
   {
+    href: "/markdown-to-pdf",
+    title: "Markdown to PDF",
+    description: "Render Markdown and download a PDF instantly.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/html-to-pdf",
+    title: "HTML to PDF",
+    description: "Render HTML and download a PDF instantly.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
     href: "#",
     title: "Edit PDF",
     description: "Edit text, images, and pages within your PDF files.",
@@ -362,6 +376,13 @@ const qrAndCodeTools = [
     icon: GlobeAltIcon,
     iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
   },
+  {
+    href: "/qr-generate",
+    title: "Text QR Generator",
+    description: "Generate a QR code from any text and download it as a PNG.",
+    icon: QrCodeIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
 ];
 
 const creatorTools = [
@@ -563,6 +584,86 @@ const productivityTools = [
       "Upload a PDF and convert each page to a PNG image.",
     icon: DocumentIcon,
     iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/split-pdf",
+    title: "Split PDF",
+    description:
+      "Split a PDF into one page per file (downloads as ZIP).",
+    icon: DocumentPlusIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/rotate-pdf",
+    title: "Rotate PDF",
+    description:
+      "Rotate an entire PDF or specific pages by 90-degree increments.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/pdf-metadata",
+    title: "PDF Metadata",
+    description:
+      "Extract page count and document metadata (title, author, producer, etc.).",
+    icon: DocumentTextIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/pdf-extract-images",
+    title: "Extract PDF Images",
+    description:
+      "Download embedded images from a PDF as a ZIP archive.",
+    icon: PhotoIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/image-to-pdf",
+    title: "Image to PDF",
+    description:
+      "Convert an image (PNG/JPG/WebP/etc.) into a single-page PDF.",
+    icon: DocumentArrowDownIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/compress-pdf",
+    title: "Compress PDF",
+    description:
+      "Shrink PDF size using Ghostscript PDF settings and download the optimized result.",
+    icon: DocumentIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/image-convert",
+    title: "Image Convert Tool",
+    description:
+      "Convert images between PNG/JPEG/WebP with optional resizing, quality, and metadata stripping.",
+    icon: PhotoIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/compress-image",
+    title: "Compress Image",
+    description:
+      "Compress an image by resizing and reducing quality, then download the smaller file.",
+    icon: DocumentArrowDownIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/zip-create",
+    title: "Zip Create",
+    description:
+      "Combine multiple files into a single ZIP archive for easy sharing.",
+    icon: CubeIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/xlsx-to-json",
+    title: "XLSX to JSON",
+    description:
+      "Convert the first sheet of an XLSX workbook into JSON rows.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
   },
 ];
 
@@ -973,6 +1074,13 @@ const developerTools = [
       "Paste JSON (array of objects) and convert to CSV for export or spreadsheets.",
     icon: CodeBracketSquareIcon,
     iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/csv-to-json",
+    title: "CSV → JSON Converter",
+    description: "Upload a CSV file and convert it into a JSON `rows` array.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
   },
   {
     href: "/api-response-formatter",

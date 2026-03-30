@@ -15,7 +15,7 @@ const interTight = Inter_Tight({
 export const metadata: Metadata = {
   title: "eProd – Productivity Tools Online",
   description:
-    "Productivity tools online: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. eprod.io",
+    "Productivity online tools for images, PDFs, and AI: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. eprod.io",
 };
 
 export default function RootLayout({

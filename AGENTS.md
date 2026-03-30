@@ -12,5 +12,5 @@
 - Use good architecture, components, and functions.
 - for any new page it must have submit btn and have conditions of auth user and subscription like generate-pdf
 - add new page to home / if new category create new category on home also add it in components/Search.tsx
-- you can use tools for FAST_API_URL are located on ./doc.md
+- you can use tools for FAST_API_URL are located on ./doc-fast-api.md
 - you can use ai with openai

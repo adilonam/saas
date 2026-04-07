@@ -16,6 +16,11 @@ type CsvMode =
   | "markdown-table";
 
 type CsvRowsResponse = { rows?: string[][] };
+type CsvRowsErrorResponse = { error?: string; detail?: string };
+
+function hasRows(data: unknown): data is CsvRowsResponse {
+  return !!data && typeof data === "object" && "rows" in data;
+}
 
 function toMarkdownTable(rows: string[][]): string {
   if (!rows.length) return "";
@@ -150,18 +155,15 @@ export default function CsvRowsToolPage({ mode }: { mode: CsvMode }) {
     if (maxRows.trim()) formData.append("max_rows", maxRows.trim());
 
     const res = await fetch("/api/csv-to-json", { method: "POST", body: formData });
-    const data = (await res.json().catch(() => null)) as
-      | CsvRowsResponse
-      | { error?: string; detail?: string }
-      | null;
+    const data = (await res.json().catch(() => null)) as CsvRowsResponse | CsvRowsErrorResponse | null;
     if (!res.ok) {
       const message =
-        (data as { error?: string; detail?: string } | null)?.error ||
-        (data as { error?: string; detail?: string } | null)?.detail ||
+        (data as CsvRowsErrorResponse | null)?.error ||
+        (data as CsvRowsErrorResponse | null)?.detail ||
         "Failed to process CSV";
       throw new Error(message);
     }
-    return (data?.rows ?? []) as string[][];
+    return hasRows(data) && Array.isArray(data.rows) ? data.rows : [];
   };
 
   const handleSubmit = async () => {

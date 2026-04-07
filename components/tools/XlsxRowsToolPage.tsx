@@ -11,6 +11,11 @@ import { Loader2 } from "lucide-react";
 type XlsxMode = "sheet-explorer" | "chart-json";
 
 type XlsxResponse = { rows?: unknown[] };
+type XlsxErrorResponse = { error?: string; detail?: string };
+
+function hasRows(data: unknown): data is XlsxResponse {
+  return !!data && typeof data === "object" && "rows" in data;
+}
 
 const COPY_BY_MODE: Record<XlsxMode, { title: string; subtitle: string; submitLabel: string }> = {
   "sheet-explorer": {
@@ -80,20 +85,17 @@ export default function XlsxRowsToolPage({ mode }: { mode: XlsxMode }) {
       if (maxRows.trim()) formData.append("max_rows", maxRows.trim());
 
       const res = await fetch("/api/xlsx-to-json", { method: "POST", body: formData });
-      const data = (await res.json().catch(() => null)) as
-        | XlsxResponse
-        | { error?: string; detail?: string }
-        | null;
+      const data = (await res.json().catch(() => null)) as XlsxResponse | XlsxErrorResponse | null;
 
       if (!res.ok) {
         const message =
-          (data as { error?: string; detail?: string } | null)?.error ||
-          (data as { error?: string; detail?: string } | null)?.detail ||
+          (data as XlsxErrorResponse | null)?.error ||
+          (data as XlsxErrorResponse | null)?.detail ||
           "Failed to process XLSX";
         throw new Error(message);
       }
 
-      const parsedRows = ((data?.rows ?? []) as (string | number | null)[][]) || [];
+      const parsedRows = hasRows(data) ? ((data.rows ?? []) as (string | number | null)[][]) : [];
       setRows(parsedRows);
 
       if (mode === "chart-json" && parsedRows.length > 1) {

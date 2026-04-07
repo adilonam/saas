@@ -68,12 +68,15 @@ import {
   CpuChipIcon,
   CircleStackIcon,
   SignalIcon,
+  FunnelIcon,
   SwatchIcon,
   PaintBrushIcon,
   QrCodeIcon,
   CommandLineIcon,
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
+import { ADS_TOOLS } from "components/tools/adsToolsConfig";
+import { TRADING_TOOLS } from "@/lib/trading-tools";
 
 const aiTools = [
   {
@@ -164,6 +167,14 @@ const popularTools = [
     comingSoon: true,
   },
 ];
+
+const tradingTools = TRADING_TOOLS.slice(0, 8).map((tool) => ({
+  href: `/${tool.slug}`,
+  title: tool.title,
+  description: tool.shortDescription,
+  icon: ChartBarIcon,
+  iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+}));
 
 const aiWritingTools = [
   {
@@ -827,6 +838,102 @@ const calculatorTools = [
     iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
   },
   {
+    href: "/position-size-calculator",
+    title: "Position Size Calculator",
+    description:
+      "Size your position from account risk, entry, and stop distance.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/risk-per-trade-calculator",
+    title: "Risk per Trade Calculator",
+    description:
+      "Convert a risk percentage into the exact dollar risk per trade.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/r-multiple-tracker",
+    title: "R-Multiple Tracker",
+    description:
+      "Track your trade outcomes in standardized R units.",
+    icon: ChartBarIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/risk-reward-ratio-calculator",
+    title: "Risk-Reward Ratio Calculator",
+    description:
+      "Measure reward versus risk from entry, stop, and target.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/break-even-win-rate-calculator",
+    title: "Break-Even Win Rate Calculator",
+    description:
+      "Find the minimum win rate needed for break-even expectancy.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/drawdown-recovery-calculator",
+    title: "Drawdown Recovery Calculator",
+    description:
+      "See the gain required to recover from a given drawdown.",
+    icon: ChartBarIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/max-daily-loss-guardrail-calculator",
+    title: "Max Daily Loss Guardrail Calculator",
+    description:
+      "Set a daily loss cap and estimate max full-R losses.",
+    icon: CalculatorIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/kelly-criterion-calculator",
+    title: "Kelly Criterion Calculator",
+    description:
+      "Estimate optimal bankroll fraction from win rate and edge.",
+    icon: ChartPieIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/fixed-fractional-sizing-tool",
+    title: "Fixed Fractional Sizing Tool",
+    description:
+      "Position sizing with a fixed equity risk percentage model.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/atr-position-sizing-tool",
+    title: "ATR Position Sizing Tool",
+    description:
+      "Use ATR-based stop distance to size each trade position.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/volatility-based-stop-loss-calculator",
+    title: "Volatility-Based Stop Loss Calculator",
+    description:
+      "Build stop loss levels from ATR and market direction.",
+    icon: CalculatorIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/trailing-stop-planner",
+    title: "Trailing Stop Planner",
+    description:
+      "Plan dynamic trailing stop levels and locked-in P/L.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
     href: "/forex-position-size-calculator",
     title: "Forex Position Size Calculator",
     description:
@@ -841,6 +948,86 @@ const calculatorTools = [
       "Required margin from position size and leverage ratio.",
     icon: CalculatorIcon,
     iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/multi-target-take-profit-planner",
+    title: "Multi-Target Take-Profit Planner",
+    description:
+      "Plan up to 4 take-profit targets and estimate weighted reward-to-risk.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/partial-exit-optimizer",
+    title: "Partial Exit Optimizer",
+    description:
+      "Model scale-out percentages and compare effective R multiple outcomes.",
+    icon: ChartPieIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/breakeven-stop-trigger-planner",
+    title: "Breakeven Stop Trigger Planner",
+    description:
+      "Choose when to move stop to breakeven based on reward multiples.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/slippage-impact-calculator",
+    title: "Slippage Impact Calculator",
+    description:
+      "Estimate execution drag from slippage in pips/points and position size.",
+    icon: CalculatorIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/spread-cost-calculator",
+    title: "Spread Cost Calculator",
+    description:
+      "Calculate spread cost per trade from spread and pip value assumptions.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/commission-impact-calculator",
+    title: "Commission Impact Calculator",
+    description:
+      "Measure one-way and round-turn commission impact on your trade plan.",
+    icon: BanknotesIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/overnight-swap-funding-calculator",
+    title: "Overnight Swap/Funding Calculator",
+    description:
+      "Estimate overnight holding cost or credit across holding days.",
+    icon: BanknotesIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/leverage-safety-calculator",
+    title: "Leverage Safety Calculator",
+    description:
+      "Estimate max safer leverage from stop distance and tolerated loss.",
+    icon: ScaleIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/margin-call-price-calculator",
+    title: "Margin Call Price Calculator",
+    description:
+      "Approximate margin call trigger price from margin and position inputs.",
+    icon: CalculatorIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/liquidation-price-calculator",
+    title: "Liquidation Price Calculator",
+    description:
+      "Estimate isolated-margin liquidation level for long or short positions.",
+    icon: CalculatorIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
   },
   {
     href: "/roi-calculator",
@@ -954,7 +1141,220 @@ const calculatorTools = [
     icon: ChartPieIcon,
     iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
   },
+  {
+    href: "/b2b-pipeline-roas-calculator",
+    title: "B2B Pipeline ROAS Calculator",
+    description:
+      "Estimate closed-revenue and profit ROAS from spend, pipeline, win rate, and margin.",
+    icon: ChartBarIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/agency-client-reporting-generator",
+    title: "Agency Client Reporting Generator",
+    description:
+      "Generate CTR, CPC, CPL, CVR, CPA, and ROAS reporting metrics from campaign totals.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/weekly-performance-narrative-ai",
+    title: "Weekly Performance Narrative AI",
+    description:
+      "Turn weekly KPI changes into a ready-to-use performance narrative and recommendations.",
+    icon: SparklesIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/account-health-scorecard",
+    title: "Account Health Scorecard",
+    description:
+      "Score account health using efficiency, delivery, and auction pressure signals.",
+    icon: ChartPieIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/campaign-naming-convention-generator",
+    title: "Campaign Naming Convention Generator",
+    description:
+      "Generate standardized campaign names from channel, objective, audience, and date tags.",
+    icon: TagIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/ads-sop-generator",
+    title: "Ads SOP Generator",
+    description:
+      "Create a practical SOP template for recurring paid media operations.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/creative-testing-roadmap-planner",
+    title: "Creative Testing Roadmap Planner",
+    description:
+      "Plan test volume and coverage from weekly budget, CPM, concepts, and variants.",
+    icon: LightBulbIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/portfolio-risk-heatmap",
+    title: "Portfolio Risk Heatmap",
+    description: "Estimate each position's contribution to portfolio risk.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/correlation-matrix-tool",
+    title: "Correlation Matrix Tool",
+    description: "Calculate pairwise correlations from historical asset returns.",
+    icon: ChartBarIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/beta-exposure-calculator",
+    title: "Beta Exposure Calculator",
+    description: "Measure portfolio market beta from position values and betas.",
+    icon: ChartBarIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/sector-exposure-analyzer",
+    title: "Sector Exposure Analyzer",
+    description: "See sector concentration and identify overexposure quickly.",
+    icon: ChartPieIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/currency-exposure-analyzer",
+    title: "Currency Exposure Analyzer",
+    description: "Break down currency allocation and FX concentration risk.",
+    icon: ChartPieIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/concentration-risk-analyzer",
+    title: "Concentration Risk Analyzer",
+    description: "Use HHI and largest-position share to assess concentration.",
+    icon: ChartPieIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/var-calculator",
+    title: "VaR (Value at Risk) Calculator",
+    description: "Parametric VaR from value, volatility, confidence, and horizon.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/expected-shortfall-calculator",
+    title: "Expected Shortfall Calculator",
+    description: "Estimate average tail loss beyond VaR under normal assumptions.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/monte-carlo-equity-simulator",
+    title: "Monte Carlo Equity Simulator",
+    description: "Project ending equity and uncertainty from trade return stats.",
+    icon: ChartBarIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/equity-curve-analyzer",
+    title: "Equity Curve Analyzer",
+    description: "Compute total return and max drawdown from an equity series.",
+    icon: ChartBarIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/streak-probability-calculator",
+    title: "Streak Probability Calculator",
+    description: "Probability of at least one winning streak over N trades.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/win-loss-streak-risk-estimator",
+    title: "Win/Loss Streak Risk Estimator",
+    description: "Estimate likelihood of a losing streak given your win rate.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/risk-of-ruin-calculator",
+    title: "Risk of Ruin Calculator",
+    description: "Approximate ruin probability from edge and risk sizing.",
+    icon: CalculatorIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/expectancy-calculator",
+    title: "Expectancy Calculator",
+    description: "Expected value per trade from win rate and average win/loss.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/profit-factor-calculator",
+    title: "Profit Factor Calculator",
+    description: "Gross profit divided by gross loss for strategy quality.",
+    icon: CalculatorIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/sharpe-ratio-calculator",
+    title: "Sharpe Ratio Calculator",
+    description: "Risk-adjusted return using total volatility.",
+    icon: CalculatorIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/sortino-ratio-calculator",
+    title: "Sortino Ratio Calculator",
+    description: "Risk-adjusted return based on downside deviation only.",
+    icon: CalculatorIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
 ];
+
+const tradingSystemTools = [
+  { href: "/calmar-ratio-calculator", title: "Calmar Ratio Calculator", description: "Annual return divided by max drawdown.", icon: ChartBarIcon, iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600" },
+  { href: "/trade-journal-manual", title: "Trade Journal (Manual)", description: "Summarize win rate, expectancy, and net from your notes.", icon: ClipboardDocumentListIcon, iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600" },
+  { href: "/auto-trade-journal-csv", title: "Auto Trade Journal from CSV", description: "Use CSV-derived metrics to evaluate trading performance.", icon: DocumentTextIcon, iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" },
+  { href: "/screenshot-note-trade-journal", title: "Screenshot + Note Trade Journal", description: "Track screenshot-tagged setups and outcomes.", icon: PhotoIcon, iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600" },
+  { href: "/setup-tag-performance-analyzer", title: "Setup Tag Performance Analyzer", description: "Analyze edge by setup tag.", icon: TagIcon, iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600" },
+  { href: "/session-performance-analyzer", title: "Session Performance Analyzer", description: "Evaluate performance by market session.", icon: ClockIcon, iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600" },
+  { href: "/day-of-week-performance-analyzer", title: "Day-of-Week Performance Analyzer", description: "Find your strongest weekdays.", icon: CalendarDaysIcon, iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600" },
+  { href: "/time-of-day-edge-analyzer", title: "Time-of-Day Edge Analyzer", description: "Measure edge by intraday time block.", icon: CalendarIcon, iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600" },
+  { href: "/long-vs-short-performance-analyzer", title: "Long vs Short Performance Analyzer", description: "Compare directional strategy performance.", icon: ArrowsRightLeftIcon, iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600" },
+  { href: "/ab-strategy-comparator", title: "A/B Strategy Comparator", description: "Compare two strategy variants side by side.", icon: ScaleIcon, iconBg: "bg-lime-100 dark:bg-lime-900/30 text-lime-700" },
+  { href: "/strategy-backtest-lite", title: "Strategy Backtest Lite", description: "Estimate expectancy and projected P&L.", icon: PresentationChartLineIcon, iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600" },
+  { href: "/walk-forward-backtest-tool", title: "Walk-Forward Backtest Tool", description: "Check in-sample vs out-of-sample robustness.", icon: ChartPieIcon, iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600" },
+  { href: "/parameter-sensitivity-tester", title: "Parameter Sensitivity Tester", description: "Test robustness to parameter changes.", icon: WrenchScrewdriverIcon, iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400" },
+  { href: "/regime-filter-tester", title: "Regime Filter Tester", description: "Quantify lift from regime filtering.", icon: FunnelIcon, iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600" },
+  { href: "/volatility-regime-detector", title: "Volatility Regime Detector", description: "Classify low/normal/high volatility regimes.", icon: BoltIcon, iconBg: "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700" },
+  { href: "/trend-strength-detector", title: "Trend Strength Detector", description: "ADX-based trend strength and bias.", icon: ArrowTrendingUpIcon, iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600" },
+  { href: "/mean-reversion-detector", title: "Mean Reversion Detector", description: "Detect stretched price conditions.", icon: ArrowUturnLeftIcon, iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600" },
+  { href: "/breakout-probability-tool", title: "Breakout Probability Tool", description: "Estimate breakout confidence from pressure + volume.", icon: SignalIcon, iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" },
+  { href: "/range-compression-detector", title: "Range Compression Detector", description: "Flag range contraction before expansion.", icon: Bars3BottomLeftIcon, iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600" },
+  { href: "/support-resistance-mapper", title: "Support/Resistance Mapper", description: "Map practical support and resistance zones.", icon: MapIcon, iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600" },
+  { href: "/pivot-levels-calculator", title: "Pivot Levels Calculator", description: "Classic pivot, support, and resistance levels.", icon: CalculatorIcon, iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600" },
+  { href: "/vwap-bands-calculator", title: "VWAP Bands Calculator", description: "Calculate upper/lower VWAP standard-deviation bands.", icon: ChartBarIcon, iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600" },
+  { href: "/fibonacci-confluence-tool", title: "Fibonacci Confluence Tool", description: "Project key retracement levels for confluence.", icon: CommandLineIcon, iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600" },
+  { href: "/market-structure-identifier", title: "Market Structure Identifier", description: "Classify HH/HL vs LH/LL conditions.", icon: Squares2X2Icon, iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600" },
+  { href: "/swing-high-low-detector", title: "Swing High/Low Detector", description: "Locate swing context in a lookback range.", icon: QueueListIcon, iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600" },
+  { href: "/supply-demand-zone-marker", title: "Supply/Demand Zone Marker", description: "Generate actionable supply/demand zones.", icon: CubeIcon, iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600" },
+  { href: "/fair-value-gap-detector", title: "Fair Value Gap Detector", description: "Detect bullish or bearish FVG imbalances.", icon: SparklesIcon, iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600" },
+];
+
+const adsMarketingTools = ADS_TOOLS.map((tool) => ({
+  href: `/${tool.slug}`,
+  title: tool.title,
+  description: tool.description,
+  icon: ChartBarIcon,
+  iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+}));
 
 const financeTools = [
   {
@@ -1336,6 +1736,41 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Trading Tools */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600">
+            <ChartBarIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Trading Tools</h3>
+          <Link
+            href="/trading-tools"
+            className="ml-auto text-sm font-semibold text-dashboard-primary hover:underline"
+          >
+            View all
+          </Link>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {tradingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <p className="font-bold text-lg">{title}</p>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Fun & Viral */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -1377,6 +1812,68 @@ export default function HomeDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {calculatorTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Trading Systems */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600">
+            <ChartBarIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Trading Systems</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {tradingSystemTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Ads & Marketing Performance */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600">
+            <ChartBarIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Ads &amp; Marketing Performance</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {adsMarketingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
             <Link
               key={title}
               href={href}

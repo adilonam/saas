@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -184,9 +185,12 @@ export default function PDFToImagePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {imageUrls.map((url, i) => (
                 <div key={i} className="rounded-lg border border-input overflow-hidden bg-white">
-                  <img
+                  <Image
                     src={url}
                     alt={`Page ${i + 1}`}
+                    width={1200}
+                    height={1600}
+                    unoptimized
                     className="w-full h-auto block"
                   />
                   <div className="p-2 flex justify-between items-center border-t border-input">

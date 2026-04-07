@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -85,7 +86,7 @@ export default function FileSizeCompressorPage() {
     }
 
     setError(null);
-    const img = new Image();
+    const img = document.createElement("img");
     img.crossOrigin = "anonymous";
     img.onload = () => {
       const w = img.naturalWidth;
@@ -160,9 +161,12 @@ export default function FileSizeCompressorPage() {
           >
             {previewUrl ? (
               <div className="space-y-2">
-                <img
+                <Image
                   src={previewUrl}
                   alt="Preview"
+                  width={800}
+                  height={400}
+                  unoptimized
                   className="max-h-48 mx-auto rounded-lg object-contain border border-input"
                 />
                 <p className="text-sm text-muted-foreground">
@@ -223,9 +227,12 @@ export default function FileSizeCompressorPage() {
             <p className="text-sm text-muted-foreground">
               Compressed size: {formatBytes(compressedBlob.size)}
             </p>
-            <img
+            <Image
               src={compressedUrl}
               alt="Compressed"
+              width={800}
+              height={400}
+              unoptimized
               className="max-h-48 rounded-lg border border-input"
             />
             <Button onClick={handleDownload} variant="outline" className="gap-2">

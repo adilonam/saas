@@ -18,7 +18,7 @@ import {
 import ThemeSwitch from "components/ThemeSwitch";
 import Footer from "components/Footer";
 import { useIsMobile } from "components/hooks/use-mobile";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { signOut } from "next-auth/react";
 
 interface DashboardLayoutProps {
@@ -32,14 +32,14 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
   const router = useRouter();
   const { data: session } = useSession();
   const isMobile = useIsMobile(); // true = mobile, false = desktop, undefined = not yet known
-  const [sidebarCollapsed, setSidebarCollapsed] = useState(true);
-
-  useEffect(() => {
-    if (isMobile !== false) return; // only restore preference on desktop
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    if (typeof window === "undefined") return true;
     try {
-      setSidebarCollapsed(localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true");
-    } catch {}
-  }, [isMobile]);
+      return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) === "true";
+    } catch {
+      return true;
+    }
+  });
 
   const handleSidebarToggle = () => {
     setSidebarCollapsed((prev) => {

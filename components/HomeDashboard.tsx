@@ -258,6 +258,46 @@ const aiWritingTools = [
     iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
   {
+    href: "/meeting-notes-action-plan",
+    title: "Meeting Notes to Action Plan",
+    description:
+      "Turn meeting notes into a practical action plan with owners, priorities, and next steps.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/weekly-review-generator",
+    title: "Weekly Review Generator",
+    description:
+      "Generate a concise weekly review from your raw notes, metrics, and outcomes.",
+    icon: BookOpenIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/goal-breakdown-planner",
+    title: "Goal Breakdown Planner",
+    description:
+      "Break a large goal into milestones, tasks, and an actionable timeline.",
+    icon: PresentationChartLineIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/habit-reflection-coach",
+    title: "Habit Reflection Coach",
+    description:
+      "Reflect on your weekly habit performance and get practical improvement steps.",
+    icon: SparklesIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/pros-cons-analyzer",
+    title: "Pros and Cons Analyzer",
+    description:
+      "Analyze decisions with balanced pros, cons, assumptions, and recommendations.",
+    icon: ScaleIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
     href: "/text-summarizer",
     title: "Text Summarizer",
     description: "Paste long text and get a concise summary with key facts preserved.",
@@ -347,6 +387,34 @@ const aiWritingTools = [
     description: "Basic SEO-style keyword clusters and questions from a seed topic.",
     icon: HashtagIcon,
     iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/policy-rewrite-assistant",
+    title: "Policy Rewrite Assistant",
+    description: "Rewrite policy text with cleaner language and selectable tone.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/email-thread-summarizer",
+    title: "Email Thread Summarizer",
+    description: "Summarize long email threads into key points and action items.",
+    icon: ChatBubbleLeftRightIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/followup-email-drafter",
+    title: "Follow-up Email Drafter",
+    description: "Generate a concise follow-up email from context and requested update.",
+    icon: EnvelopeIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/project-kickoff-brief",
+    title: "Project Kickoff Brief Generator",
+    description: "Build a kickoff brief with objective, scope, stakeholders, and timeline.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
   {
     href: "/palette-generator",
@@ -621,6 +689,22 @@ const productivityTools = [
     iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
   },
   {
+    href: "/pdf-to-text",
+    title: "PDF to Text (OCR Extractor)",
+    description:
+      "Extract OCR text from uploaded PDFs and download the result as plain text.",
+    icon: DocumentMagnifyingGlassIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/pdf-metadata-inspector",
+    title: "PDF Metadata Inspector + JSON Export",
+    description:
+      "Inspect PDF metadata and page count, then export structured JSON.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
     href: "/pdf-extract-images",
     title: "Extract PDF Images",
     description:
@@ -669,12 +753,220 @@ const productivityTools = [
     iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
   {
+    href: "/screenshot-to-pdf-reporter",
+    title: "Screenshot to PDF Reporter",
+    description:
+      "Convert multiple screenshots to PDF and download all converted files in one ZIP package.",
+    icon: DocumentArrowDownIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/smart-qr-batch-generator",
+    title: "Smart QR Batch Generator",
+    description:
+      "Generate many QR codes from line-separated values and export as a ZIP archive.",
+    icon: QrCodeIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
     href: "/xlsx-to-json",
     title: "XLSX to JSON",
     description:
       "Convert the first sheet of an XLSX workbook into JSON rows.",
     icon: CodeBracketSquareIcon,
     iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/data-profiler",
+    title: "CSV/XLSX Quick Profiler",
+    description:
+      "Upload CSV/XLSX and get a quick profile of rows, columns, and empty cells.",
+    icon: ChartBarIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/bulk-zip-builder",
+    title: "Batch File Archive Builder",
+    description:
+      "Select many files and package them into a single ZIP download.",
+    icon: CubeIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/markdown-report-bundle",
+    title: "Markdown Report Packager",
+    description:
+      "Split markdown sections, render each to PDF, and bundle everything into one ZIP.",
+    icon: DocumentArrowDownIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/csv-cleaner",
+    title: "CSV Cleaner",
+    description:
+      "Trim whitespace and remove blank rows from CSV files.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/csv-column-mapper",
+    title: "CSV Column Mapper",
+    description:
+      "Rename CSV headers quickly with your own column mapping.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/csv-deduplicator",
+    title: "CSV Deduplicator",
+    description:
+      "Remove duplicate rows while preserving original order.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/csv-merge-assistant",
+    title: "CSV Merge Assistant",
+    description:
+      "Merge multiple CSV files into one combined table.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/csv-to-markdown-table",
+    title: "CSV to Markdown Table",
+    description:
+      "Convert CSV rows into markdown table format for docs.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/xlsx-sheet-explorer",
+    title: "XLSX Sheet Explorer",
+    description:
+      "Inspect the first worksheet rows with a quick table preview.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/xlsx-chart-json",
+    title: "XLSX to Chart JSON",
+    description:
+      "Generate labels and dataset JSON from XLSX columns.",
+    icon: ChartBarIcon,
+    iconBg: "bg-lime-100 dark:bg-lime-900/30 text-lime-700",
+  },
+  {
+    href: "/zip-notes-packager",
+    title: "ZIP Notes Packager",
+    description:
+      "Split text notes into files and download one ZIP package.",
+    icon: CubeIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+  {
+    href: "/pdf-ocr-translate",
+    title: "PDF OCR + Translate",
+    description:
+      "Extract PDF text with OCR and translate into a cleaner readable version.",
+    icon: LanguageIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/pdf-keyword-extractor",
+    title: "PDF Keyword Extractor",
+    description:
+      "Extract key terms and keyword phrases from PDF content.",
+    icon: HashtagIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/pdf-qa-assistant",
+    title: "PDF Q&A Assistant",
+    description:
+      "Ask a question and get an answer based on your uploaded PDF.",
+    icon: ChatBubbleLeftRightIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/pdf-to-markdown",
+    title: "PDF to Markdown",
+    description:
+      "Extract OCR text and reformat it to markdown-ready output.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/pdf-outline-generator",
+    title: "PDF Outline Generator",
+    description:
+      "Generate section-by-section outline bullets from PDF text.",
+    icon: QueueListIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/pdf-action-items",
+    title: "PDF Action Items Extractor",
+    description:
+      "Turn document text into actionable tasks, owners, and due dates.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/multi-pdf-compare",
+    title: "Multi-PDF Compare",
+    description:
+      "Compare multiple PDF files and summarize key differences.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/pdf-compliance-checker",
+    title: "PDF Compliance Checker",
+    description:
+      "Run quick metadata and page-limit checks before document delivery.",
+    icon: ShieldCheckIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/pdf-range-splitter",
+    title: "PDF Page Range Splitter",
+    description:
+      "Extract a custom page range like 1-3,5 into a new PDF.",
+    icon: DocumentPlusIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/pdf-rotate-compress",
+    title: "PDF Rotate + Compress Pipeline",
+    description:
+      "Rotate first, then compress the same PDF in one workflow.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/image-batch-to-pdf",
+    title: "Image Batch to PDF",
+    description:
+      "Convert many images into PDFs and package all outputs in a ZIP.",
+    icon: PhotoIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/markdown-brand-pdf",
+    title: "Markdown to Branded PDF",
+    description:
+      "Apply simple brand metadata to markdown then export as PDF.",
+    icon: DocumentArrowDownIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/html-invoice-to-pdf",
+    title: "HTML Invoice to PDF",
+    description:
+      "Generate invoice HTML and export directly to a PDF file.",
+    icon: ReceiptPercentIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
 ];
 
@@ -1060,6 +1352,30 @@ const calculatorTools = [
       "Calculate sale price from discount % or discount % from original and sale price.",
     icon: CalculatorIcon,
     iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/priority-score-calculator",
+    title: "Priority Score Calculator",
+    description:
+      "Rank initiatives using impact, urgency, confidence, and effort.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/rice-score-calculator",
+    title: "RICE Score Calculator",
+    description:
+      "Compute RICE score from reach, impact, confidence, and effort.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/ice-score-calculator",
+    title: "ICE Score Calculator",
+    description:
+      "Prioritize ideas quickly using impact, confidence, and ease.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
   },
   {
     href: "/wealth-comparison-calculator",
@@ -1463,6 +1779,86 @@ const utilityTools = [
       "List options one per line and pick one at random — quick tie-breaker.",
     icon: ArrowsRightLeftIcon,
     iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+  {
+    href: "/task-prioritizer",
+    title: "Smart Task Prioritizer",
+    description:
+      "Place tasks into Eisenhower matrix quadrants using urgency and importance.",
+    icon: ChartPieIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/daily-planner",
+    title: "Daily Planner Generator",
+    description:
+      "Build a simple day schedule from wake/sleep times and task priorities.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/meeting-agenda-builder",
+    title: "Meeting Agenda Builder",
+    description:
+      "Create a structured meeting agenda with timed topics and clear flow.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/checklist-builder",
+    title: "SOP / Checklist Builder",
+    description:
+      "Generate reusable SOP and checklist drafts from your process steps.",
+    icon: QueueListIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/batch-rename",
+    title: "Batch Rename Utility",
+    description:
+      "Preview consistent bulk file naming and export a rename CSV map.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+  {
+    href: "/meeting-minutes-formatter",
+    title: "Meeting Minutes Formatter",
+    description:
+      "Turn raw notes into structured minutes with summary, decisions, and actions.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/sop-version-diff",
+    title: "SOP Version Diff Checker",
+    description:
+      "Compare two SOP versions and highlight added and removed lines.",
+    icon: DocumentDuplicateIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/focus-session-planner",
+    title: "Focus Session Planner",
+    description:
+      "Plan deep-work sessions with focus/break blocks and total session timing.",
+    icon: BoltIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/time-blocking-builder",
+    title: "Time Blocking Builder",
+    description:
+      "Create a simple day schedule by adding time blocks and priorities.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/decision-matrix-tool",
+    title: "Decision Matrix Tool",
+    description:
+      "Rank options using impact, effort, and risk scoring in a quick matrix.",
+    icon: ScaleIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
   },
 ];
 

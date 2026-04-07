@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { PhotoIcon, ArrowUpTrayIcon, CheckIcon } from "@heroicons/react/24/outline";
@@ -135,9 +136,12 @@ export default function ImageToPromptPage() {
         />
         {previewUrl ? (
           <div className="flex flex-col items-center gap-3">
-            <img
+            <Image
               src={previewUrl}
               alt="Preview"
+              width={800}
+              height={400}
+              unoptimized
               className="max-h-48 rounded-xl object-contain border border-slate-200 dark:border-slate-700"
             />
             <p className="text-sm text-slate-600 dark:text-slate-400">

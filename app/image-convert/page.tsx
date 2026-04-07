@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -179,9 +180,12 @@ export default function ImageConvertPage() {
           {previewUrl && (
             <div className="rounded-lg border border-input bg-white/60 p-3">
               <p className="text-xs text-muted-foreground mb-2">Original preview</p>
-              <img
+              <Image
                 src={previewUrl}
                 alt="Original"
+                width={1200}
+                height={800}
+                unoptimized
                 className="max-h-64 w-full object-contain rounded-md border border-input"
               />
             </div>
@@ -306,9 +310,12 @@ export default function ImageConvertPage() {
                 Download
               </Button>
             </div>
-            <img
+            <Image
               src={resultUrl}
               alt="Converted"
+              width={1200}
+              height={800}
+              unoptimized
               className="max-h-[520px] w-full object-contain rounded-lg border border-input bg-white"
             />
           </div>

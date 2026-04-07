@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { TradingViewRoomTrading } from "components/TradingViewRoomTrading";
 import { Button } from "@/components/ui/button";
@@ -118,7 +119,14 @@ export default function TradingSignalPage() {
               />
               {previewUrl && (
                 <div className="mt-2 rounded-lg overflow-hidden border border-slate-200 dark:border-slate-700 max-h-32">
-                  <img src={previewUrl} alt="Chart preview" className="w-full h-32 object-contain bg-slate-100 dark:bg-slate-800" />
+                  <Image
+                    src={previewUrl}
+                    alt="Chart preview"
+                    width={512}
+                    height={128}
+                    unoptimized
+                    className="w-full h-32 object-contain bg-slate-100 dark:bg-slate-800"
+                  />
                 </div>
               )}
             </div>

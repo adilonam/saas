@@ -7,6 +7,7 @@
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint .",
+    "indexnow:submit": "tsx scripts/submit-indexnow.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio --port 5555",
@@ -59,6 +60,7 @@
     "postcss": "^8.4.47",
     "prisma": "^7.3.0",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2"
   }
 }

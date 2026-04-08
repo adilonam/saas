@@ -1,14 +1,14 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 type RouteContext = {
   params: Promise<{
-    indexnowKey: string;
+    indexnowKey?: string;
   }>;
 };
 
-export async function GET(_: Request, context: RouteContext) {
+export async function GET(_: NextRequest, context: RouteContext) {
   const configuredKey = process.env.INDEXNOW_KEY;
 
   if (!configuredKey) {
@@ -20,7 +20,8 @@ export async function GET(_: Request, context: RouteContext) {
     });
   }
 
-  const { indexnowKey } = await context.params;
+  const params = await context.params;
+  const indexnowKey = params?.indexnowKey;
   if (indexnowKey !== configuredKey) {
     return new NextResponse("Not Found", { status: 404 });
   }

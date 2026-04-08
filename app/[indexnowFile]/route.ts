@@ -4,14 +4,14 @@ export const dynamic = "force-dynamic";
 
 type RouteContext = {
   params: Promise<{
-    indexnowKey?: string;
+    indexnowFile?: string;
   }>;
 };
 
 export async function GET(_: NextRequest, context: RouteContext) {
-  const configuredKey = process.env.INDEXNOW_KEY;
+  const configuredKeyRaw = process.env.INDEXNOW_KEY;
 
-  if (!configuredKey) {
+  if (!configuredKeyRaw) {
     return new NextResponse("INDEXNOW_KEY is not configured.", {
       status: 500,
       headers: {
@@ -20,9 +20,14 @@ export async function GET(_: NextRequest, context: RouteContext) {
     });
   }
 
+  const normalizeKey = (value: string) =>
+    value.trim().replace(/^['"]|['"]$/g, "").replace(/\.txt$/i, "");
+
+  const configuredKey = normalizeKey(configuredKeyRaw);
   const params = await context.params;
-  const indexnowKey = params?.indexnowKey;
-  if (indexnowKey !== configuredKey) {
+  const requestedKey = normalizeKey(params?.indexnowFile ?? "");
+
+  if (requestedKey !== configuredKey) {
     return new NextResponse("Not Found", { status: 404 });
   }
 

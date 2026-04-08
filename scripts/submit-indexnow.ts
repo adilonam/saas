@@ -1,10 +1,30 @@
 #!/usr/bin/env node
 
+import { existsSync, readFileSync } from "node:fs";
+import path from "node:path";
+
+function getEnvFromDotEnv(key: string): string | undefined {
+  const envPath = path.join(process.cwd(), ".env");
+  if (!existsSync(envPath)) return undefined;
+
+  const content = readFileSync(envPath, "utf8");
+  const line = content
+    .split(/\r?\n/)
+    .find((item) => item.trim().startsWith(`${key}=`));
+
+  if (!line) return undefined;
+  const [, ...rest] = line.split("=");
+  const rawValue = rest.join("=").trim();
+  if (!rawValue) return undefined;
+
+  return rawValue.replace(/^['"]|['"]$/g, "").trim();
+}
+
 const INDEXNOW_ENDPOINT =
   process.env.INDEXNOW_ENDPOINT ?? "https://api.indexnow.org/indexnow";
 const SITE_URL = (process.env.SITE_URL ?? "https://www.eprod.io").replace(/\/+$/, "");
 const SITEMAP_URL = process.env.SITEMAP_URL ?? `${SITE_URL}/sitemap.xml`;
-const INDEXNOW_KEY = process.env.INDEXNOW_KEY;
+const INDEXNOW_KEY = process.env.INDEXNOW_KEY ?? getEnvFromDotEnv("INDEXNOW_KEY");
 const BATCH_SIZE = Number(process.env.INDEXNOW_BATCH_SIZE ?? "10000");
 
 if (!INDEXNOW_KEY) {

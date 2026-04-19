@@ -12,6 +12,7 @@ import {
   DocumentDuplicateIcon,
   CheckIcon,
   ExclamationTriangleIcon,
+  ArrowPathIcon,
 } from "@heroicons/react/24/outline";
 import { guardToolAccess } from "@/lib/guard-tool-access";
 
@@ -40,6 +41,24 @@ export default function CssGradientGeneratorPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+
+  const randomHex = () => {
+    const n = Math.floor(Math.random() * 0xffffff);
+    return `#${n.toString(16).padStart(6, "0")}`;
+  };
+
+  const handleRandomize = () => {
+    const a = Math.floor(Math.random() * 361);
+    const p1 = Math.floor(Math.random() * 51);
+    const p2 = 50 + Math.floor(Math.random() * 51);
+    setAngle(String(a));
+    setC1(randomHex());
+    setC2(randomHex());
+    setStop1(String(p1));
+    setStop2(String(p2));
+    setUnlocked(false);
+    setError(null);
+  };
 
   const handleGenerate = () => {
     if (!guardToolAccess(status, session, pathname, "/css-gradient-generator", router)) {
@@ -163,10 +182,21 @@ export default function CssGradientGeneratorPage() {
             </div>
           </div>
 
-          <Button onClick={handleGenerate} className="gap-2">
-            <PaintBrushIcon className="h-4 w-4" />
-            Generate CSS
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button onClick={handleGenerate} className="gap-2">
+              <PaintBrushIcon className="h-4 w-4" />
+              Generate CSS
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={handleRandomize}
+              className="gap-2"
+            >
+              <ArrowPathIcon className="h-4 w-4" />
+              Randomize
+            </Button>
+          </div>
 
           {error && (
             <div className="flex items-center gap-2 text-amber-600 dark:text-amber-400 text-sm">

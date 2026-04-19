@@ -7,11 +7,11 @@ import {
 } from "components/tradingToolsConfig";
 
 type TradingToolSlugPageProps = {
-  slug: string;
+  definitionKey: string;
 };
 
-export default function TradingToolSlugPage({ slug }: TradingToolSlugPageProps) {
-  const tool = getTradingToolDefinition(slug);
+export default function TradingToolSlugPage({ definitionKey }: TradingToolSlugPageProps) {
+  const tool = getTradingToolDefinition(definitionKey);
 
   if (!tool) return null;
 
@@ -21,7 +21,7 @@ export default function TradingToolSlugPage({ slug }: TradingToolSlugPageProps) 
       description={tool.description}
       formulaNote={tool.formulaNote}
       fields={tool.fields}
-      compute={(values) => computeTradingToolResults(slug, values)}
+      compute={(values) => computeTradingToolResults(definitionKey, values)}
     />
   );
 }

@@ -20,8 +20,8 @@ export default function TradingToolsHubPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {TRADING_TOOLS.map((tool) => (
           <Link
-            key={tool.slug}
-            href={`/${tool.slug}`}
+            key={tool.path}
+            href={`/${tool.path}`}
             className="tool-card group flex items-start gap-4 p-6 rounded-3xl bg-slate-50/60 dark:bg-slate-900/40 text-left"
           >
             <div className="size-12 rounded-2xl bg-amber-100 dark:bg-amber-900/30 text-amber-600 flex items-center justify-center shrink-0 transition-transform group-hover:scale-105">

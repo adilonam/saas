@@ -8,13 +8,19 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ChartBarIcon, CalculatorIcon } from "@heroicons/react/24/outline";
-import { getTradingToolBySlug } from "@/lib/trading-tools";
+import { getTradingToolByPath } from "@/lib/trading-tools";
 
-export default function TradingToolDetailPage() {
+type TradingToolDetailPageProps = {
+  /** When the page is a static route (e.g. `/order-block-detector`), pass the URL segment; otherwise dynamic route params are used. */
+  pathSegment?: string;
+};
+
+export default function TradingToolDetailPage({ pathSegment: pathSegmentProp }: TradingToolDetailPageProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams<{ slug: string }>();
-  const slug = typeof params?.slug === "string" ? params.slug : "";
+  const params = useParams<{ tool?: string }>();
+  const pathSegment =
+    pathSegmentProp ?? (typeof params?.tool === "string" ? params.tool : "");
   const { data: session, status } = useSession();
 
   const [symbol, setSymbol] = useState("");
@@ -22,7 +28,7 @@ export default function TradingToolDetailPage() {
   const [notes, setNotes] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const tool = getTradingToolBySlug(slug);
+  const tool = getTradingToolByPath(pathSegment);
 
   const handleRun = () => {
     if (status === "unauthenticated" || !session) {

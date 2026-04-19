@@ -73,6 +73,22 @@ import {
   PaintBrushIcon,
   QrCodeIcon,
   CommandLineIcon,
+  BriefcaseIcon,
+  RectangleStackIcon,
+  FolderIcon,
+  ViewColumnsIcon,
+  TableCellsIcon,
+  FlagIcon,
+  BugAntIcon,
+  ExclamationTriangleIcon,
+  ClipboardDocumentCheckIcon,
+  BellAlertIcon,
+  DocumentChartBarIcon,
+  IdentificationIcon,
+  HomeModernIcon,
+  MapPinIcon,
+  ServerStackIcon,
+  DevicePhoneMobileIcon,
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 import { ADS_TOOLS } from "components/tools/adsToolsConfig";
@@ -169,7 +185,7 @@ const popularTools = [
 ];
 
 const tradingTools = TRADING_TOOLS.slice(0, 8).map((tool) => ({
-  href: `/${tool.slug}`,
+  href: `/${tool.path}`,
   title: tool.title,
   description: tool.shortDescription,
   icon: ChartBarIcon,
@@ -356,6 +372,34 @@ const aiWritingTools = [
     icon: SwatchIcon,
     iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
   },
+  {
+    href: "/inclusive-language-linter",
+    title: "Inclusive Language Linter",
+    description: "Starter rules for biased or charged wording, plus optional AI nuance.",
+    icon: ShieldCheckIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/plain-language-rewriter",
+    title: "Plain Language Rewriter",
+    description: "Simplify dense copy into clear, short sentences while preserving facts.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/reading-level-estimator",
+    title: "Reading Level Estimator",
+    description: "Syllable heuristics and Flesch-style scores with optional AI coaching.",
+    icon: BookOpenIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/keyword-blog-outline",
+    title: "Keyword → Blog Outline",
+    description: "Fast scaffold from keyword lists plus optional AI outline (no PDF).",
+    icon: QueueListIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
 ];
 
 const qrAndCodeTools = [
@@ -451,6 +495,51 @@ const creatorTools = [
       "Build three profile bios from your details using fixed templates (no AI).",
     icon: UserCircleIcon,
     iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600",
+  },
+  {
+    href: "/social-thread-splitter",
+    title: "Social Thread Splitter",
+    description: "Numbered thread chunks for Bluesky, Threads, or X length limits.",
+    icon: ListBulletIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/social-character-counter",
+    title: "Social Character Counter",
+    description: "Compare one draft against Bluesky, Threads, X, and LinkedIn ceilings.",
+    icon: DocumentChartBarIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/poll-option-balancer",
+    title: "Poll Option Balancer",
+    description: "Dedupe, shuffle, and trim poll lines for cleaner surveys and posts.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+];
+
+const workshopDeskTools = [
+  {
+    href: "/team-shuffler",
+    title: "Team Shuffler",
+    description: "Randomize names into balanced breakout groups for workshops.",
+    icon: UserGroupIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/name-tag-print",
+    title: "Name Tag Print Layout",
+    description: "Two-column printable cards for table tents or simple badges.",
+    icon: IdentificationIcon,
+    iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600",
+  },
+  {
+    href: "/personal-dashboard",
+    title: "Personal Dashboard",
+    description: "Weather, local todos, and an optional AI focus line in one view.",
+    icon: HomeModernIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700",
   },
 ];
 
@@ -678,6 +767,126 @@ const productivityTools = [
   },
 ];
 
+const focusPlanningTools = [
+  {
+    href: "/pomodoro-timer",
+    title: "Pomodoro Timer",
+    description:
+      "Work and break intervals with session history saved in your browser.",
+    icon: ClockIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/deep-work-stopwatch",
+    title: "Deep Work Stopwatch",
+    description: "Count-up timer for focus blocks with optional session log.",
+    icon: BoltIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/daily-time-block-planner",
+    title: "Daily Time Block Planner",
+    description: "Plan labeled start and end times for each part of your day.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/weekly-calendar-notes",
+    title: "Weekly Calendar Notes",
+    description: "Monday–Sunday notes grid with local persistence.",
+    icon: CalendarIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/eisenhower-matrix",
+    title: "Eisenhower Matrix",
+    description: "Sort tasks across urgent and important quadrants.",
+    icon: Squares2X2Icon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/para-inbox",
+    title: "PARA Inbox",
+    description: "Projects, Areas, Resources, and Archive capture lists.",
+    icon: FolderIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/personal-kanban",
+    title: "Personal Kanban",
+    description: "To do, Doing, and Done columns with local storage.",
+    icon: ViewColumnsIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+];
+
+const workHabitsTools = [
+  {
+    href: "/habit-chain-calendar",
+    title: "Habit chain calendar",
+    description:
+      "Mark completed days on a month grid and track your current streak locally.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/one-big-thing",
+    title: "One big thing",
+    description:
+      "Pick one daily focus and keep a short log of what mattered each day.",
+    icon: LightBulbIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/energy-journal",
+    title: "Energy journal",
+    description:
+      "Rate focus from 1–10 for every hour to see when you peak and dip.",
+    icon: BoltIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/meeting-cost-timer",
+    title: "Meeting cost timer",
+    description:
+      "Run a timer with attendees and hourly rate to watch estimated meeting burn.",
+    icon: ClockIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/standup-formatter",
+    title: "Standup formatter",
+    description:
+      "Turn yesterday / today / blockers into a tidy snippet for Slack or tickets.",
+    icon: ListBulletIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/retrospective-board",
+    title: "Retrospective board",
+    description:
+      "Capture went well, improve, and actions — then export markdown for the team.",
+    icon: ViewColumnsIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/decision-log",
+    title: "Decision log",
+    description:
+      "Record context, options, the choice, and a revisit date in the browser.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/pros-cons-matrix",
+    title: "Pros / cons matrix",
+    description:
+      "Weight criteria and score options 0–10 for a quick weighted comparison.",
+    icon: ScaleIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+];
+
 const textProductivityTools = [
   {
     href: "/word-counter",
@@ -734,6 +943,151 @@ const textProductivityTools = [
       "Score password strength and get quick tips to improve security.",
     icon: ShieldCheckIcon,
     iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+];
+
+const studyMeetingTools = [
+  {
+    href: "/reading-speed-test",
+    title: "Reading Speed Test",
+    description:
+      "Time a fixed passage for WPM and estimate minutes to finish pasted text at your pace.",
+    icon: BoltIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/syllabus-week-generator",
+    title: "Syllabus Week Generator",
+    description:
+      "Build week-by-week date ranges from a start date and highlight holidays (YYYY-MM-DD).",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/grade-needed-calculator",
+    title: "Grade Needed on Final",
+    description:
+      "Weighted course average: see the exam score required to hit your target grade.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/study-topic-picker",
+    title: "Study Topic Picker",
+    description: "Random line from your pool — pick what to study next without debate.",
+    icon: QueueListIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/vocabulary-quiz",
+    title: "Vocabulary Quiz",
+    description:
+      "Build a word list from pasted text; optional AI definitions for multiple-choice practice.",
+    icon: BookOpenIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/mind-map-outliner",
+    title: "Mind-Map Outliner",
+    description: "Indented bullets to a clean tree you can copy for docs or slides.",
+    icon: Bars3BottomLeftIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/meeting-agenda-timer",
+    title: "Meeting Agenda Timer",
+    description: "Agenda rows with minutes each and a simple countdown per topic.",
+    icon: ClockIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/meeting-parking-lot",
+    title: "Meeting Parking Lot",
+    description: "List ideas to revisit later and copy a numbered export for notes.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/action-items-extractor",
+    title: "Action Item Extractor",
+    description:
+      "Pull TODO and checkbox lines from notes, or use AI for unstructured meeting text.",
+    icon: CheckCircleIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/tone-checker",
+    title: "Tone Checker",
+    description:
+      "Quick caps and punctuation signals plus AI feedback for Slack or email drafts.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+];
+
+const projectManagementTools = [
+  {
+    href: "/raci-chart-builder",
+    title: "RACI chart builder",
+    description: "Map tasks to Responsible, Accountable, Consulted, and Informed roles.",
+    icon: TableCellsIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/okr-tree-writer",
+    title: "OKR tree writer",
+    description: "One objective plus key results in a clean outline you can paste anywhere.",
+    icon: FlagIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/smart-goal-checker",
+    title: "SMART goal checker",
+    description: "Guided prompts for Specific, Measurable, Achievable, Relevant, and Time-bound.",
+    icon: LightBulbIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/backlog-prioritizer",
+    title: "Backlog prioritizer",
+    description: "RICE scoring or MoSCoW buckets to compare backlog items.",
+    icon: FunnelIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/roadmap-quarter-planner",
+    title: "Roadmap quarter planner",
+    description: "Themes and initiatives for a quarter, with optional theme tags per line.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/user-story-splitter",
+    title: "User story splitter",
+    description: "Format As a / I want / So that stories for your backlog.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/acceptance-criteria-generator",
+    title: "Acceptance criteria generator",
+    description: "Given/When/Then skeleton plus a practical engineering checklist.",
+    icon: ClipboardDocumentCheckIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/bug-report-templater",
+    title: "Bug report templater",
+    description: "Repro steps, environment, expected vs actual for issue trackers.",
+    icon: BugAntIcon,
+    iconBg: "bg-red-100 dark:bg-red-900/30 text-red-600",
+  },
+  {
+    href: "/incident-timeline-builder",
+    title: "Incident timeline builder",
+    description: "UTC-ordered events with roles and links for postmortems.",
+    icon: ExclamationTriangleIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
   },
 ];
 
@@ -1399,6 +1753,89 @@ const financeTools = [
   },
 ];
 
+const careerStudyTools = [
+  {
+    href: "/linkedin-headline-combiner",
+    title: "LinkedIn headline combiner",
+    description:
+      "Join headline segments with separators, enforce length, and optionally polish with AI.",
+    icon: LinkIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/resume-skills-gap",
+    title: "Resume skills gap suggester",
+    description:
+      "Compare resume text to a pasted job description with keyword scan plus optional AI analysis.",
+    icon: AcademicCapIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/job-application-tracker",
+    title: "Job application tracker",
+    description:
+      "Stages, applied dates, contacts, and notes — saved locally with CSV export.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/interview-question-bank",
+    title: "Interview question bank (SRS)",
+    description:
+      "Store behavioral and technical Q/A and review with lightweight SM-2 scheduling.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/flashcard-maker",
+    title: "Flashcard maker",
+    description:
+      "Turn bullet lists into front/back cards; optional AI expansion for richer backs.",
+    icon: RectangleStackIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/spaced-repetition-scheduler",
+    title: "Spaced repetition scheduler",
+    description:
+      "SM-2 lite: enter EF, interval, reps, and quality to get the next review interval.",
+    icon: ClockIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/cornell-notes-template",
+    title: "Cornell notes template",
+    description:
+      "Generate a plain-text Cornell layout with cue/notes rows and a summary band.",
+    icon: DocumentTextIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/outline-flashcards",
+    title: "Outline ↔ flashcards",
+    description:
+      "Convert outlines to Front/Back lines or the reverse; optional AI for structure.",
+    icon: QueueListIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
+  {
+    href: "/citation-formatter",
+    title: "Citation formatter",
+    description:
+      "Fill author, title, journal, volume, pages, DOI — get APA- or MLA-style strings.",
+    icon: BookOpenIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/bibliography-deduper",
+    title: "Bibliography deduper",
+    description:
+      "Paste references; dedupe by DOI and fuzzy title overlap with an adjustable threshold.",
+    icon: DocumentDuplicateIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+];
+
 const utilityTools = [
   {
     href: "/meeting-cost-calculator",
@@ -1457,11 +1894,117 @@ const utilityTools = [
     iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
   },
   {
+    href: "/timezone-now-grid",
+    title: "Time Zone Now Grid",
+    description: "Live local times across the regions you choose, in one table.",
+    icon: GlobeAltIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/meeting-overlap-finder",
+    title: "World Meeting Overlap Finder",
+    description:
+      "Scan a date range for meeting slots when everyone’s local work hours overlap (browser-only).",
+    icon: UserGroupIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/working-days-countdown",
+    title: "Working-Days Countdown",
+    description:
+      "Calendar days and Mon–Fri working days until a deadline, skipping optional holidays.",
+    icon: CalendarIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/fiscal-week-calculator",
+    title: "Fiscal Week Calculator",
+    description:
+      "Fiscal year from a recurring start month/day plus week number using your week-start rule.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
+  {
+    href: "/invoice-line-builder",
+    title: "Invoice Line Builder",
+    description:
+      "Per-line discount and tax on subtotals with running totals — no PDF export.",
+    icon: ReceiptPercentIcon,
+    iconBg: "bg-lime-100 dark:bg-lime-900/30 text-lime-700",
+  },
+  {
     href: "/random-decision-maker",
     title: "Random Decision Maker",
     description:
       "List options one per line and pick one at random — quick tie-breaker.",
     icon: ArrowsRightLeftIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+];
+
+const freelanceWorkTools = [
+  {
+    href: "/freelance-rate-converter",
+    title: "Freelance Rate ↔ Annual Income",
+    description:
+      "Convert hourly bill rate to expected annual income and back, using your weeks and utilization.",
+    icon: BanknotesIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/utilization-calculator",
+    title: "Utilization Calculator",
+    description:
+      "Billable hours divided by available hours — see your utilization percentage.",
+    icon: ChartPieIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/burn-rate-runway",
+    title: "Burn Rate Runway",
+    description:
+      "Simple runway from cash on hand and average monthly net burn (personal or small business).",
+    icon: PresentationChartLineIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/meeting-free-day-planner",
+    title: "Meeting-Free Day Planner",
+    description:
+      "From meeting hours and workweek size, see meeting load and how many hours stay meeting-free.",
+    icon: CalendarDaysIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/deep-work-quota-tracker",
+    title: "Deep-Work Quota Tracker",
+    description:
+      "Set a weekly deep-work target and log hours; progress is saved in your browser for this week.",
+    icon: ClockIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/email-followup-snooze",
+    title: "Email Follow-Up Snooze List",
+    description:
+      "Local-only reminders: who to follow up with and when — stored in your browser.",
+    icon: EnvelopeIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/cold-email-opener-library",
+    title: "Cold Email Opener Library",
+    description:
+      "Curated opening lines plus optional AI-generated variants for your situation.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/subject-line-ab-lab",
+    title: "Subject Line A/B Idea Lab",
+    description:
+      "Compare two subject lines side by side or ask AI for paired A/B ideas from a topic.",
+    icon: SparklesIcon,
     iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
   },
 ];
@@ -1583,6 +2126,182 @@ const developerTools = [
     description: "Build a two-stop linear gradient and copy the CSS.",
     icon: PaintBrushIcon,
     iconBg: "bg-pink-100 dark:bg-pink-900/30 text-pink-600",
+  },
+  {
+    href: "/gitignore-suggester",
+    title: ".gitignore by stack",
+    description:
+      "Merge curated ignore rules per stack; optional AI suggests extra patterns.",
+    icon: CommandLineIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/conventional-commit-helper",
+    title: "Conventional commit helper",
+    description: "Compose type, scope, breaking flag, body, and footers — copy ready.",
+    icon: ClipboardDocumentListIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/changelog-from-commits",
+    title: "Changelog from commits",
+    description: "Group conventional commits by type into Markdown changelog sections.",
+    icon: DocumentDuplicateIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/release-notes-polisher",
+    title: "Release notes polisher",
+    description: "Optional AI tightens tone and structure while keeping facts accurate.",
+    icon: PencilSquareIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/semver-bump-suggester",
+    title: "Semantic version bump suggester",
+    description: "From semver + commit list, suggest major, minor, or patch bump.",
+    icon: TagIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/code-comment-expander",
+    title: "Code comment expander",
+    description: "Optional AI turns a one-liner into a short block comment for your language.",
+    icon: ChatBubbleBottomCenterTextIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/variable-renamer",
+    title: "Variable renamer suggestions",
+    description: "Optional AI proposes clearer names using language conventions.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-rose-100 dark:bg-rose-900/30 text-rose-600",
+  },
+  {
+    href: "/regex-plain-english",
+    title: "Regex plain-English explainer",
+    description: "Optional AI explains your pattern in plain language with flavor context.",
+    icon: FunnelIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
+  {
+    href: "/log-line-parser",
+    title: "Log line parser",
+    description: "Parse JSON or key=value lines into a sortable table; copy as TSV.",
+    icon: TableCellsIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/runbook-checklist-runner",
+    title: "Runbook checklist runner",
+    description: "Tick steps with UTC timestamps and export a checklist log.",
+    icon: ClipboardDocumentCheckIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+  {
+    href: "/on-call-handoff",
+    title: "On-call handoff notes",
+    description: "Structured markdown template for shift handoffs.",
+    icon: BellAlertIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
+  },
+  {
+    href: "/adr-writer",
+    title: "ADR writer",
+    description: "Architecture Decision Record template in markdown.",
+    icon: BookOpenIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/api-design-sketch",
+    title: "API design sketch",
+    description: "Outline resources, verbs, auth, and error model before OpenAPI.",
+    icon: CodeBracketSquareIcon,
+    iconBg: "bg-sky-100 dark:bg-sky-900/30 text-sky-600",
+  },
+  {
+    href: "/openapi-outline",
+    title: "OpenAPI outline",
+    description: "JSON or YAML to human outline; optional AI narration.",
+    icon: DocumentDuplicateIcon,
+    iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
+  },
+  {
+    href: "/json-schema-form-mockup",
+    title: "JSON Schema form mockup",
+    description: "Describe a form UI from a JSON Schema object.",
+    icon: ViewColumnsIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300",
+  },
+  {
+    href: "/graphql-prettifier",
+    title: "GraphQL prettifier",
+    description: "Format pasted queries and see shallow complexity hints.",
+    icon: ShareIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
+  {
+    href: "/sql-explain-formatter",
+    title: "SQL EXPLAIN formatter",
+    description: "Tidy pasted EXPLAIN plans — read-only, no execution.",
+    icon: CircleStackIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/query-cost-estimator",
+    title: "Query cost estimator",
+    description: "Rough row-size math for teaching — not a real planner.",
+    icon: CalculatorIcon,
+    iconBg: "bg-orange-100 dark:bg-orange-900/30 text-orange-600",
+  },
+  {
+    href: "/database-naming-linter",
+    title: "Database naming linter",
+    description: "snake_case checks and light pluralization hints.",
+    icon: FunnelIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/env-var-diff",
+    title: "Environment variable diff",
+    description: "Compare two env files with automatic redaction.",
+    icon: ArrowsRightLeftIcon,
+    iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
+  },
+  {
+    href: "/cidr-calculator",
+    title: "CIDR Calculator",
+    description: "IPv4 network, mask, broadcast, and usable host range from CIDR.",
+    icon: MapPinIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
+  {
+    href: "/ip-integer-converter",
+    title: "IP ↔ Integer Converter",
+    description: "Convert dotted IPv4 to 32-bit unsigned decimal and back.",
+    icon: CalculatorIcon,
+    iconBg: "bg-cyan-100 dark:bg-cyan-900/30 text-cyan-600",
+  },
+  {
+    href: "/common-ports-reference",
+    title: "Common Ports Reference",
+    description: "Filterable cheat sheet of well-known TCP/UDP ports and what they mean.",
+    icon: ServerStackIcon,
+    iconBg: "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400",
+  },
+  {
+    href: "/user-agent-parser",
+    title: "User-Agent Parser",
+    description: "Best-effort browser, OS, and device hints from a classic User-Agent string.",
+    icon: DevicePhoneMobileIcon,
+    iconBg: "bg-violet-100 dark:bg-violet-900/30 text-violet-600",
+  },
+  {
+    href: "/locale-bcp47-helper",
+    title: "Locale / BCP-47 Helper",
+    description: "Canonicalize language tags and inspect language, region, and script fields.",
+    icon: LanguageIcon,
+    iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
   },
 ];
 
@@ -1895,6 +2614,37 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Freelance & work */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center text-teal-600">
+            <BriefcaseIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Freelance &amp; work</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {freelanceWorkTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Finance */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -1905,6 +2655,37 @@ export default function HomeDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {financeTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Career & study */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-sky-100 dark:bg-sky-900/20 flex items-center justify-center text-sky-600">
+            <AcademicCapIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Career &amp; study</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {careerStudyTools.map(({ href, title, description, icon: Icon, iconBg }) => (
             <Link
               key={title}
               href={href}
@@ -2025,6 +2806,40 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Workshop & desk */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-teal-100 dark:bg-teal-900/20 flex items-center justify-center text-teal-600">
+            <TableCellsIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Workshop &amp; desk</h3>
+          <span className="bg-teal-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
+            Premium
+          </span>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {workshopDeskTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* SEO & Marketing */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -2083,6 +2898,35 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Focus & planning */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/20 flex items-center justify-center text-violet-600">
+            <ClockIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Focus & planning</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {focusPlanningTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <p className="font-bold text-lg">{title}</p>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Productivity & Utilities */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -2112,6 +2956,35 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      {/* Work habits & focus */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center text-emerald-600">
+            <CalendarDaysIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Work habits & focus</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          {workHabitsTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <p className="font-bold text-lg">{title}</p>
+              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                {description}
+              </p>
+            </Link>
+          ))}
+        </div>
+      </section>
+
       {/* Text & Productivity */}
       <section className="mb-14">
         <div className="flex items-center gap-3 mb-8">
@@ -2122,6 +2995,66 @@ export default function HomeDashboard() {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {textProductivityTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Study & meetings */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-cyan-100 dark:bg-cyan-900/20 flex items-center justify-center text-cyan-600">
+            <AcademicCapIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Study & meetings</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {studyMeetingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">{description}</p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
+
+      {/* Project management */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-indigo-100 dark:bg-indigo-900/20 flex items-center justify-center text-indigo-600">
+            <BriefcaseIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Project management</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projectManagementTools.map(({ href, title, description, icon: Icon, iconBg }) => (
             <Link
               key={title}
               href={href}

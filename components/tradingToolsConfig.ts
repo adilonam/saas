@@ -285,6 +285,27 @@ const toolDefinitions: Record<string, ToolDefinition> = {
   },
 };
 
+export const TRADING_CALCULATOR_ORDERED_KEYS = Object.keys(toolDefinitions) as string[];
+
+export function getTradingCalculatorSearchEntries(): Array<{
+  title: string;
+  href: string;
+  keywords: string;
+}> {
+  return TRADING_CALCULATOR_ORDERED_KEYS.map((key, i) => {
+    const def = toolDefinitions[key as keyof typeof toolDefinitions];
+    const href = `/${key}`;
+    if (!def) {
+      return { title: key, href, keywords: `${key} trading calculator` };
+    }
+    return {
+      title: def.title,
+      href,
+      keywords: `${def.title} ${def.description} ${def.formulaNote} trading calculator`,
+    };
+  });
+}
+
 function performanceResults(values: Record<string, number | string>): ToolResult[] | null {
   const wins = Number(values.wins || 0);
   const losses = Number(values.losses || 0);
@@ -305,10 +326,6 @@ function performanceResults(values: Record<string, number | string>): ToolResult
 
 export function getTradingToolDefinition(slug: string): ToolDefinition | null {
   return toolDefinitions[slug] ?? null;
-}
-
-export function getAllTradingToolSlugs() {
-  return Object.keys(toolDefinitions);
 }
 
 export function computeTradingToolResults(

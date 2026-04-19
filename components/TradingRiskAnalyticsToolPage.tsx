@@ -46,13 +46,19 @@ function safePct(value: number): string {
   return `${(value * 100).toFixed(2)}%`;
 }
 
-export default function TradingRiskAnalyticsToolPage() {
+type TradingRiskAnalyticsToolPageProps = {
+  /** When the route is a static segment (e.g. `/var-calculator`), pass the slug; otherwise `[tool]` params are used. */
+  slug?: string;
+};
+
+export default function TradingRiskAnalyticsToolPage({ slug: slugProp }: TradingRiskAnalyticsToolPageProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const params = useParams<{ slug: string }>();
+  const params = useParams<{ tool?: string }>();
   const { data: session, status } = useSession();
   const [resultUnlocked, setResultUnlocked] = useState(false);
-  const tool = TRADING_RISK_TOOLS.find((item) => item.slug === params.slug);
+  const segment = slugProp ?? (typeof params?.tool === "string" ? params.tool : "");
+  const tool = TRADING_RISK_TOOLS.find((item) => item.slug === segment);
 
   const [form, setForm] = useState<FormState>({});
 

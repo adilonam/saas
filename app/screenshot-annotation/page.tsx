@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
@@ -50,46 +50,49 @@ export default function ScreenshotAnnotationPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const draw = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, clear = false) => {
-    const c = canvasRef.current;
-    if (!c || !img) return;
-    c.width = img.naturalWidth;
-    c.height = img.naturalHeight;
-    ctx.drawImage(img, 0, 0);
-    if (clear) return;
-    const lw = Math.max(2, c.width / 300);
-    const fontSz = Math.max(14, c.width / 40);
-    const drawArrow = (s: { x: number; y: number }, e: { x: number; y: number }, col: string) => {
-      ctx.strokeStyle = col;
-      ctx.beginPath();
-      ctx.moveTo(s.x, s.y);
-      ctx.lineTo(e.x, e.y);
-      const angle = Math.atan2(e.y - s.y, e.x - s.x);
-      const head = 12;
-      ctx.lineTo(e.x - head * Math.cos(angle - 0.4), e.y - head * Math.sin(angle - 0.4));
-      ctx.moveTo(e.x, e.y);
-      ctx.lineTo(e.x - head * Math.cos(angle + 0.4), e.y - head * Math.sin(angle + 0.4));
-      ctx.stroke();
-    };
-    const drawRect = (s: { x: number; y: number }, e: { x: number; y: number }, col: string) => {
-      ctx.strokeStyle = col;
-      ctx.strokeRect(Math.min(s.x, e.x), Math.min(s.y, e.y), Math.abs(e.x - s.x), Math.abs(e.y - s.y));
-    };
-    shapes.forEach((sh) => {
-      if (sh.type === "arrow") drawArrow(sh.start, sh.end, sh.color);
-      else drawRect(sh.start, sh.end, sh.color);
-    });
-    texts.forEach((t) => {
-      ctx.fillStyle = t.color;
-      ctx.font = `bold ${fontSz}px sans-serif`;
-      ctx.fillText(t.text, t.x, t.y);
-    });
-    ctx.strokeStyle = color;
-    ctx.fillStyle = color;
-    ctx.lineWidth = lw;
-    if (start && current && tool === "arrow") drawArrow(start, current, color);
-    if (start && current && tool === "rect") drawRect(start, current, color);
-  };
+  const draw = useCallback(
+    (ctx: CanvasRenderingContext2D, img: HTMLImageElement, clear = false) => {
+      const c = canvasRef.current;
+      if (!c || !img) return;
+      c.width = img.naturalWidth;
+      c.height = img.naturalHeight;
+      ctx.drawImage(img, 0, 0);
+      if (clear) return;
+      const lw = Math.max(2, c.width / 300);
+      const fontSz = Math.max(14, c.width / 40);
+      const drawArrow = (s: { x: number; y: number }, e: { x: number; y: number }, col: string) => {
+        ctx.strokeStyle = col;
+        ctx.beginPath();
+        ctx.moveTo(s.x, s.y);
+        ctx.lineTo(e.x, e.y);
+        const angle = Math.atan2(e.y - s.y, e.x - s.x);
+        const head = 12;
+        ctx.lineTo(e.x - head * Math.cos(angle - 0.4), e.y - head * Math.sin(angle - 0.4));
+        ctx.moveTo(e.x, e.y);
+        ctx.lineTo(e.x - head * Math.cos(angle + 0.4), e.y - head * Math.sin(angle + 0.4));
+        ctx.stroke();
+      };
+      const drawRect = (s: { x: number; y: number }, e: { x: number; y: number }, col: string) => {
+        ctx.strokeStyle = col;
+        ctx.strokeRect(Math.min(s.x, e.x), Math.min(s.y, e.y), Math.abs(e.x - s.x), Math.abs(e.y - s.y));
+      };
+      shapes.forEach((sh) => {
+        if (sh.type === "arrow") drawArrow(sh.start, sh.end, sh.color);
+        else drawRect(sh.start, sh.end, sh.color);
+      });
+      texts.forEach((t) => {
+        ctx.fillStyle = t.color;
+        ctx.font = `bold ${fontSz}px sans-serif`;
+        ctx.fillText(t.text, t.x, t.y);
+      });
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = lw;
+      if (start && current && tool === "arrow") drawArrow(start, current, color);
+      if (start && current && tool === "rect") drawRect(start, current, color);
+    },
+    [color, current, shapes, start, texts, tool],
+  );
 
   useEffect(() => {
     if (!imageUrl || !canvasRef.current) return;
@@ -100,7 +103,7 @@ export default function ScreenshotAnnotationPage() {
       if (ctx) draw(ctx, img);
     };
     img.src = imageUrl;
-  }, [imageUrl, start, current, shapes, texts, text, tool, color]);
+  }, [draw, imageUrl]);
 
   const getCoord = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const c = canvasRef.current;

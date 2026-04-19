@@ -30,7 +30,7 @@ export default function CsvToJsonPage() {
   const [error, setError] = useState<string | null>(null);
 
   const [response, setResponse] = useState<CsvToJsonResponse | null>(null);
-  const rows = response?.rows ?? [];
+  const rows = useMemo(() => response?.rows ?? [], [response]);
 
   const preview = useMemo(() => {
     if (!rows.length) return { header: [] as string[], data: [] as string[][] };

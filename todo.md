@@ -61,7 +61,10 @@
 - [x] Goal Progress Tracker
 - [x] Salary After Tax Calculator
 
-100 Trading Tool Ideas
+
+
+
+
 
 Position Size Calculator
 Risk per Trade Calculator
@@ -372,3 +375,54 @@ Creative Testing Roadmap Planner
 - [x] Random team shuffler / breakout group maker
 - [x] Name tag / table tent text layout (HTML print view)
 - [x] Personal dashboard widgets (weather, todos, focus quote—optional AI quote)
+
+- [x] PDF to Text (OCR Extractor) — /pdf-to-text (FastAPI: /fast-api/v1/pdf-to-text)
+- [x] PDF Metadata Inspector + JSON Export — /pdf-metadata-inspector (FastAPI: /fast-api/v1/pdf-metadata)
+- [x] CSV/XLSX Quick Profiler — /data-profiler (FastAPI: /fast-api/v1/csv-to-json, /fast-api/v1/xlsx-to-json)
+- [x] Batch File Archive Builder — /bulk-zip-builder (FastAPI: /fast-api/v1/zip-create)
+- [x] Markdown Report Packager — /markdown-report-bundle (FastAPI: /fast-api/v1/markdown-to-pdf, /fast-api/v1/zip-create)
+- [x] Smart Task Prioritizer (Eisenhower Matrix) — /task-prioritizer (no FastAPI needed)
+- [x] Daily Planner Generator — /daily-planner (optional AI)
+- [x] Meeting Agenda Builder — /meeting-agenda-builder (optional AI)
+- [x] SOP / Checklist Builder — /checklist-builder (optional AI)
+- [x] Batch Rename Utility — /batch-rename (no FastAPI needed)
+- [x] PDF OCR + Translate — /pdf-ocr-translate (FastAPI: /fast-api/v1/pdf-to-text + optional AI translation)
+- [x] PDF Keyword Extractor — /pdf-keyword-extractor (FastAPI: /fast-api/v1/pdf-to-text + optional AI)
+- [x] PDF Q&A Assistant — /pdf-qa-assistant (FastAPI: /fast-api/v1/pdf-to-text + OpenAI)
+- [x] PDF to Markdown — /pdf-to-markdown (FastAPI: /fast-api/v1/pdf-to-text + formatter)
+- [x] PDF Outline Generator — /pdf-outline-generator (FastAPI: /fast-api/v1/pdf-to-text + OpenAI)
+- [x] PDF Action Items Extractor — /pdf-action-items (FastAPI: /fast-api/v1/pdf-to-text + OpenAI)
+- [x] Multi-PDF Compare — /multi-pdf-compare (FastAPI: /fast-api/v1/pdf-to-text)
+- [x] PDF Compliance Checker — /pdf-compliance-checker (FastAPI: /fast-api/v1/pdf-metadata + rules)
+- [x] PDF Page Range Splitter — /pdf-range-splitter (FastAPI: /fast-api/v1/split-pdf + post-processing)
+- [x] PDF Rotate + Compress Pipeline — /pdf-rotate-compress (FastAPI: /fast-api/v1/rotate-pdf + /fast-api/v1/compress-pdf)
+- [x] Image Batch to PDF — /image-batch-to-pdf (FastAPI: /fast-api/v1/image-to-pdf + /fast-api/v1/zip-create)
+- [x] Markdown to Branded PDF — /markdown-brand-pdf (FastAPI: /fast-api/v1/markdown-to-pdf)
+- [x] HTML Invoice to PDF — /html-invoice-to-pdf (FastAPI: /fast-api/v1/html-to-pdf)
+- [x] CSV Cleaner — /csv-cleaner (FastAPI: /fast-api/v1/csv-to-json)
+- [x] CSV Column Mapper — /csv-column-mapper (FastAPI: /fast-api/v1/csv-to-json)
+- [x] CSV Deduplicator — /csv-deduplicator (FastAPI: /fast-api/v1/csv-to-json)
+- [x] CSV Merge Assistant — /csv-merge-assistant (FastAPI: /fast-api/v1/csv-to-json)
+- [x] CSV to Markdown Table — /csv-to-markdown-table (FastAPI: /fast-api/v1/csv-to-json)
+- [x] XLSX Sheet Explorer — /xlsx-sheet-explorer (FastAPI: /fast-api/v1/xlsx-to-json)
+- [x] XLSX to Chart JSON — /xlsx-chart-json (FastAPI: /fast-api/v1/xlsx-to-json)
+- [x] ZIP Notes Packager — /zip-notes-packager (FastAPI: /fast-api/v1/zip-create)
+- [x] Screenshot to PDF Reporter — /screenshot-to-pdf-reporter (FastAPI: /fast-api/v1/image-to-pdf)
+- [x] Smart QR Batch Generator — /smart-qr-batch-generator (FastAPI: /fast-api/v1/qr-generate + /fast-api/v1/zip-create)
+- [x] Meeting Notes to Action Plan — /meeting-notes-action-plan (optional AI)
+- [x] Weekly Review Generator — /weekly-review-generator (optional AI)
+- [x] Goal Breakdown Planner — /goal-breakdown-planner (optional AI)
+- [x] Habit Reflection Coach — /habit-reflection-coach (optional AI)
+- [x] Focus Session Planner — /focus-session-planner (no FastAPI needed)
+- [x] Time Blocking Builder — /time-blocking-builder (no FastAPI needed)
+- [x] Decision Matrix Tool — /decision-matrix-tool (no FastAPI needed)
+- [x] Pros and Cons Analyzer — /pros-cons-analyzer (optional AI)
+- [x] Priority Score Calculator — /priority-score-calculator (no FastAPI needed)
+- [x] RICE Score Calculator — /rice-score-calculator (no FastAPI needed)
+- [x] ICE Score Calculator — /ice-score-calculator (no FastAPI needed)
+- [x] Meeting Minutes Formatter — /meeting-minutes-formatter (optional AI)
+- [x] SOP Version Diff Checker — /sop-version-diff (no FastAPI needed)
+- [x] Policy Rewrite Assistant — /policy-rewrite-assistant (optional AI)
+- [x] Email Thread Summarizer — /email-thread-summarizer (optional AI)
+- [x] Follow-up Email Drafter — /followup-email-drafter (optional AI)
+- [x] Project Kickoff Brief Generator — /project-kickoff-brief (optional AI)

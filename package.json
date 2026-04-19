@@ -7,6 +7,7 @@
     "build": "prisma generate && prisma migrate deploy && next build",
     "start": "next start",
     "lint": "eslint .",
+    "indexnow:submit": "tsx scripts/submit-indexnow.ts",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:studio": "prisma studio --port 5555",
@@ -54,12 +55,13 @@
     "@types/react": "^19.0.6",
     "@types/react-dom": "^19.0.2",
     "autoprefixer": "^10.4.20",
-    "baseline-browser-mapping": "^2.10.13",
+    "baseline-browser-mapping": "^2.10.16",
     "eslint": "^9.39.1",
     "eslint-config-next": "^16.0.8",
     "postcss": "^8.4.47",
     "prisma": "^7.3.0",
     "tailwindcss": "^4.1.17",
+    "tsx": "^4.21.0",
     "typescript": "^5.7.2"
   }
 }

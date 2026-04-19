@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
+import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -195,9 +196,12 @@ export default function QrGeneratePage() {
                 Download
               </Button>
             </div>
-            <img
+            <Image
               src={resultUrl}
               alt="QR code"
+              width={320}
+              height={320}
+              unoptimized
               className="max-w-[320px] w-full mx-auto rounded-lg border border-input bg-white"
             />
           </div>

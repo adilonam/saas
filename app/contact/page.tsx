@@ -2,8 +2,7 @@
 
 import DashboardLayout from "components/DashboardLayout";
 import { EnvelopeIcon } from "@heroicons/react/24/outline";
-
-const CONTACT_EMAIL = "info@eprod.io";
+import { CONTACT_EMAIL, LEGAL_BUSINESS_NAME, SITE_BRAND } from "@/lib/business";
 
 export default function ContactPage() {
   return (
@@ -36,6 +35,13 @@ export default function ContactPage() {
         </div>
         <p className="mt-4 sm:mt-6 text-xs sm:text-sm text-slate-600 dark:text-slate-400">
           Send us an email and we will get back to you as soon as possible.
+        </p>
+        <p className="mt-4 text-xs sm:text-sm text-slate-500 dark:text-slate-500 border-t border-slate-200 dark:border-slate-700 pt-4">
+          {SITE_BRAND} is operated by{" "}
+          <span className="font-semibold text-slate-700 dark:text-slate-300">
+            {LEGAL_BUSINESS_NAME}
+          </span>
+          .
         </p>
       </div>
     </DashboardLayout>

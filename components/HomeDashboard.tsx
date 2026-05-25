@@ -93,6 +93,7 @@ import {
 import DashboardLayout from "components/DashboardLayout";
 import { ADS_TOOLS } from "components/tools/adsToolsConfig";
 import { TRADING_TOOLS } from "@/lib/trading-tools";
+import { LEGAL_BUSINESS_NAME, SITE_BRAND } from "@/lib/business";
 
 const aiTools = [
   {
@@ -3535,8 +3536,23 @@ export default function HomeDashboard() {
         </div>
       </section>
 
+      <section
+        className="mt-14 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/80 dark:bg-slate-900/40 px-6 py-5 sm:px-8 sm:py-6 text-center"
+        aria-label="Business operator"
+      >
+        <p className="text-sm text-slate-600 dark:text-slate-400">
+          {SITE_BRAND} is operated by{" "}
+          <Link
+            href="/legal"
+            className="font-semibold text-slate-900 dark:text-white hover:underline"
+          >
+            {LEGAL_BUSINESS_NAME}
+          </Link>
+        </p>
+      </section>
+
       {/* CTA cards - fixed colors, do not change with theme */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-14 pb-20">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 pb-20">
         <div className="p-8 rounded-[2.5rem] bg-linear-to-br from-[#135bec] to-indigo-700 text-white flex justify-between items-center group overflow-hidden relative">
           <div className="relative z-10">
             <h4 className="text-2xl font-bold">API for Developers</h4>

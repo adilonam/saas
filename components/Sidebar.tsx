@@ -7,6 +7,7 @@ import {
   HomeIcon,
   CurrencyDollarIcon,
   EnvelopeIcon,
+  BuildingOffice2Icon,
   ChevronLeftIcon,
   ChevronRightIcon,
 } from "@heroicons/react/24/outline";
@@ -16,6 +17,7 @@ const navItems = [
   { href: "/", label: "Home", icon: HomeIcon },
   { href: "/pricing", label: "Pricing", icon: CurrencyDollarIcon },
   { href: "/contact", label: "Contact us", icon: EnvelopeIcon },
+  { href: "/legal", label: "Legal", icon: BuildingOffice2Icon },
 ];
 
 interface SidebarProps {

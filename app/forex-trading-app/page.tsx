@@ -1,0 +1,199 @@
+"use client";
+
+import { useState } from "react";
+import { useSession } from "next-auth/react";
+import { useRouter, usePathname } from "next/navigation";
+import DashboardLayout from "components/DashboardLayout";
+import { Button } from "@/components/ui/button";
+import {
+  ChartBarIcon,
+  ComputerDesktopIcon,
+  ShieldCheckIcon,
+  BoltIcon,
+  CurrencyDollarIcon,
+  CheckCircleIcon,
+} from "@heroicons/react/24/outline";
+import { Loader2 } from "lucide-react";
+
+const PRICE_USD = 999;
+
+const FEATURES = [
+  "Live charts with TradingView-style market views",
+  "Built-in trade journal, analytics, and performance tracking",
+  "Risk calculators: position size, stop loss, and R:R planning",
+  "Responsive web app — deploy on your domain or cloud",
+  "Modern UI with dark mode and mobile-friendly layouts",
+  "Full source license for commercial use",
+];
+
+export default function ForexTradingAppPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const { data: session, status } = useSession();
+  const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleBuyNow = async () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/forex-trading-app")}`,
+      );
+      return;
+    }
+
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
+
+    setIsCheckingOut(true);
+    setError(null);
+
+    try {
+      const res = await fetch("/api/create-forex-app-checkout", {
+        method: "POST",
+      });
+      const data = (await res.json()) as { url?: string; error?: string };
+      if (data.url) {
+        window.location.href = data.url;
+        return;
+      }
+      setError(data.error || "Failed to start checkout");
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsCheckingOut(false);
+    }
+  };
+
+  return (
+    <DashboardLayout>
+      <div className="mx-auto max-w-5xl space-y-8">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wider text-dashboard-primary">
+              Trading product
+            </p>
+            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              Forex Trading Web App
+            </h1>
+            <p className="mt-3 max-w-2xl text-lg text-slate-500 dark:text-slate-400">
+              A production-ready forex trading platform you can brand, host, and
+              sell to your audience. Preview the app below, then purchase the
+              full license.
+            </p>
+          </div>
+          <div className="shrink-0 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-center shadow-xl dark:border-slate-700 dark:bg-slate-900/50">
+            <p className="text-sm text-slate-500 dark:text-slate-400">One-time license</p>
+            <p className="mt-1 text-4xl font-bold text-slate-900 dark:text-white">
+              ${PRICE_USD.toLocaleString()}
+              <span className="text-lg font-medium text-slate-500"> USD</span>
+            </p>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-2xl border border-slate-200 bg-black shadow-xl dark:border-slate-700">
+          <div className="border-b border-slate-800 px-4 py-3 sm:px-6">
+            <div className="flex items-center gap-2 text-sm text-slate-300">
+              <ComputerDesktopIcon className="size-4" />
+              App preview
+            </div>
+          </div>
+          <video
+            className="aspect-video w-full bg-slate-950"
+            controls
+            playsInline
+            preload="metadata"
+            poster=""
+          >
+            <source src="/video/forex-app.mov" type="video/quicktime" />
+            <source src="/video/forex-app.mov" type="video/mp4" />
+            Your browser does not support the video tag.
+          </video>
+        </div>
+
+        <div className="grid gap-6 lg:grid-cols-5">
+          <div className="lg:col-span-3 rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900/50 sm:p-8">
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+              What you get
+            </h2>
+            <ul className="mt-5 space-y-3">
+              {FEATURES.map((feature) => (
+                <li key={feature} className="flex items-start gap-3 text-slate-600 dark:text-slate-300">
+                  <CheckCircleIcon className="mt-0.5 size-5 shrink-0 text-emerald-500" />
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="lg:col-span-2 space-y-4">
+            <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900/50">
+              <div className="mb-4 flex items-center gap-3">
+                <div className="flex size-12 items-center justify-center rounded-xl bg-dashboard-primary/10 text-dashboard-primary">
+                  <ChartBarIcon className="size-6" />
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 dark:text-white">
+                    Built for traders
+                  </h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Charts, journal, risk tools in one app
+                  </p>
+                </div>
+              </div>
+              <div className="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                <p className="flex items-center gap-2">
+                  <BoltIcon className="size-4 text-amber-500" />
+                  Ship faster with a ready-made trading UI
+                </p>
+                <p className="flex items-center gap-2">
+                  <ShieldCheckIcon className="size-4 text-emerald-500" />
+                  Secure Stripe checkout for your purchase
+                </p>
+                <p className="flex items-center gap-2">
+                  <CurrencyDollarIcon className="size-4 text-sky-500" />
+                  One payment — no recurring fees for the license
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-900/40">
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Sign in with an active eProd subscription to complete checkout.
+                After payment, our team will deliver setup instructions within
+                1–2 business days.
+              </p>
+              <Button
+                onClick={handleBuyNow}
+                disabled={isCheckingOut}
+                className="mt-4 w-full gap-2 rounded-xl bg-dashboard-primary text-white/90 hover:bg-dashboard-primary/90 hover:text-white"
+                size="lg"
+              >
+                {isCheckingOut ? (
+                  <>
+                    <Loader2 className="size-4 animate-spin" />
+                    Redirecting to checkout…
+                  </>
+                ) : (
+                  <>
+                    <CurrencyDollarIcon className="size-5" />
+                    Buy now — ${PRICE_USD.toLocaleString()} USD
+                  </>
+                )}
+              </Button>
+              {error && (
+                <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">
+                  {error}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    </DashboardLayout>
+  );
+}

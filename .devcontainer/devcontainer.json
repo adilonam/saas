@@ -19,7 +19,7 @@
       "onAutoForward": "notify"
     }
   },
-  "postCreateCommand": "npm install",
+  "postCreateCommand": "pnpm install",
   "customizations": {
     "vscode": {
       "extensions": [

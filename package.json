@@ -1,6 +1,7 @@
 {
   "name": "saas",
   "version": "1.0.0",
+  "packageManager": "pnpm@10.11.0",
   "description": "Nextjs Saas Starter Template",
   "scripts": {
     "dev": "next dev",

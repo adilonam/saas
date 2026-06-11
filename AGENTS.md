@@ -1,5 +1,8 @@
 # Cursor Rules
 
+## Package Manager
+- Use **pnpm** (`pnpm install`, `pnpm dev`, `pnpm exec …`). Do not use npm or yarn.
+
 ## Technology Stack Versions
 - Tailwind CSS v4 is required (follow respective latest conventions).
 - shadcn/ui v3 is required (follow respective latest conventions).

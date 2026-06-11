@@ -10,8 +10,8 @@ Tailwind CSS is used for styling, and Next Themes is used for dark mode. React I
 ### How to use
 
 1. Clone the repository
-2. Install dependencies `npm install`
-3. Run the development server `npm run dev`
+2. Install dependencies `pnpm install`
+3. Run the development server `pnpm dev`
 
 ### Features
 

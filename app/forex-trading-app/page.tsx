@@ -15,10 +15,14 @@ import {
   ArrowTopRightOnSquareIcon,
   GlobeAltIcon,
 } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
 import { Loader2 } from "lucide-react";
+import { SiFiverr } from "react-icons/si";
 
 const PRICE_USD = 499;
 const DEMO_URL = "https://www.cfi-trading.com/";
+const FIVERR_REVIEWS_URL =
+  "https://www.fiverr.com/adilonam/create-trading-platform-for-your-business";
 
 const FEATURES = [
   "Live charts with TradingView-style market views",
@@ -157,6 +161,50 @@ export default function ForexTradingAppPage() {
             >
               <a href={DEMO_URL} target="_blank" rel="noopener noreferrer">
                 Open live demo
+                <ArrowTopRightOnSquareIcon className="size-4" />
+              </a>
+            </Button>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900/50 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-emerald-100 text-[#1DBF73] dark:bg-emerald-900/30">
+                <SiFiverr className="size-7" aria-hidden />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Client reviews
+                </h2>
+                <div className="mt-2 flex flex-wrap items-center gap-2">
+                  <div className="flex items-center gap-0.5" aria-label="5 out of 5 stars">
+                    {Array.from({ length: 5 }).map((_, index) => (
+                      <StarIcon key={index} className="size-5 text-amber-400" />
+                    ))}
+                  </div>
+                  <span className="text-sm font-semibold text-slate-900 dark:text-white">
+                    5.0
+                  </span>
+                  <span className="text-sm text-slate-500 dark:text-slate-400">
+                    on Fiverr
+                  </span>
+                </div>
+                <p className="mt-2 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
+                  See what buyers say about our trading platform builds — delivery,
+                  quality, and support from real Fiverr orders.
+                </p>
+              </div>
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="shrink-0 gap-2 rounded-xl border-slate-200 dark:border-slate-700"
+            >
+              <a href={FIVERR_REVIEWS_URL} target="_blank" rel="noopener noreferrer">
+                <SiFiverr className="size-4 text-[#1DBF73]" aria-hidden />
+                Read reviews on Fiverr
                 <ArrowTopRightOnSquareIcon className="size-4" />
               </a>
             </Button>

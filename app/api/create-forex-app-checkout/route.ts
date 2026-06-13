@@ -6,7 +6,7 @@ const stripe = process.env.STRIPE_SECRET_KEY
   ? new Stripe(process.env.STRIPE_SECRET_KEY)
   : null;
 
-const DEFAULT_PRICE_USD = 999;
+const DEFAULT_PRICE_USD = 499;
 
 function parsePrice(env: string | undefined): number {
   if (env == null || env === "") return DEFAULT_PRICE_USD;

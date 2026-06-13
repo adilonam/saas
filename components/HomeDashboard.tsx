@@ -197,10 +197,10 @@ const tradingProduct = {
   href: "/forex-trading-app",
   title: "Forex Trading Web App",
   description:
-    "Production-ready trading platform with live charts and risk tools. Preview the demo — $999 one-time license.",
+    "Production-ready trading platform with live charts and risk tools. Preview the demo — $499 one-time license.",
   icon: ComputerDesktopIcon,
   iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
-  price: "$999",
+  price: "$499",
 };
 
 const aiWritingTools = [

@@ -31,7 +31,7 @@ const SEARCHABLE_FEATURES = [
   { title: "Markdown to Branded PDF", href: "/markdown-brand-pdf", keywords: "markdown branded pdf brand report" },
   { title: "HTML Invoice to PDF", href: "/html-invoice-to-pdf", keywords: "html invoice to pdf invoice generator" },
   { title: "Trading Signal", href: "/trading-signal", keywords: "trading signal chart analyze bitcoin crypto entry stop loss take profit" },
-  { title: "Forex Trading Web App", href: "/forex-trading-app", keywords: "forex trading web app buy purchase license platform demo video 999" },
+  { title: "Forex Trading Web App", href: "/forex-trading-app", keywords: "forex trading web app buy purchase license platform demo video 499" },
   { title: "Sign PDF", href: "/sign-pdf", keywords: "sign signature sign pdf" },
   { title: "Merge PDFs", href: "/merge-pdf", keywords: "merge combine pdf multiple" },
   { title: "Convert PDF", href: "/pdf-to-word", keywords: "convert word docx excel image" },

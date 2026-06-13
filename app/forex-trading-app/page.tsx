@@ -12,10 +12,13 @@ import {
   BoltIcon,
   CurrencyDollarIcon,
   CheckCircleIcon,
+  ArrowTopRightOnSquareIcon,
+  GlobeAltIcon,
 } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
-const PRICE_USD = 999;
+const PRICE_USD = 499;
+const DEMO_URL = "https://www.cfi-trading.com/";
 
 const FEATURES = [
   "Live charts with TradingView-style market views",
@@ -82,8 +85,16 @@ export default function ForexTradingAppPage() {
             </h1>
             <p className="mt-3 max-w-2xl text-lg text-slate-500 dark:text-slate-400">
               A production-ready forex trading platform you can brand, host, and
-              sell to your audience. Preview the app below, then purchase the
-              full license.
+              sell to your audience. Watch the preview, explore the live demo at{" "}
+              <a
+                href={DEMO_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="font-medium text-dashboard-primary hover:underline"
+              >
+                CFI Trade
+              </a>
+              , then purchase the full license.
             </p>
           </div>
           <div className="shrink-0 rounded-2xl border border-slate-200 bg-white px-6 py-5 text-center shadow-xl dark:border-slate-700 dark:bg-slate-900/50">
@@ -113,6 +124,43 @@ export default function ForexTradingAppPage() {
             <source src="/video/forex-app.mov" type="video/mp4" />
             Your browser does not support the video tag.
           </video>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900/50 sm:p-8">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-start gap-4">
+              <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-sky-100 text-sky-600 dark:bg-sky-900/30 dark:text-sky-400">
+                <GlobeAltIcon className="size-6" />
+              </div>
+              <div>
+                <h2 className="text-xl font-bold text-slate-900 dark:text-white">
+                  Live demo website
+                </h2>
+                <p className="mt-1 max-w-2xl text-sm text-slate-600 dark:text-slate-400 sm:text-base">
+                  Explore the full trading platform in production — charts, markets,
+                  account flows, and mobile-ready UI on{" "}
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    CFI Trade
+                  </span>
+                  .
+                </p>
+                <p className="mt-2 text-sm text-slate-500 dark:text-slate-500">
+                  {DEMO_URL.replace(/^https:\/\//, "")}
+                </p>
+              </div>
+            </div>
+            <Button
+              asChild
+              variant="outline"
+              size="lg"
+              className="shrink-0 gap-2 rounded-xl border-slate-200 dark:border-slate-700"
+            >
+              <a href={DEMO_URL} target="_blank" rel="noopener noreferrer">
+                Open live demo
+                <ArrowTopRightOnSquareIcon className="size-4" />
+              </a>
+            </Button>
+          </div>
         </div>
 
         <div className="grid gap-6 lg:grid-cols-5">

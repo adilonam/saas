@@ -92,19 +92,8 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
                         <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 uppercase tracking-tighter">
                           {session.user.subscriptionExpiresAt &&
                           new Date(session.user.subscriptionExpiresAt) > new Date()
-                            ? session.user.waitlistNumber != null
-                              ? (
-                                  <>
-                                    Expires {new Date(session.user.subscriptionExpiresAt).toLocaleDateString()} ·{" "}
-                                    <span className="text-dashboard-primary font-semibold normal-case">Waitlist {session.user.waitlistNumber}</span>
-                                  </>
-                                )
-                              : `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                            : session.user.waitlistNumber != null
-                              ? (
-                                  <span className="text-dashboard-primary font-semibold normal-case">Waitlist {session.user.waitlistNumber}</span>
-                                )
-                              : "No subscription"}
+                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No subscription"}
                         </p>
                       </div>
                       <div className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border-2 border-dashboard-primary/10 bg-slate-700 flex items-center justify-center text-white font-bold text-xs sm:text-sm overflow-hidden shrink-0">
@@ -131,19 +120,8 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
                         <p className="text-xs leading-none text-slate-500 dark:text-slate-400 mt-1">
                           {session.user.subscriptionExpiresAt &&
                           new Date(session.user.subscriptionExpiresAt) > new Date()
-                            ? session.user.waitlistNumber != null
-                              ? (
-                                  <>
-                                    Subscription expires {new Date(session.user.subscriptionExpiresAt).toLocaleDateString()} ·{" "}
-                                    <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
-                                  </>
-                                )
-                              : `Subscription expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                            : session.user.waitlistNumber != null
-                              ? (
-                                  <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
-                                )
-                              : "No active subscription"}
+                            ? `Subscription expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No active subscription"}
                         </p>
                       </div>
                     </DropdownMenuLabel>

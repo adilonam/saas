@@ -139,17 +139,8 @@ export default function Header() {
                         <p className="text-xs leading-none text-muted-foreground mt-1">
                           {session.user.subscriptionExpiresAt &&
                           new Date(session.user.subscriptionExpiresAt) > new Date()
-                            ? session.user.waitlistNumber != null
-                              ? (
-                                  <>
-                                    Expires {new Date(session.user.subscriptionExpiresAt).toLocaleDateString()} ·{" "}
-                                    <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
-                                  </>
-                                )
-                              : `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                            : session.user.waitlistNumber != null
-                              ? <span className="text-dashboard-primary font-medium">Waitlist {session.user.waitlistNumber}</span>
-                              : "No subscription"}
+                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
+                            : "No subscription"}
                         </p>
                       </div>
                     </DropdownMenuLabel>

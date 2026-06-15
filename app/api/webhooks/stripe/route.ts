@@ -11,6 +11,58 @@ const stripe = process.env.STRIPE_SECRET_KEY
   : null;
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
+async function createOrderFromCheckout(
+  userId: string,
+  product: string,
+  amountCents: number,
+  currency: string,
+  stripeCheckoutSessionId: string,
+  stripePaymentIntentId: string | null,
+  metadata: Record<string, unknown>
+) {
+  const existing = await prisma.order.findUnique({
+    where: { stripeCheckoutSessionId },
+  });
+  if (existing) return existing;
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+  if (!user) return null;
+
+  const [order] = await prisma.$transaction([
+    prisma.order.create({
+      data: {
+        userId,
+        product,
+        status: "PAID",
+        amountCents,
+        currency,
+        stripeCheckoutSessionId,
+        stripePaymentIntentId,
+      },
+    }),
+    prisma.history.create({
+      data: {
+        userId,
+        action: "order_paid",
+        description: `Order paid: ${product}`,
+        metadata: {
+          ...metadata,
+          product,
+          amountCents,
+          currency,
+          stripeCheckoutSessionId,
+          stripePaymentIntentId,
+        },
+      },
+    }),
+  ]);
+
+  return order;
+}
+
 async function addSubscriptionDays(
   userId: string,
   email: string,
@@ -142,6 +194,47 @@ export async function POST(request: Request) {
           priceId: item?.price?.id ?? undefined,
         }
       );
+      return NextResponse.json({ received: true }, { status: 200 });
+    }
+
+    if (event.type === "checkout.session.completed") {
+      const checkoutSession = event.data.object as Stripe.Checkout.Session;
+      if (checkoutSession.mode !== "payment") {
+        return NextResponse.json({ received: true }, { status: 200 });
+      }
+
+      const product = checkoutSession.metadata?.product;
+      if (!product) {
+        return NextResponse.json({ received: true, skipped: "no_product" }, { status: 200 });
+      }
+
+      const userId =
+        checkoutSession.client_reference_id ?? checkoutSession.metadata?.userId ?? null;
+      if (!userId) {
+        console.warn("Stripe webhook checkout.session.completed: no userId", checkoutSession.id);
+        return NextResponse.json({ received: true }, { status: 200 });
+      }
+
+      const paymentIntent = checkoutSession.payment_intent;
+      const stripePaymentIntentId =
+        typeof paymentIntent === "string"
+          ? paymentIntent
+          : (paymentIntent?.id ?? null);
+
+      await createOrderFromCheckout(
+        userId,
+        product,
+        checkoutSession.amount_total ?? 0,
+        checkoutSession.currency ?? "usd",
+        checkoutSession.id,
+        stripePaymentIntentId,
+        {
+          source: "stripe",
+          checkoutSessionId: checkoutSession.id,
+          customerEmail: checkoutSession.customer_details?.email ?? null,
+        }
+      );
+
       return NextResponse.json({ received: true }, { status: 200 });
     }
 

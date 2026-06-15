@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
@@ -24,6 +24,15 @@ const DEMO_URL = "https://www.cfi-trading.com/";
 const FIVERR_REVIEWS_URL =
   "https://www.fiverr.com/adilonam/create-trading-platform-for-your-business";
 
+type ForexOrder = {
+  id: string;
+  product: string;
+  status: string;
+  amountCents: number;
+  currency: string;
+  createdAt: string;
+};
+
 const FEATURES = [
   "Live charts with TradingView-style market views",
   "Built-in trade journal, analytics, and performance tracking",
@@ -39,6 +48,40 @@ export default function ForexTradingAppPage() {
   const { data: session, status } = useSession();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [existingOrder, setExistingOrder] = useState<ForexOrder | null>(null);
+  const [isLoadingOrder, setIsLoadingOrder] = useState(false);
+
+  useEffect(() => {
+    if (status !== "authenticated") {
+      setExistingOrder(null);
+      return;
+    }
+
+    let cancelled = false;
+    setIsLoadingOrder(true);
+
+    fetch("/api/forex-app-order")
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { order?: ForexOrder | null } | null) => {
+        if (!cancelled) {
+          setExistingOrder(data?.order ?? null);
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setExistingOrder(null);
+        }
+      })
+      .finally(() => {
+        if (!cancelled) {
+          setIsLoadingOrder(false);
+        }
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [status]);
 
   const handleBuyNow = async () => {
     if (status === "unauthenticated" || !session) {
@@ -48,11 +91,7 @@ export default function ForexTradingAppPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
+    if (existingOrder) {
       return;
     }
 
@@ -258,29 +297,49 @@ export default function ForexTradingAppPage() {
             </div>
 
             <div className="rounded-2xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-900/40">
-              <p className="text-sm text-slate-600 dark:text-slate-400">
-                Sign in with an active eProd subscription to complete checkout.
-                After payment, our team will deliver setup instructions within
-                1–2 business days.
-              </p>
-              <Button
-                onClick={handleBuyNow}
-                disabled={isCheckingOut}
-                className="mt-4 w-full gap-2 rounded-xl bg-dashboard-primary text-white/90 hover:bg-dashboard-primary/90 hover:text-white"
-                size="lg"
-              >
-                {isCheckingOut ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    Redirecting to checkout…
-                  </>
-                ) : (
-                  <>
-                    <CurrencyDollarIcon className="size-5" />
-                    Buy now — ${PRICE_USD.toLocaleString()} USD
-                  </>
-                )}
-              </Button>
+              {existingOrder ? (
+                <div className="space-y-4">
+                  <div className="flex items-start gap-3 rounded-xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-900/50 dark:bg-emerald-900/20">
+                    <CheckCircleIcon className="mt-0.5 size-5 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                    <div>
+                      <p className="font-semibold text-slate-900 dark:text-white">
+                        License purchased
+                      </p>
+                      <p className="mt-1 text-sm text-slate-600 dark:text-slate-400">
+                        Order confirmed on{" "}
+                        {new Date(existingOrder.createdAt).toLocaleDateString()}.
+                        Our team will deliver setup instructions within 1–2 business days.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <>
+                  <p className="text-sm text-slate-600 dark:text-slate-400">
+                    Sign in to complete a one-time purchase via Stripe — no subscription
+                    required. After payment, our team will deliver setup instructions within
+                    1–2 business days.
+                  </p>
+                  <Button
+                    onClick={handleBuyNow}
+                    disabled={isCheckingOut || isLoadingOrder}
+                    className="mt-4 w-full gap-2 rounded-xl bg-dashboard-primary text-white/90 hover:bg-dashboard-primary/90 hover:text-white"
+                    size="lg"
+                  >
+                    {isCheckingOut ? (
+                      <>
+                        <Loader2 className="size-4 animate-spin" />
+                        Redirecting to checkout…
+                      </>
+                    ) : (
+                      <>
+                        <CurrencyDollarIcon className="size-5" />
+                        Buy now — ${PRICE_USD.toLocaleString()} USD
+                      </>
+                    )}
+                  </Button>
+                </>
+              )}
               {error && (
                 <p className="mt-3 text-sm text-rose-600 dark:text-rose-400">
                   {error}

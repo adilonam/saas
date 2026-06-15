@@ -31,17 +31,7 @@ export default function UserMenu({ user }: UserMenuProps) {
 
   const renderSubtitle = () => {
     if (hasActiveSubscription) {
-      return user.waitlistNumber != null
-        ? (
-            <>
-              Expires {new Date(user.subscriptionExpiresAt!).toLocaleDateString()} ·{" "}
-              <span className="text-dashboard-primary font-semibold normal-case">Waitlist {user.waitlistNumber}</span>
-            </>
-          )
-        : `Expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`;
-    }
-    if (user.waitlistNumber != null) {
-      return <span className="text-dashboard-primary font-semibold normal-case">Waitlist {user.waitlistNumber}</span>;
+      return `Expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`;
     }
     return "No subscription";
   };
@@ -77,17 +67,8 @@ export default function UserMenu({ user }: UserMenuProps) {
             )}
             <p className="text-xs leading-none text-muted-foreground mt-1">
               {hasActiveSubscription
-                ? user.waitlistNumber != null
-                  ? (
-                      <>
-                        Subscription expires {new Date(user.subscriptionExpiresAt!).toLocaleDateString()} ·{" "}
-                        <span className="text-dashboard-primary font-medium">Waitlist {user.waitlistNumber}</span>
-                      </>
-                    )
-                  : `Subscription expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`
-                : user.waitlistNumber != null
-                  ? <span className="text-dashboard-primary font-medium">Waitlist {user.waitlistNumber}</span>
-                  : "No active subscription"}
+                ? `Subscription expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`
+                : "No active subscription"}
             </p>
           </div>
         </DropdownMenuLabel>

@@ -1,12 +1,13 @@
 "use client";
 
+import { Suspense } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
 
-export default function ThankYouPage() {
+function ThankYouContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product");
   const isForexOrder = product === "forex-trading-app";
@@ -63,5 +64,23 @@ export default function ThankYouPage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+function ThankYouFallback() {
+  return (
+    <DashboardLayout>
+      <div className="max-w-lg mx-auto text-center py-12 sm:py-16 px-4">
+        <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+      </div>
+    </DashboardLayout>
+  );
+}
+
+export default function ThankYouPage() {
+  return (
+    <Suspense fallback={<ThankYouFallback />}>
+      <ThankYouContent />
+    </Suspense>
   );
 }

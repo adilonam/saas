@@ -47,7 +47,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           email: user.email,
           name: user.name,
           subscriptionExpiresAt: user.subscriptionExpiresAt,
-          waitlistNumber: user.waitlistNumber,
         };
       },
     }),
@@ -71,17 +70,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
           // Check if user exists
           const existingUser = await prisma.user.findUnique({
             where: { email: user.email! },
-            select: { id: true, waitlistNumber: true },
+            select: { id: true },
           });
 
           if (!existingUser) {
             // Create new user for Google OAuth (email already verified by Google → 1 day free)
             const now = new Date();
             const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-            const { _max } = await prisma.user.aggregate({
-              _max: { waitlistNumber: true },
-            });
-            const nextWaitlistNumber = (_max?.waitlistNumber ?? 233) + 1;
             const newUser = await prisma.user.create({
               data: {
                 email: user.email!,
@@ -89,18 +84,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
                 password: null,
                 emailVerified: now,
                 subscriptionExpiresAt: oneDayLater,
-                waitlistNumber: nextWaitlistNumber,
               },
             });
             user.id = newUser.id;
             (user as any).subscriptionExpiresAt = oneDayLater;
-            (user as any).waitlistNumber = nextWaitlistNumber;
             console.log("Sending welcome email to", newUser.email);
             await sendWelcomeEmail(newUser.email, newUser.name);
             console.log("Welcome email sent to", newUser.email);
           } else {
             user.id = existingUser.id;
-            (user as any).waitlistNumber = existingUser.waitlistNumber;
           }
         } catch (error) {
           console.error("Error in Google sign in:", error);
@@ -115,15 +107,13 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         token.email = user.email;
         token.name = user.name;
         token.subscriptionExpiresAt = (user as any).subscriptionExpiresAt ?? null;
-        token.waitlistNumber = (user as any).waitlistNumber ?? null;
       } else if (token.id) {
         const dbUser = await prisma.user.findUnique({
           where: { id: token.id as string },
-          select: { subscriptionExpiresAt: true, waitlistNumber: true },
+          select: { subscriptionExpiresAt: true },
         });
         if (dbUser) {
           token.subscriptionExpiresAt = dbUser.subscriptionExpiresAt;
-          token.waitlistNumber = dbUser.waitlistNumber;
         }
       }
       return token;
@@ -136,7 +126,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         session.user.subscriptionExpiresAt = token.subscriptionExpiresAt
           ? new Date(token.subscriptionExpiresAt as unknown as string)
           : null;
-        session.user.waitlistNumber = (token.waitlistNumber as number) ?? null;
       }
       return session;
     },

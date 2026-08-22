@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 import { SiFiverr } from "react-icons/si";
 
 const PRICE_USD = 499;
-const DEMO_URL = "https://www.cfi-trading.com/";
+const DEMO_URL = "https://www.cfix.markets/";
 const FIVERR_REVIEWS_URL =
   "https://www.fiverr.com/adilonam/create-trading-platform-for-your-business";
 

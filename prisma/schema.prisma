@@ -24,6 +24,19 @@ model User {
   sessions             Session[]
   history              History[]
   orders               Order[]
+  passwordResetTokens  PasswordResetToken[]
+  iqTestAttempts       IqTestAttempt[]
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  userId    String
+  token     String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }
 
 model Account {
@@ -99,4 +112,23 @@ model Order {
   @@index([userId])
   @@index([product])
   @@index([userId, product])
+}
+
+/// Anonymous or authenticated IQ test attempt (survives auth/paywall).
+model IqTestAttempt {
+  id             String   @id @default(cuid())
+  guestToken     String? // httpOnly cookie token for anonymous visitors
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  answers        Json // client answer payload (q11 → option index, etc.)
+  elapsedSeconds Int      @default(0)
+  result         Json? // scored result when available
+  status         String // "in_progress" | "completed" | "scored"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([guestToken])
+  @@index([userId])
+  @@index([guestToken, updatedAt])
+  @@index([userId, updatedAt])
 }

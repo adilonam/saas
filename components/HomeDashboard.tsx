@@ -663,6 +663,14 @@ const funViralTools = [
     icon: ScaleIcon,
     iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
   },
+  {
+    href: "/iq-test",
+    title: "IQ Test",
+    description:
+      "38-question cognitive assessment with visual puzzles, mindset prompts, and a detailed score report.",
+    icon: LightBulbIcon,
+    iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
+  },
 ];
 
 const seoMarketingTools = [

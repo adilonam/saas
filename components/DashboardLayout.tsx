@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { BellIcon } from "@heroicons/react/24/outline";
 import Sidebar from "components/Sidebar";
 import Search from "components/Search";
 import { Button } from "@/components/ui/button";
@@ -68,13 +67,6 @@ export default function DashboardLayout({ children, fullWidth }: DashboardLayout
           </div>
           <div className="flex items-center gap-1.5 sm:gap-4 shrink-0">
             <ThemeSwitch />
-            <button
-              type="button"
-              className="size-9 sm:size-11 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 flex items-center justify-center text-slate-500 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors"
-              aria-label="Notifications"
-            >
-              <BellIcon className="size-4 sm:size-5" />
-            </button>
             <div className="h-5 sm:h-6 w-px bg-slate-200 dark:bg-slate-800 mx-0.5 sm:mx-2" />
             <div className="flex items-center gap-2 sm:gap-3">
               {session?.user ? (

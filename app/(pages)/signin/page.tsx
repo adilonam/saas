@@ -47,6 +47,9 @@ function SignInForm() {
     if (searchParams.get("registered") === "true") {
       setSuccess("Account created successfully! Please sign in.");
     }
+    if (searchParams.get("reset") === "success") {
+      setSuccess("Password updated successfully. Please sign in with your new password.");
+    }
     const err = searchParams.get("error");
     if (err === "invalid_or_expired_token") {
       setError("Verification link is invalid or has expired. Please sign in and check your email for a new link.");
@@ -132,9 +135,17 @@ function SignInForm() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
-                Password
-              </Label>
+              <div className="flex items-center justify-between">
+                <Label htmlFor="password" className="text-slate-700 dark:text-slate-300">
+                  Password
+                </Label>
+                <Link
+                  href="/forgot-password"
+                  className="text-sm font-medium text-dashboard-primary hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
               <Input
                 id="password"
                 type="password"

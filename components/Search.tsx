@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useId, type KeyboardEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "components/hooks/use-mobile";
@@ -152,6 +153,7 @@ const SEARCHABLE_FEATURES = [
   { title: "SOP / Checklist Builder", href: "/checklist-builder", keywords: "sop checklist builder steps process" },
   { title: "Batch Rename Utility", href: "/batch-rename", keywords: "batch rename utility file rename mapping" },
   { title: "Coin Flip", href: "/coin-flip", keywords: "coin flip heads tails random chance decision" },
+  { title: "IQ Test", href: "/iq-test", keywords: "iq test intelligence quotient cognitive assessment puzzle score report" },
   { title: "Dice Roller", href: "/dice-roller", keywords: "dice roll d6 d20 tabletop rpg game random" },
   { title: "Random Name Picker", href: "/random-name-picker", keywords: "random name picker winner draw list raffle" },
   { title: "Truth or Dare Generator", href: "/truth-or-dare-generator", keywords: "truth or dare party game generator prompts" },
@@ -411,17 +413,33 @@ export default function Search() {
   const [query, setQuery] = useState("");
   const [isOpen, setIsOpen] = useState(false);
   const [mobilePanelOpen, setMobilePanelOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(-1);
   const containerRef = useRef<HTMLDivElement>(null);
+  const optionRefs = useRef<(HTMLAnchorElement | null)[]>([]);
+  const listboxId = useId();
+  const router = useRouter();
   const isMobile = useIsMobile();
 
   const results = query.trim().length >= 1
     ? SEARCHABLE_FEATURES.filter((f) => matchQuery(f.title, f.keywords, query))
     : [];
 
+  const resultsKey = results.map((r) => r.href).join("\0");
+
+  useEffect(() => {
+    setActiveIndex(-1);
+  }, [resultsKey]);
+
+  useEffect(() => {
+    if (activeIndex < 0) return;
+    optionRefs.current[activeIndex]?.scrollIntoView({ block: "nearest" });
+  }, [activeIndex]);
+
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
         setIsOpen(false);
+        setActiveIndex(-1);
         if (isMobile === true) setMobilePanelOpen(false);
       }
     }
@@ -433,28 +451,88 @@ export default function Search() {
     setMobilePanelOpen(false);
     setQuery("");
     setIsOpen(false);
+    setActiveIndex(-1);
   };
+
+  const navigateToResult = (href: string) => {
+    closeMobilePanel();
+    router.push(href);
+  };
+
+  const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+    const dropdownVisible = isOpen && query.trim().length >= 1 && results.length > 0;
+
+    if (e.key === "Escape") {
+      e.preventDefault();
+      setIsOpen(false);
+      setActiveIndex(-1);
+      if (isMobile === true) setMobilePanelOpen(false);
+      return;
+    }
+
+    if (!dropdownVisible) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      setActiveIndex((i) => (i < results.length - 1 ? i + 1 : 0));
+      return;
+    }
+
+    if (e.key === "ArrowUp") {
+      e.preventDefault();
+      setActiveIndex((i) => (i <= 0 ? results.length - 1 : i - 1));
+      return;
+    }
+
+    if (e.key === "Enter" && activeIndex >= 0 && activeIndex < results.length) {
+      e.preventDefault();
+      navigateToResult(results[activeIndex].href);
+    }
+  };
+
+  const activeOptionId =
+    activeIndex >= 0 && activeIndex < results.length
+      ? `${listboxId}-option-${activeIndex}`
+      : undefined;
 
   const resultsList = (
     <>
       {results.length > 0 ? (
-        <ul className="py-2 max-h-[min(280px,60vh)] overflow-y-auto">
-          {results.map(({ title, href }) => (
-            <li key={href}>
-              <Link
-                href={href}
-                onClick={closeMobilePanel}
-                className="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left"
-              >
-                <div className="size-8 sm:size-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
-                  <DocumentTextIcon className="size-4 sm:size-5 text-slate-500 dark:text-slate-400" />
-                </div>
-                <span className="font-medium text-sm sm:text-base text-slate-900 dark:text-white truncate">
-                  {title}
-                </span>
-              </Link>
-            </li>
-          ))}
+        <ul
+          id={listboxId}
+          role="listbox"
+          className="py-2 max-h-[min(280px,60vh)] overflow-y-auto"
+        >
+          {results.map(({ title, href }, index) => {
+            const isActive = index === activeIndex;
+            return (
+              <li key={href} role="presentation">
+                <Link
+                  id={`${listboxId}-option-${index}`}
+                  ref={(el) => {
+                    optionRefs.current[index] = el;
+                  }}
+                  href={href}
+                  role="option"
+                  aria-selected={isActive}
+                  onClick={closeMobilePanel}
+                  onMouseEnter={() => setActiveIndex(index)}
+                  className={`flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 transition-colors text-left ${
+                    isActive
+                      ? "bg-slate-200 dark:bg-slate-700"
+                      : "hover:bg-slate-100 dark:hover:bg-slate-800"
+                  }`}
+                >
+                  <div className="size-8 sm:size-9 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0">
+                    <DocumentTextIcon className="size-4 sm:size-5 text-slate-500 dark:text-slate-400" />
+                  </div>
+                  <span className="font-medium text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                    {title}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
       ) : query.trim().length >= 1 ? (
         <p className="px-3 sm:px-4 py-3 sm:py-4 text-sm text-slate-500 dark:text-slate-400">
@@ -469,6 +547,15 @@ export default function Search() {
       {resultsList}
     </div>
   );
+
+  const inputAriaProps = {
+    role: "combobox" as const,
+    "aria-expanded": isOpen && query.trim().length >= 1,
+    "aria-controls": listboxId,
+    "aria-activedescendant": activeOptionId,
+    "aria-autocomplete": "list" as const,
+    onKeyDown: handleKeyDown,
+  };
 
   // Mobile: icon only, tap opens panel with input + results
   if (isMobile === true) {
@@ -501,6 +588,7 @@ export default function Search() {
                   onFocus={() => query.length >= 1 && setIsOpen(true)}
                   className="w-full bg-slate-100 dark:bg-slate-800 border-none rounded-xl py-3 pl-12 pr-4 text-sm focus-visible:ring-2 focus-visible:ring-dashboard-primary/20 placeholder:text-slate-500 h-auto"
                   autoFocus
+                  {...inputAriaProps}
                 />
               </div>
             </div>
@@ -538,6 +626,7 @@ export default function Search() {
           }}
           onFocus={() => query.length >= 1 && setIsOpen(true)}
           className="w-full min-w-0 bg-slate-100 dark:bg-slate-900 border-none rounded-xl sm:rounded-2xl py-2.5 sm:py-3 pl-9 sm:pl-12 pr-3 sm:pr-4 text-sm focus-visible:ring-2 focus-visible:ring-dashboard-primary/20 placeholder:text-slate-500 h-auto"
+          {...inputAriaProps}
         />
       </div>
 

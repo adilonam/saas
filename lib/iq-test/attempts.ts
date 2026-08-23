@@ -1,3 +1,4 @@
+import type { IqTestAttempt } from "@/prisma/generated/client";
 import type { IqTestAnswers, IqTestResult } from "@/lib/iq-test/types";
 
 export const IQ_ATTEMPT_STATUSES = [
@@ -6,6 +7,7 @@ export const IQ_ATTEMPT_STATUSES = [
   "scored",
 ] as const;
 
+/** Valid values for IqTestAttempt.status (schema stores plain String). */
 export type IqAttemptStatus = (typeof IQ_ATTEMPT_STATUSES)[number];
 
 export function isIqAttemptStatus(value: unknown): value is IqAttemptStatus {
@@ -15,28 +17,19 @@ export function isIqAttemptStatus(value: unknown): value is IqAttemptStatus {
   );
 }
 
-/** Minimal row shape used when serializing DB attempts to the client. */
-export type IqAttemptRow = {
-  id: string;
-  status: string;
-  answers: unknown;
-  elapsedSeconds: number;
-  result: unknown;
-  updatedAt: Date;
-  createdAt: Date;
-};
-
-export type IqAttemptPublic = {
-  id: string;
+/** Client-safe attempt shape (ISO dates, typed JSON fields). */
+export type IqAttemptPublic = Pick<
+  IqTestAttempt,
+  "id" | "elapsedSeconds"
+> & {
   status: IqAttemptStatus;
   answers: IqTestAnswers;
-  elapsedSeconds: number;
   result: IqTestResult | null;
   updatedAt: string;
   createdAt: string;
 };
 
-export function serializeAttempt(attempt: IqAttemptRow): IqAttemptPublic {
+export function serializeAttempt(attempt: IqTestAttempt): IqAttemptPublic {
   const status = isIqAttemptStatus(attempt.status)
     ? attempt.status
     : "in_progress";

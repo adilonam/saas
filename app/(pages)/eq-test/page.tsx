@@ -2,37 +2,37 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import DashboardLayout from "components/DashboardLayout";
-import IqTestAnalyzing from "@/components/iq-test/IqTestAnalyzing";
-import { IqTestChooser } from "@/components/iq-test/IqTestChooser";
-import IqTestQuiz, {
-  IqTestConfirmation,
-  IqTestIntro,
-} from "@/components/iq-test/IqTestQuiz";
-import IqTestResults from "@/components/iq-test/IqTestResults";
-import { IQ_TEST_QUESTIONS, IQ_TEST_TOTAL } from "@/lib/iq-test/questions";
-import { clientAnswersToSelected } from "@/lib/iq-test/scoring";
+import EqTestAnalyzing from "@/components/eq-test/EqTestAnalyzing";
+import { EqTestChooser } from "@/components/eq-test/EqTestChooser";
+import EqTestQuiz, {
+  EqTestConfirmation,
+  EqTestIntro,
+} from "@/components/eq-test/EqTestQuiz";
+import EqTestResults from "@/components/eq-test/EqTestResults";
+import { EQ_TEST_QUESTIONS, EQ_TEST_TOTAL } from "@/lib/eq-test/questions";
+import { clientAnswersToSelected } from "@/lib/eq-test/scoring";
 import type {
-  IqAttemptPublic,
-  IqAttemptStatus,
-} from "@/lib/iq-test/attempts";
+  EqAttemptPublic,
+  EqAttemptStatus,
+} from "@/lib/eq-test/attempts";
 import type {
-  IqTestAnswers,
-  IqTestPhase,
-  IqTestResult,
-} from "@/lib/iq-test/types";
+  EqTestAnswers,
+  EqTestPhase,
+  EqTestResult,
+} from "@/lib/eq-test/types";
 import { useToolAccess } from "@/lib/use-tool-access";
-import { LightBulbIcon } from "@heroicons/react/24/outline";
+import { HeartIcon } from "@heroicons/react/24/outline";
 
 type ScoreFetchResult =
-  | { ok: true; result: IqTestResult }
+  | { ok: true; result: EqTestResult }
   | { ok: false; status: number; code?: string };
 
-async function fetchIqScore(
-  answers: IqTestAnswers,
+async function fetchEqScore(
+  answers: EqTestAnswers,
   elapsedSeconds: number,
   attemptId: string | null,
 ): Promise<ScoreFetchResult> {
-  const res = await fetch("/api/iq-test/score", {
+  const res = await fetch("/api/eq-test/score", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -53,8 +53,8 @@ async function fetchIqScore(
     return { ok: false, status: res.status, code };
   }
 
-  const data = (await res.json()) as IqTestResult & {
-    attempt?: IqAttemptPublic;
+  const data = (await res.json()) as EqTestResult & {
+    attempt?: EqAttemptPublic;
   };
   const { attempt: _a, ...result } = data;
   return { ok: true, result };
@@ -62,13 +62,13 @@ async function fetchIqScore(
 
 async function saveAttempt(payload: {
   id?: string | null;
-  answers: IqTestAnswers;
+  answers: EqTestAnswers;
   elapsedSeconds: number;
-  status: IqAttemptStatus;
-  result?: IqTestResult | null;
-}): Promise<IqAttemptPublic | null> {
+  status: EqAttemptStatus;
+  result?: EqTestResult | null;
+}): Promise<EqAttemptPublic | null> {
   try {
-    const res = await fetch("/api/iq-test/attempts", {
+    const res = await fetch("/api/eq-test/attempts", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
@@ -81,7 +81,7 @@ async function saveAttempt(payload: {
       }),
     });
     if (!res.ok) return null;
-    const data = (await res.json()) as { attempt: IqAttemptPublic };
+    const data = (await res.json()) as { attempt: EqAttemptPublic };
     return data.attempt;
   } catch {
     return null;
@@ -94,18 +94,18 @@ function statusLabel(status: string): string {
   return "in progress";
 }
 
-export default function IqTestPage() {
+export default function EqTestPage() {
   const { ensureAccess, session, status } = useToolAccess();
-  const [phase, setPhase] = useState<IqTestPhase>("intro");
+  const [phase, setPhase] = useState<EqTestPhase>("intro");
   const [questionIndex, setQuestionIndex] = useState(0);
-  const [answers, setAnswers] = useState<IqTestAnswers>({});
+  const [answers, setAnswers] = useState<EqTestAnswers>({});
   const [elapsedSeconds, setElapsedSeconds] = useState(0);
-  const [result, setResult] = useState<IqTestResult | null>(null);
+  const [result, setResult] = useState<EqTestResult | null>(null);
   const [scoreError, setScoreError] = useState<string | null>(null);
   const [timerRunning, setTimerRunning] = useState(false);
   const [scoring, setScoring] = useState(false);
   const [attemptId, setAttemptId] = useState<string | null>(null);
-  const [latestAttempt, setLatestAttempt] = useState<IqAttemptPublic | null>(
+  const [latestAttempt, setLatestAttempt] = useState<EqAttemptPublic | null>(
     null,
   );
   const [bootstrapping, setBootstrapping] = useState(true);
@@ -119,7 +119,6 @@ export default function IqTestPage() {
     );
   }, [session, status]);
 
-  // Attach guest attempts after login, then load latest for chooser.
   useEffect(() => {
     if (status === "loading") return;
 
@@ -129,18 +128,18 @@ export default function IqTestPage() {
       try {
         if (status === "authenticated" && !attachDone.current) {
           attachDone.current = true;
-          await fetch("/api/iq-test/attempts/attach", {
+          await fetch("/api/eq-test/attempts/attach", {
             method: "POST",
             credentials: "include",
           });
         }
 
-        const res = await fetch("/api/iq-test/attempts/latest", {
+        const res = await fetch("/api/eq-test/attempts/latest", {
           credentials: "include",
         });
         if (!res.ok) return;
         const data = (await res.json()) as {
-          attempt: IqAttemptPublic | null;
+          attempt: EqAttemptPublic | null;
         };
         if (cancelled) return;
 
@@ -189,7 +188,7 @@ export default function IqTestPage() {
     setTimerRunning(true);
   };
 
-  const applyAttempt = async (attempt: IqAttemptPublic) => {
+  const applyAttempt = async (attempt: EqAttemptPublic) => {
     setAttemptId(attempt.id);
     setAnswers(attempt.answers ?? {});
     setElapsedSeconds(attempt.elapsedSeconds ?? 0);
@@ -199,17 +198,15 @@ export default function IqTestPage() {
 
     if (attempt.status === "in_progress") {
       const answered = Object.keys(attempt.answers ?? {}).length;
-      const idx = Math.min(answered, IQ_TEST_TOTAL - 1);
+      const idx = Math.min(answered, EQ_TEST_TOTAL - 1);
       setQuestionIndex(Math.max(0, idx));
       setPhase("quiz");
       setTimerRunning(true);
       return;
     }
 
-    // completed or scored → results (paywall if no result / no access)
     setPhase("results");
 
-    // Subscribed user with saved answers but no score yet → score now
     if (
       hasAccess &&
       !attempt.result &&
@@ -218,7 +215,7 @@ export default function IqTestPage() {
     ) {
       setScoring(true);
       try {
-        const scored = await fetchIqScore(
+        const scored = await fetchEqScore(
           attempt.answers,
           attempt.elapsedSeconds,
           attempt.id,
@@ -242,7 +239,7 @@ export default function IqTestPage() {
   };
 
   const advance = useCallback((fromIndex: number) => {
-    if (fromIndex + 1 >= IQ_TEST_TOTAL) {
+    if (fromIndex + 1 >= EQ_TEST_TOTAL) {
       setTimerRunning(false);
       setPhase("confirmation");
     } else {
@@ -264,7 +261,6 @@ export default function IqTestPage() {
   };
 
   const handleGetResults = async () => {
-    // Persist before analyzing / auth gate so results survive signup.
     const saved = await saveAttempt({
       id: attemptId,
       answers,
@@ -282,7 +278,6 @@ export default function IqTestPage() {
     setScoring(true);
     setScoreError(null);
     try {
-      // Ensure attempt exists even if confirmation save failed
       let id = attemptId;
       if (!id) {
         const saved = await saveAttempt({
@@ -303,7 +298,7 @@ export default function IqTestPage() {
         return;
       }
 
-      const scored = await fetchIqScore(answers, elapsedSeconds, id);
+      const scored = await fetchEqScore(answers, elapsedSeconds, id);
       if (scored.ok === true) {
         setResult(scored.result);
         if (id) {
@@ -349,7 +344,7 @@ export default function IqTestPage() {
         }
       }
 
-      const scored = await fetchIqScore(answers, elapsedSeconds, id);
+      const scored = await fetchEqScore(answers, elapsedSeconds, id);
       if (scored.ok === true) {
         setResult(scored.result);
       } else {
@@ -369,11 +364,11 @@ export default function IqTestPage() {
 
   const handleEdit = () => {
     setPhase("quiz");
-    setQuestionIndex(IQ_TEST_TOTAL - 1);
+    setQuestionIndex(EQ_TEST_TOTAL - 1);
     setTimerRunning(true);
   };
 
-  const currentQuestion = IQ_TEST_QUESTIONS[questionIndex];
+  const currentQuestion = EQ_TEST_QUESTIONS[questionIndex];
   const showMinimalHeader = phase !== "intro" && phase !== "chooser";
 
   const updatedAtLabel = latestAttempt
@@ -390,10 +385,10 @@ export default function IqTestPage() {
           {showMinimalHeader && (
             <div className="mb-8 flex items-center justify-center gap-2">
               <div className="flex size-9 items-center justify-center rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900">
-                <LightBulbIcon className="size-5" />
+                <HeartIcon className="size-5" />
               </div>
               <span className="text-lg font-semibold text-slate-800 dark:text-slate-100">
-                IQ Test
+                EQ Test
               </span>
             </div>
           )}
@@ -405,7 +400,7 @@ export default function IqTestPage() {
           )}
 
           {!bootstrapping && phase === "chooser" && latestAttempt && (
-            <IqTestChooser
+            <EqTestChooser
               statusLabel={statusLabel(latestAttempt.status)}
               updatedAtLabel={updatedAtLabel}
               onViewLast={handleViewLast}
@@ -414,11 +409,11 @@ export default function IqTestPage() {
           )}
 
           {!bootstrapping && phase === "intro" && (
-            <IqTestIntro onStart={handleStart} />
+            <EqTestIntro onStart={handleStart} />
           )}
 
           {phase === "quiz" && currentQuestion && (
-            <IqTestQuiz
+            <EqTestQuiz
               questionIndex={questionIndex}
               answers={answers}
               elapsedSeconds={elapsedSeconds}
@@ -429,18 +424,18 @@ export default function IqTestPage() {
           )}
 
           {phase === "confirmation" && (
-            <IqTestConfirmation
+            <EqTestConfirmation
               onGetResults={handleGetResults}
               onEdit={handleEdit}
             />
           )}
 
           {phase === "analyzing" && (
-            <IqTestAnalyzing onComplete={handleAnalyzingComplete} />
+            <EqTestAnalyzing onComplete={handleAnalyzingComplete} />
           )}
 
           {phase === "results" && (
-            <IqTestResults
+            <EqTestResults
               result={result}
               hasAccess={hasAccess}
               onUnlock={handleUnlock}

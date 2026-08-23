@@ -25,6 +25,7 @@ model User {
   orders               Order[]
   passwordResetTokens  PasswordResetToken[]
   iqTestAttempts       IqTestAttempt[]
+  eqTestAttempts       EqTestAttempt[]
 }
 
 model PasswordResetToken {
@@ -120,6 +121,25 @@ model IqTestAttempt {
   userId         String?
   user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
   answers        Json // client answer payload (q11 → option index, etc.)
+  elapsedSeconds Int      @default(0)
+  result         Json? // scored result when available
+  status         String // "in_progress" | "completed" | "scored"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([guestToken])
+  @@index([userId])
+  @@index([guestToken, updatedAt])
+  @@index([userId, updatedAt])
+}
+
+/// Anonymous or authenticated EQ test attempt (survives auth/paywall).
+model EqTestAttempt {
+  id             String   @id @default(cuid())
+  guestToken     String? // httpOnly cookie token for anonymous visitors
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  answers        Json // client answer payload (eq01 → option index, etc.)
   elapsedSeconds Int      @default(0)
   result         Json? // scored result when available
   status         String // "in_progress" | "completed" | "scored"

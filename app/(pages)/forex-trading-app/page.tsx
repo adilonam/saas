@@ -20,7 +20,7 @@ import { Loader2 } from "lucide-react";
 import { SiFiverr } from "react-icons/si";
 
 const PRICE_USD = 499;
-const DEMO_URL = "https://www.cfix.markets/";
+const DEMO_URL = "https://www.smxmarkets.com/";
 const FIVERR_REVIEWS_URL =
   "https://www.fiverr.com/adilonam/create-trading-platform-for-your-business";
 
@@ -135,7 +135,7 @@ export default function ForexTradingAppPage() {
                 rel="noopener noreferrer"
                 className="font-medium text-dashboard-primary hover:underline"
               >
-                CFI Trade
+                SMX Markets
               </a>
               , then purchase the full license.
             </p>
@@ -183,7 +183,7 @@ export default function ForexTradingAppPage() {
                   Explore the full trading platform in production — charts, markets,
                   account flows, and mobile-ready UI on{" "}
                   <span className="font-semibold text-slate-900 dark:text-white">
-                    CFI Trade
+                    SMX Markets
                   </span>
                   .
                 </p>

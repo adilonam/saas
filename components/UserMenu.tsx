@@ -17,7 +17,6 @@ interface UserMenuProps {
     name?: string | null;
     email?: string | null;
     subscriptionExpiresAt?: Date | null;
-    waitlistNumber?: number | null;
   };
 }
 

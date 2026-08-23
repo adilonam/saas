@@ -671,6 +671,14 @@ const funViralTools = [
     icon: LightBulbIcon,
     iconBg: "bg-blue-100 dark:bg-blue-900/30 text-blue-600",
   },
+  {
+    href: "/eq-test",
+    title: "EQ Test",
+    description:
+      "30-scenario emotional intelligence assessment across self-awareness, empathy, regulation, social skills, and motivation.",
+    icon: FaceSmileIcon,
+    iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
+  },
 ];
 
 const seoMarketingTools = [

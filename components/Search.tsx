@@ -154,6 +154,7 @@ const SEARCHABLE_FEATURES = [
   { title: "Batch Rename Utility", href: "/batch-rename", keywords: "batch rename utility file rename mapping" },
   { title: "Coin Flip", href: "/coin-flip", keywords: "coin flip heads tails random chance decision" },
   { title: "IQ Test", href: "/iq-test", keywords: "iq test intelligence quotient cognitive assessment puzzle score report" },
+  { title: "EQ Test", href: "/eq-test", keywords: "eq test emotional intelligence empathy self awareness social skills score report" },
   { title: "Dice Roller", href: "/dice-roller", keywords: "dice roll d6 d20 tabletop rpg game random" },
   { title: "Random Name Picker", href: "/random-name-picker", keywords: "random name picker winner draw list raffle" },
   { title: "Truth or Dare Generator", href: "/truth-or-dare-generator", keywords: "truth or dare party game generator prompts" },

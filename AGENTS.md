@@ -18,3 +18,4 @@
 - you can use tools for FAST_API_URL are located on ./doc-fast-api.md
 - you can use ai with openai
 - use always for new tools single-segment URL dont use slug 
+- dont create new type if they are a modal import them from prisma client

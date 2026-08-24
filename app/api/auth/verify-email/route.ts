@@ -39,7 +39,7 @@ export async function GET(request: Request) {
     );
   }
 
-  // Free day is granted on sign up only; here we just mark email as verified
+  // Mark email as verified only (no subscription grant)
   await prisma.$transaction([
     prisma.user.update({
       where: { id: user.id },

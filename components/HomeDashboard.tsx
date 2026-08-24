@@ -2744,7 +2744,7 @@ export default function HomeDashboard() {
         <div className="mb-6 flex items-center gap-3 rounded-2xl border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-900/20 px-4 py-3 text-emerald-800 dark:text-emerald-200">
           <CheckCircleIcon className="size-6 shrink-0 text-emerald-600 dark:text-emerald-400" />
           <p className="text-sm font-medium">
-            Email verified. Your 1 day free subscription (from sign up) is active for all productivity tools.
+            Email verified. Your account is ready.
           </p>
           <button
             type="button"

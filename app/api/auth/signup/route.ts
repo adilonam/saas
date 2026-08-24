@@ -33,17 +33,11 @@ export async function POST(request: Request) {
     // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    // 1 free day for all users on sign up (not on email verify)
-    const now = new Date();
-    const oneDayLater = new Date(now.getTime() + 24 * 60 * 60 * 1000);
-
-    // Create user with 1 day free subscription on sign up
     const user = await prisma.user.create({
       data: {
         email,
         password: hashedPassword,
         name: name || null,
-        subscriptionExpiresAt: oneDayLater,
       },
       select: {
         id: true,

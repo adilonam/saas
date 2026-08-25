@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import EqTestAnalyzing from "@/components/eq-test/EqTestAnalyzing";
 import { EqTestChooser } from "@/components/eq-test/EqTestChooser";
@@ -20,12 +20,23 @@ import type {
   EqTestPhase,
   EqTestResult,
 } from "@/lib/eq-test/types";
+import { resolveStoredOrLatestAttempt } from "@/lib/resolve-test-attempt";
+import {
+  EQ_TEST_ATTEMPT_STORAGE_KEY,
+  clearStoredAttemptId,
+  getStoredAttemptId,
+  setStoredAttemptId,
+} from "@/lib/test-attempt-storage";
 import { useToolAccess } from "@/lib/use-tool-access";
 import { HeartIcon } from "@heroicons/react/24/outline";
 
 type ScoreFetchResult =
   | { ok: true; result: EqTestResult }
   | { ok: false; status: number; code?: string };
+
+function answerCount(answers: EqTestAnswers | null | undefined): number {
+  return Object.keys(answers ?? {}).length;
+}
 
 async function fetchEqScore(
   answers: EqTestAnswers,
@@ -35,6 +46,7 @@ async function fetchEqScore(
   const res = await fetch("/api/eq-test/score", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       answers: clientAnswersToSelected(answers),
       elapsedSeconds,
@@ -82,6 +94,9 @@ async function saveAttempt(payload: {
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { attempt: EqAttemptPublic };
+    if (data.attempt?.id) {
+      setStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY, data.attempt.id);
+    }
     return data.attempt;
   } catch {
     return null;
@@ -109,7 +124,6 @@ export default function EqTestPage() {
     null,
   );
   const [bootstrapping, setBootstrapping] = useState(true);
-  const attachDone = useRef(false);
 
   const hasAccess = useMemo(() => {
     if (status !== "authenticated" || !session) return false;
@@ -119,6 +133,7 @@ export default function EqTestPage() {
     );
   }, [session, status]);
 
+  // Prefer localStorage attempt (claim on login), else latest DB, else start UI.
   useEffect(() => {
     if (status === "loading") return;
 
@@ -126,25 +141,78 @@ export default function EqTestPage() {
 
     (async () => {
       try {
-        if (status === "authenticated" && !attachDone.current) {
-          attachDone.current = true;
-          await fetch("/api/eq-test/attempts/attach", {
-            method: "POST",
-            credentials: "include",
-          });
-        }
-
-        const res = await fetch("/api/eq-test/attempts/latest", {
-          credentials: "include",
+        const storedId = getStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
+        const attempt = await resolveStoredOrLatestAttempt<EqAttemptPublic>({
+          storageKey: EQ_TEST_ATTEMPT_STORAGE_KEY,
+          authenticated: status === "authenticated",
+          attachUrl: "/api/eq-test/attempts/attach",
+          latestUrl: "/api/eq-test/attempts/latest",
+          attemptUrl: (id) => `/api/eq-test/attempts/${id}`,
         });
-        if (!res.ok) return;
-        const data = (await res.json()) as {
-          attempt: EqAttemptPublic | null;
-        };
-        if (cancelled) return;
+        if (cancelled || !attempt) return;
 
-        if (data.attempt) {
-          setLatestAttempt(data.attempt);
+        setLatestAttempt(attempt);
+
+        if (storedId && attempt.id === storedId) {
+          setAttemptId(attempt.id);
+          setAnswers(attempt.answers ?? {});
+          setElapsedSeconds(attempt.elapsedSeconds ?? 0);
+          setScoreError(null);
+          setTimerRunning(false);
+
+          if (attempt.status === "in_progress") {
+            setResult(attempt.result);
+            const answered = answerCount(attempt.answers);
+            const idx = Math.min(answered, EQ_TEST_TOTAL - 1);
+            setQuestionIndex(Math.max(0, idx));
+            setPhase("quiz");
+            setTimerRunning(true);
+            return;
+          }
+
+          // Subscribed but empty/legacy attempt: don't trap on a dead results wall.
+          if (
+            hasAccess &&
+            !attempt.result &&
+            answerCount(attempt.answers) === 0
+          ) {
+            clearStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
+            setAttemptId(null);
+            setResult(null);
+            setPhase("chooser");
+            return;
+          }
+
+          // Soft paywall: only show score when unlocked; auto-score if subscribed.
+          setResult(hasAccess ? attempt.result : null);
+          setPhase("results");
+
+          if (
+            hasAccess &&
+            !attempt.result &&
+            attempt.status === "completed" &&
+            answerCount(attempt.answers) > 0
+          ) {
+            setScoring(true);
+            try {
+              const scored = await fetchEqScore(
+                attempt.answers,
+                attempt.elapsedSeconds,
+                attempt.id,
+              );
+              if (cancelled) return;
+              if (scored.ok === true) {
+                setResult(scored.result);
+              } else {
+                setScoreError(
+                  "Could not calculate your score. Please try again.",
+                );
+              }
+            } finally {
+              if (!cancelled) setScoring(false);
+            }
+          }
+        } else {
           setPhase("chooser");
         }
       } catch {
@@ -157,6 +225,8 @@ export default function EqTestPage() {
     return () => {
       cancelled = true;
     };
+    // Re-bootstrap on auth status only (login / logout / session ready).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hasAccess read when status settles
   }, [status]);
 
   useEffect(() => {
@@ -166,6 +236,7 @@ export default function EqTestPage() {
   }, [timerRunning]);
 
   const resetToIntro = () => {
+    clearStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
     setAttemptId(null);
     setLatestAttempt(null);
     setPhase("intro");
@@ -178,6 +249,7 @@ export default function EqTestPage() {
   };
 
   const handleStart = () => {
+    clearStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
     setAttemptId(null);
     setPhase("quiz");
     setQuestionIndex(0);
@@ -192,12 +264,12 @@ export default function EqTestPage() {
     setAttemptId(attempt.id);
     setAnswers(attempt.answers ?? {});
     setElapsedSeconds(attempt.elapsedSeconds ?? 0);
-    setResult(attempt.result);
     setScoreError(null);
     setTimerRunning(false);
 
     if (attempt.status === "in_progress") {
-      const answered = Object.keys(attempt.answers ?? {}).length;
+      setResult(attempt.result);
+      const answered = answerCount(attempt.answers);
       const idx = Math.min(answered, EQ_TEST_TOTAL - 1);
       setQuestionIndex(Math.max(0, idx));
       setPhase("quiz");
@@ -205,13 +277,26 @@ export default function EqTestPage() {
       return;
     }
 
+    // Empty attempt (no score, no answers): clear restore id and offer a new test.
+    if (hasAccess && !attempt.result && answerCount(attempt.answers) === 0) {
+      clearStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
+      setAttemptId(null);
+      setResult(null);
+      setScoreError(
+        "This attempt has no saved report. Please start a new test.",
+      );
+      setPhase("results");
+      return;
+    }
+
+    setResult(hasAccess ? attempt.result : null);
     setPhase("results");
 
     if (
       hasAccess &&
       !attempt.result &&
       attempt.status === "completed" &&
-      Object.keys(attempt.answers ?? {}).length > 0
+      answerCount(attempt.answers) > 0
     ) {
       setScoring(true);
       try {
@@ -222,6 +307,8 @@ export default function EqTestPage() {
         );
         if (scored.ok === true) {
           setResult(scored.result);
+        } else {
+          setScoreError("Could not calculate your score. Please try again.");
         }
       } finally {
         setScoring(false);
@@ -231,6 +318,17 @@ export default function EqTestPage() {
 
   const handleViewLast = () => {
     if (!latestAttempt) return;
+    // Empty scored/completed attempt: skip the dead wall — start a new test.
+    if (
+      hasAccess &&
+      !latestAttempt.result &&
+      answerCount(latestAttempt.answers) === 0 &&
+      (latestAttempt.status === "completed" ||
+        latestAttempt.status === "scored")
+    ) {
+      resetToIntro();
+      return;
+    }
     void applyAttempt(latestAttempt);
   };
 
@@ -331,20 +429,69 @@ export default function EqTestPage() {
     setScoring(true);
     setScoreError(null);
     try {
-      let id = attemptId;
+      // Already scored in UI (e.g. race) or restored from attempt
+      if (result) {
+        setPhase("results");
+        return;
+      }
+      if (latestAttempt?.result) {
+        setResult(latestAttempt.result);
+        setPhase("results");
+        return;
+      }
+
+      let id = attemptId ?? latestAttempt?.id ?? null;
+      let answersToScore = answers;
+      let elapsed = elapsedSeconds;
+
+      // Refetch attempt in case attach/bootstrap raced ahead of local state
+      if (id) {
+        const res = await fetch(`/api/eq-test/attempts/${id}`, {
+          credentials: "include",
+        }).catch(() => null);
+        if (res?.ok) {
+          const data = (await res.json()) as { attempt?: EqAttemptPublic };
+          if (data.attempt?.result) {
+            setLatestAttempt(data.attempt);
+            setResult(data.attempt.result);
+            setPhase("results");
+            return;
+          }
+          if (data.attempt && answerCount(answersToScore) === 0) {
+            answersToScore = data.attempt.answers ?? {};
+            elapsed = data.attempt.elapsedSeconds ?? 0;
+            setAnswers(answersToScore);
+            setElapsedSeconds(elapsed);
+            setLatestAttempt(data.attempt);
+          }
+        }
+      }
+
+      if (answerCount(answersToScore) === 0) {
+        // No scoreable answers — clear stale id so Retry / Start new works.
+        clearStoredAttemptId(EQ_TEST_ATTEMPT_STORAGE_KEY);
+        setAttemptId(null);
+        setScoreError(
+          "This attempt has no saved report. Please start a new test.",
+        );
+        setPhase("results");
+        return;
+      }
+
       if (!id) {
         const saved = await saveAttempt({
-          answers,
-          elapsedSeconds,
+          answers: answersToScore,
+          elapsedSeconds: elapsed,
           status: "completed",
         });
         if (saved) {
           id = saved.id;
           setAttemptId(saved.id);
+          setLatestAttempt(saved);
         }
       }
 
-      const scored = await fetchEqScore(answers, elapsedSeconds, id);
+      const scored = await fetchEqScore(answersToScore, elapsed, id);
       if (scored.ok === true) {
         setResult(scored.result);
       } else {
@@ -380,8 +527,8 @@ export default function EqTestPage() {
 
   return (
     <DashboardLayout fullWidth>
-      <div className="min-h-[calc(100vh-8rem)] bg-[#f5f3ef] px-4 py-8 dark:bg-slate-950">
-        <div className="mx-auto max-w-5xl">
+      <div className="min-h-[calc(100vh-8rem)] bg-[#f5f3ef] px-4 py-6 sm:py-8 dark:bg-slate-950">
+        <div className="mx-auto w-full min-w-0 max-w-5xl">
           {showMinimalHeader && (
             <div className="mb-8 flex items-center justify-center gap-2">
               <div className="flex size-9 items-center justify-center rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900">

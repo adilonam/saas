@@ -26,6 +26,7 @@ model User {
   passwordResetTokens  PasswordResetToken[]
   iqTestAttempts       IqTestAttempt[]
   eqTestAttempts       EqTestAttempt[]
+  dnaTestAttempts      DnaTestAttempt[]
 }
 
 model PasswordResetToken {
@@ -142,6 +143,26 @@ model EqTestAttempt {
   answers        Json // client answer payload (eq01 → option index, etc.)
   elapsedSeconds Int      @default(0)
   result         Json? // scored result when available
+  status         String // "in_progress" | "completed" | "scored"
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([guestToken])
+  @@index([userId])
+  @@index([guestToken, updatedAt])
+  @@index([userId, updatedAt])
+}
+
+/// Anonymous or authenticated DNA ancestry attempt (survives auth/paywall).
+model DnaTestAttempt {
+  id             String   @id @default(cuid())
+  guestToken     String? // httpOnly cookie token for anonymous visitors
+  userId         String?
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+  result         Json? // scored origins report when available
+  /// Uploaded/captured selfie image bytes (PostgreSQL bytea).
+  selfie         Bytes?
+  selfieMimeType String? // e.g. image/jpeg — used when serving the selfie
   status         String // "in_progress" | "completed" | "scored"
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

@@ -111,8 +111,9 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
 
-      // Prefer body answers; fall back to stored client payload (q11 → 0-based)
-      if (!selected) {
+      // Prefer body answers; fall back to stored client payload (q11 → 0-based).
+      // Empty array from the client must not block the DB fallback.
+      if (!selected || selected.length === 0) {
         const stored = attempt.answers;
         if (stored && typeof stored === "object" && !Array.isArray(stored)) {
           const fromClient = clientAnswersToSelected(
@@ -131,7 +132,7 @@ export async function POST(request: Request) {
       }
     }
 
-    if (!selected) {
+    if (!selected || selected.length === 0) {
       return NextResponse.json(
         {
           error:

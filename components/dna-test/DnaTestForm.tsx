@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { useSubscribedToolAccess } from "@/hooks/useSubscribedToolAccess";
-import { countryCodeToFlag } from "@/lib/dna-test/country-flag";
-import type { DnaOrigin } from "@/lib/dna-test/normalize-origins";
 import {
   ArrowUpTrayIcon,
   CameraIcon,
@@ -15,9 +11,17 @@ import {
 } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
-export default function DnaTestForm() {
-  const router = useRouter();
-  const { assertAccess } = useSubscribedToolAccess("/dna-test");
+type DnaTestFormProps = {
+  onSubmit: (file: File) => void | Promise<void>;
+  submitting?: boolean;
+  error?: string | null;
+};
+
+export default function DnaTestForm({
+  onSubmit,
+  submitting = false,
+  error = null,
+}: DnaTestFormProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -28,9 +32,7 @@ export default function DnaTestForm() {
   const previewUrlRef = useRef<string | null>(null);
   const [cameraOpen, setCameraOpen] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
-  const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [origins, setOrigins] = useState<DnaOrigin[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [localError, setLocalError] = useState<string | null>(null);
 
   const stopCamera = useCallback(() => {
     streamRef.current?.getTracks().forEach((t) => t.stop());
@@ -54,7 +56,7 @@ export default function DnaTestForm() {
 
   const setImageFile = (file: File) => {
     if (!file.type.startsWith("image/")) {
-      setError("Please choose a valid image file.");
+      setLocalError("Please choose a valid image file.");
       return;
     }
     if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
@@ -62,8 +64,7 @@ export default function DnaTestForm() {
     previewUrlRef.current = url;
     setPreviewUrl(url);
     setSelectedImage(file);
-    setOrigins(null);
-    setError(null);
+    setLocalError(null);
     stopCamera();
   };
 
@@ -81,9 +82,8 @@ export default function DnaTestForm() {
 
   const openWebcam = async () => {
     setCameraError(null);
-    setError(null);
+    setLocalError(null);
     if (!navigator.mediaDevices?.getUserMedia) {
-      // Fall back to capture file input (mobile-friendly).
       cameraInputRef.current?.click();
       return;
     }
@@ -111,7 +111,7 @@ export default function DnaTestForm() {
   const captureFromWebcam = () => {
     const video = videoRef.current;
     if (!video || !video.videoWidth) {
-      setError("Camera is not ready yet. Please wait a moment.");
+      setLocalError("Camera is not ready yet. Please wait a moment.");
       return;
     }
     const canvas = document.createElement("canvas");
@@ -123,7 +123,7 @@ export default function DnaTestForm() {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          setError("Failed to capture photo.");
+          setLocalError("Failed to capture photo.");
           return;
         }
         const file = new File([blob], "selfie.jpg", { type: "image/jpeg" });
@@ -141,59 +141,19 @@ export default function DnaTestForm() {
     }
     setPreviewUrl(null);
     setSelectedImage(null);
-    setOrigins(null);
-    setError(null);
+    setLocalError(null);
   };
 
   const handleAnalyze = async () => {
-    if (!assertAccess()) return;
-
     if (!selectedImage) {
-      setError("Please upload a selfie or take a photo first.");
+      setLocalError("Please upload a selfie or take a photo first.");
       return;
     }
-
-    setIsAnalyzing(true);
-    setError(null);
-    setOrigins(null);
-
-    try {
-      const formData = new FormData();
-      formData.append("image", selectedImage);
-
-      const res = await fetch("/api/dna-test", {
-        method: "POST",
-        body: formData,
-      });
-
-      const data = (await res.json()) as {
-        origins?: DnaOrigin[];
-        error?: string;
-        code?: string;
-      };
-
-      if (!res.ok) {
-        if (
-          data.code === "subscription_required" ||
-          data.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          return;
-        }
-        throw new Error(data.error || "Failed to analyze selfie");
-      }
-
-      if (!data.origins?.length) {
-        throw new Error("No ancestry results returned.");
-      }
-
-      setOrigins(data.origins);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : "An error occurred.");
-    } finally {
-      setIsAnalyzing(false);
-    }
+    setLocalError(null);
+    await onSubmit(selectedImage);
   };
+
+  const displayError = localError || error;
 
   return (
     <div className="mx-auto max-w-2xl space-y-6">
@@ -298,26 +258,26 @@ export default function DnaTestForm() {
         </p>
       )}
 
-      {error && (
+      {displayError && (
         <div
           className="rounded-xl border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-900/20"
           role="alert"
         >
-          <p className="text-sm text-red-600 dark:text-red-400">{error}</p>
+          <p className="text-sm text-red-600 dark:text-red-400">{displayError}</p>
         </div>
       )}
 
       <Button
         type="button"
         onClick={handleAnalyze}
-        disabled={!selectedImage || isAnalyzing}
+        disabled={!selectedImage || submitting}
         className="gap-2"
         size="lg"
       >
-        {isAnalyzing ? (
+        {submitting ? (
           <>
             <Loader2 className="h-4 w-4 animate-spin" />
-            Analyzing…
+            Preparing…
           </>
         ) : (
           <>
@@ -326,50 +286,6 @@ export default function DnaTestForm() {
           </>
         )}
       </Button>
-
-      {origins && origins.length > 0 && (
-        <div className="space-y-4 rounded-2xl border border-border bg-card p-6">
-          <h2 className="text-lg font-semibold text-foreground">
-            Estimated origins
-          </h2>
-          <ul className="space-y-3">
-            {origins.map((o) => (
-              <li
-                key={o.countryCode}
-                className="flex items-center gap-3 rounded-xl bg-muted/40 px-4 py-3"
-              >
-                <span
-                  className="text-2xl leading-none"
-                  role="img"
-                  aria-label={`${o.country} flag`}
-                >
-                  {countryCodeToFlag(o.countryCode)}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-medium text-foreground truncate">
-                      {o.country}
-                    </span>
-                    <span className="shrink-0 text-sm font-semibold tabular-nums text-foreground">
-                      {o.percentage}%
-                    </span>
-                  </div>
-                  <div className="mt-2 h-2 overflow-hidden rounded-full bg-muted">
-                    <div
-                      className="h-full rounded-full bg-dashboard-primary transition-all"
-                      style={{ width: `${o.percentage}%` }}
-                    />
-                  </div>
-                </div>
-              </li>
-            ))}
-          </ul>
-          <p className="text-xs text-muted-foreground">
-            Entertainment estimate only — not a real DNA or genetic test. Results
-            are speculative guesses from facial appearance.
-          </p>
-        </div>
-      )}
     </div>
   );
 }

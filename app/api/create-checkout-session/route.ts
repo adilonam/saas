@@ -37,7 +37,7 @@ export async function POST(request: Request) {
   const unitAmountCents = isAnnual ? annualCents : monthlyCents;
 
   const baseUrl = (process.env.NEXTAUTH_URL || "").replace(/\/$/, "");
-  const successUrl = `${baseUrl}/thank-you?plan=${plan}`;
+  const successUrl = `${baseUrl}/thank-you`;
   const cancelUrl = `${baseUrl}/pricing`;
 
   try {

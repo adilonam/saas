@@ -1,16 +1,28 @@
 "use client";
 
-import { Suspense } from "react";
+import { Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";
+import { trackTikTokEvent } from "@/lib/tiktok-events-client";
 
 function ThankYouContent() {
   const searchParams = useSearchParams();
   const product = searchParams.get("product");
+  const plan = searchParams.get("plan");
+  const purchaseTracked = useRef(false);
   const isForexOrder = product === "forex-trading-app";
+
+  useEffect(() => {
+    if (purchaseTracked.current) return;
+    purchaseTracked.current = true;
+    void trackTikTokEvent("CompletePayment", {
+      plan: plan ?? undefined,
+      product: product ?? undefined,
+    });
+  }, [plan, product]);
 
   return (
     <DashboardLayout>

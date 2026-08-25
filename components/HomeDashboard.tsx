@@ -679,6 +679,14 @@ const funViralTools = [
     icon: FaceSmileIcon,
     iconBg: "bg-teal-100 dark:bg-teal-900/30 text-teal-600",
   },
+  {
+    href: "/dna-test",
+    title: "DNA Test",
+    description:
+      "Upload or take a selfie for a fun ancestry-style country estimate with flags and percentages (entertainment only).",
+    icon: BeakerIcon,
+    iconBg: "bg-fuchsia-100 dark:bg-fuchsia-900/30 text-fuchsia-600",
+  },
 ];
 
 const seoMarketingTools = [

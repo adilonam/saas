@@ -155,6 +155,7 @@ const SEARCHABLE_FEATURES = [
   { title: "Coin Flip", href: "/coin-flip", keywords: "coin flip heads tails random chance decision" },
   { title: "IQ Test", href: "/iq-test", keywords: "iq test intelligence quotient cognitive assessment puzzle score report" },
   { title: "EQ Test", href: "/eq-test", keywords: "eq test emotional intelligence empathy self awareness social skills score report" },
+  { title: "DNA Test", href: "/dna-test", keywords: "dna test ancestry selfie ethnicity country origins flag fun entertainment" },
   { title: "Dice Roller", href: "/dice-roller", keywords: "dice roll d6 d20 tabletop rpg game random" },
   { title: "Random Name Picker", href: "/random-name-picker", keywords: "random name picker winner draw list raffle" },
   { title: "Truth or Dare Generator", href: "/truth-or-dare-generator", keywords: "truth or dare party game generator prompts" },

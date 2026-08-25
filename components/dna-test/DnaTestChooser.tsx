@@ -3,19 +3,19 @@
 import { ArrowPathIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { Button } from "@/components/ui/button";
 
-type IqTestChooserProps = {
+type DnaTestChooserProps = {
   statusLabel: string;
   updatedAtLabel: string;
   onViewLast: () => void;
   onStartNew: () => void;
 };
 
-export function IqTestChooser({
+export function DnaTestChooser({
   statusLabel,
   updatedAtLabel,
   onViewLast,
   onStartNew,
-}: IqTestChooserProps) {
+}: DnaTestChooserProps) {
   return (
     <div className="mx-auto w-full min-w-0 max-w-lg text-center">
       <div className="rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:rounded-3xl sm:px-6 sm:py-10 dark:border-slate-700 dark:bg-slate-900">
@@ -23,8 +23,8 @@ export function IqTestChooser({
           Welcome back
         </h1>
         <p className="mt-3 text-sm text-pretty text-slate-600 sm:text-base dark:text-slate-300">
-          We saved your last IQ test so you can pick up where you left off or
-          start fresh.
+          We saved your last DNA ancestry estimate so you can view it again or
+          start a new test.
         </p>
         <p className="mt-4 break-words text-sm text-slate-500 dark:text-slate-400">
           Last attempt: {statusLabel}

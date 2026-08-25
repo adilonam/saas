@@ -13,9 +13,9 @@ export default function UniversityLogos({ className }: { className?: string }) {
       <p className="mb-3 text-center text-xs font-medium uppercase tracking-wide text-slate-400">
         Research-backed methodology
       </p>
-      <div className="mx-auto flex w-fit flex-wrap items-center justify-center gap-6 rounded-xl border border-slate-200/80 bg-white px-6 py-3 shadow-sm dark:border-slate-200 dark:bg-slate-100">
+      <div className="mx-auto flex w-full max-w-md flex-wrap items-center justify-center gap-4 rounded-xl border border-slate-200/80 bg-white px-4 py-3 shadow-sm sm:w-fit sm:gap-6 sm:px-6 dark:border-slate-200 dark:bg-slate-100">
         {logos.map((logo) => (
-          <div key={logo.alt} className="relative h-8 w-24">
+          <div key={logo.alt} className="relative h-8 w-20 sm:w-24">
             <Image
               src={logo.src}
               alt={logo.alt}

@@ -313,8 +313,8 @@ export default function IqTestQuiz({
 
 export function IqTestIntro({ onStart }: { onStart: () => void }) {
   return (
-    <div className="mx-auto w-full max-w-lg text-center">
-      <div className="rounded-3xl border border-slate-200 bg-white px-6 py-10 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+    <div className="mx-auto w-full min-w-0 max-w-lg text-center">
+      <div className="rounded-2xl border border-slate-200 bg-white px-4 py-8 shadow-sm sm:rounded-3xl sm:px-6 sm:py-10 dark:border-slate-700 dark:bg-slate-900">
         <div className="relative mx-auto mb-6 aspect-[4/3] w-full max-w-sm overflow-hidden rounded-2xl bg-slate-50 dark:bg-slate-800">
           <Image
             src={IQ_TEST_GUIDELINES_IMAGE}
@@ -325,10 +325,10 @@ export function IqTestIntro({ onStart }: { onStart: () => void }) {
             priority
           />
         </div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
           IQ Test
         </h1>
-        <p className="mt-3 text-slate-600 dark:text-slate-300">
+        <p className="mt-3 text-sm text-pretty text-slate-600 sm:text-base dark:text-slate-300">
           {IQ_TEST_TOTAL} questions mixing visual puzzles, logical reasoning, and
           a short profile section. Allow about 15 minutes.
         </p>
@@ -338,7 +338,7 @@ export function IqTestIntro({ onStart }: { onStart: () => void }) {
           <li>• Your detailed score report unlocks after completion</li>
         </ul>
         <Button
-          className="mt-8 w-full bg-emerald-600 hover:bg-emerald-700"
+          className="mt-8 h-12 w-full bg-emerald-600 hover:bg-emerald-700"
           size="lg"
           onClick={onStart}
         >
@@ -358,10 +358,10 @@ export function IqTestConfirmation({
   onEdit: () => void;
 }) {
   return (
-    <div className="mx-auto w-full max-w-2xl">
-      <div className="flex flex-col items-center gap-8 rounded-3xl border border-slate-200 bg-[#faf8f5] px-6 py-10 md:flex-row md:px-10 dark:border-slate-700 dark:bg-slate-900/80">
-        <div className="flex-1 text-center md:text-left">
-          <h2 className="text-3xl font-bold text-slate-900 dark:text-white">
+    <div className="mx-auto w-full min-w-0 max-w-2xl">
+      <div className="flex flex-col items-center gap-8 rounded-2xl border border-slate-200 bg-[#faf8f5] px-4 py-8 sm:rounded-3xl sm:px-6 sm:py-10 md:flex-row md:px-10 dark:border-slate-700 dark:bg-slate-900/80">
+        <div className="min-w-0 flex-1 text-center md:text-left">
+          <h2 className="text-2xl font-bold text-slate-900 sm:text-3xl dark:text-white">
             Well done!
           </h2>
           <p className="mt-2 text-slate-600 dark:text-slate-300">

@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { auth } from "@/auth";
 import prisma from "@/lib/prisma";
-import { serializeAttempt } from "@/lib/iq-test/attempts";
-import { getGuestToken } from "@/lib/iq-test/guest-token";
+import { serializeAttempt } from "@/lib/dna-test/attempts";
+import { getGuestToken } from "@/lib/dna-test/guest-token";
 
 /**
- * POST /api/iq-test/attempts/attach
+ * POST /api/dna-test/attempts/attach
  * Link guest-cookie attempts (and optional localStorage attemptId) to the user.
  *
  * Body (optional): { attemptId?: string }
@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     let attached = 0;
 
     if (guestToken) {
-      const byCookie = await prisma.iqTestAttempt.updateMany({
+      const byCookie = await prisma.dnaTestAttempt.updateMany({
         where: {
           guestToken,
           OR: [{ userId: null }, { userId }],
@@ -44,14 +44,14 @@ export async function POST(request: Request) {
 
     let claimed = null;
     if (attemptId) {
-      const existing = await prisma.iqTestAttempt.findUnique({
+      const existing = await prisma.dnaTestAttempt.findUnique({
         where: { id: attemptId },
       });
       if (
         existing &&
         (existing.userId === null || existing.userId === userId)
       ) {
-        claimed = await prisma.iqTestAttempt.update({
+        claimed = await prisma.dnaTestAttempt.update({
           where: { id: attemptId },
           data: { userId },
         });
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       attempt: claimed ? serializeAttempt(claimed) : null,
     });
   } catch (err) {
-    console.error("iq-test/attempts/attach POST error:", err);
+    console.error("dna-test/attempts/attach POST error:", err);
     return NextResponse.json(
       { error: "Failed to attach attempts" },
       { status: 500 },

@@ -7,7 +7,6 @@ import { useSession } from "next-auth/react";
 import { Button } from "@/components/ui/button";
 import { CurrencyDollarIcon, CheckIcon } from "@heroicons/react/24/outline";
 import { ArrowTopRightOnSquareIcon } from "@heroicons/react/24/outline";
-import { trackTikTokEvent } from "@/lib/tiktok-events-client";
 
 type PricingPayload = {
   monthlyUsd: number;
@@ -20,10 +19,6 @@ export default function PricingPage() {
   const { data: session, update } = useSession();
   const [loading, setLoading] = useState<"monthly" | "annual" | null>(null);
   const [prices, setPrices] = useState<PricingPayload | null>(null);
-
-  useEffect(() => {
-    trackTikTokEvent("ViewContent", { plan: "pricing" });
-  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -61,7 +56,6 @@ export default function PricingPage() {
       return;
     }
     setLoading(plan);
-    void trackTikTokEvent("AddToCart", { plan });
     try {
       const res = await fetch("/api/create-checkout-session", {
         method: "POST",
@@ -70,7 +64,6 @@ export default function PricingPage() {
       });
       const data = await res.json();
       if (data.url) {
-        void trackTikTokEvent("InitiateCheckout", { plan });
         window.location.href = data.url;
         return;
       }

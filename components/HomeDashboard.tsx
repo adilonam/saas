@@ -95,6 +95,17 @@ import { ADS_TOOLS } from "components/tools/adsToolsConfig";
 import { TRADING_TOOLS } from "@/lib/trading-tools";
 import { LEGAL_BUSINESS_NAME, SITE_BRAND } from "@/lib/business";
 
+const agencyServices = [
+  {
+    href: "/apexridgelytics",
+    title: "ApexRidgeLytics Consulting",
+    description:
+      "AI software agency — custom apps, SaaS, and LLM integrations. 4.8★ on Upwork, Fiverr, and more.",
+    icon: SparklesIcon,
+    iconBg: "bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600",
+  },
+];
+
 const aiTools = [
   {
     href: "/summarize-pdf",
@@ -2775,6 +2786,37 @@ export default function HomeDashboard() {
           Manage, convert, and sign your documents with precision.
         </p>
       </div>
+
+      {/* Agency & Services */}
+      <section className="mb-14">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-10 rounded-xl bg-violet-100 dark:bg-violet-900/20 flex items-center justify-center text-violet-600">
+            <BriefcaseIcon className="size-5" />
+          </div>
+          <h3 className="text-xl font-bold">Agency &amp; Services</h3>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {agencyServices.map(({ href, title, description, icon: Icon, iconBg }) => (
+            <Link
+              key={title}
+              href={href}
+              className="tool-card group flex items-start gap-5 p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
+            >
+              <div
+                className={`size-14 rounded-2xl shrink-0 flex items-center justify-center transition-transform group-hover:scale-110 ${iconBg}`}
+              >
+                <Icon className="size-8" />
+              </div>
+              <div>
+                <p className="font-bold text-lg">{title}</p>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  {description}
+                </p>
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
 
       {/* AI PDF Assistant */}
       <section className="mb-14">

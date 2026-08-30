@@ -13,6 +13,7 @@ import { ADS_TOOLS } from "components/tools/adsToolsConfig";
 const SEARCHABLE_FEATURES = [
   { title: "Home", href: "/", keywords: "home dashboard main eprod tools" },
   { title: "Legal & Business", href: "/legal", keywords: "legal business apexridgelytics consulting llc operator company" },
+  { title: "ApexRidgeLytics Consulting", href: "/apexridgelytics", keywords: "apexridgelytics consulting llc agency ai software upwork fiverr freelancer whatsapp telegram adilonam" },
   { title: "Contact us", href: "/contact", keywords: "contact support email info eprod" },
   { title: "AI Summarize", href: "/summarize-pdf", keywords: "summarize pdf ai extract insights" },
   { title: "Generate PDF", href: "/generate-pdf", keywords: "generate pdf latex ai document compile report" },

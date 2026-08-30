@@ -27,6 +27,7 @@ model User {
   iqTestAttempts       IqTestAttempt[]
   eqTestAttempts       EqTestAttempt[]
   dnaTestAttempts      DnaTestAttempt[]
+  agencyInquiries      AgencyInquiry[]
 }
 
 model PasswordResetToken {
@@ -171,4 +172,22 @@ model DnaTestAttempt {
   @@index([userId])
   @@index([guestToken, updatedAt])
   @@index([userId, updatedAt])
+}
+
+enum AgencyInquiryStatus {
+  PENDING
+  REVIEWED
+  CLOSED
+}
+
+model AgencyInquiry {
+  id        String              @id @default(cuid())
+  userId    String
+  brief     String              @db.Text
+  status    AgencyInquiryStatus @default(PENDING)
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
 }

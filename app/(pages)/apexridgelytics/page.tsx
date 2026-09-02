@@ -27,12 +27,6 @@ import {
 import { useSubscribedToolAccess } from "@/hooks/useSubscribedToolAccess";
 import { LEGAL_BUSINESS_NAME } from "@/lib/business";
 
-declare global {
-  interface Window {
-    dataLayer: Record<string, unknown>[];
-  }
-}
-
 function trackApexEvent(payload: {
   event: string;
   eventCategory: string;

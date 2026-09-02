@@ -11,12 +11,6 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-declare global {
-  interface Window {
-    dataLayer: any[];
-  }
-}
-
 interface DepositDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;

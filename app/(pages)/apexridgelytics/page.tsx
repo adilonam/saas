@@ -27,6 +27,24 @@ import {
 import { useSubscribedToolAccess } from "@/hooks/useSubscribedToolAccess";
 import { LEGAL_BUSINESS_NAME } from "@/lib/business";
 
+declare global {
+  interface Window {
+    dataLayer: Record<string, unknown>[];
+  }
+}
+
+function trackApexEvent(payload: {
+  event: string;
+  eventCategory: string;
+  eventAction: string;
+  eventLabel: string;
+  [key: string]: unknown;
+}) {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    window.dataLayer.push(payload);
+  }
+}
+
 const AGENCY_RATING = 4.8;
 
 const PLATFORMS = [
@@ -205,7 +223,25 @@ export default function ApexRidgeLyticsPage() {
     document.getElementById("project-inquiry")?.scrollIntoView({ behavior: "smooth" });
   };
 
+  const handlePlatformClick = (name: string, href: string) => {
+    trackApexEvent({
+      event: "apexridgelytics_platform_click",
+      eventCategory: "ApexRidgeLytics",
+      eventAction: "Platform Click",
+      eventLabel: name,
+      platform: name,
+      platformUrl: href,
+    });
+  };
+
   const handleSubmit = async () => {
+    trackApexEvent({
+      event: "apexridgelytics_inquiry_submit",
+      eventCategory: "ApexRidgeLytics",
+      eventAction: "Submit Inquiry",
+      eventLabel: "Project Brief",
+    });
+
     if (!assertAccess()) return;
 
     const trimmed = projectBrief.trim();
@@ -325,6 +361,7 @@ export default function ApexRidgeLyticsPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group"
+                    onClick={() => handlePlatformClick(name, href)}
                   >
                     <GlassPanel className="flex flex-col items-center justify-center gap-3 p-4 transition-colors hover:bg-[#2a292f]/60">
                       <div

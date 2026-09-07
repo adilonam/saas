@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import IqTestAnalyzing from "@/components/iq-test/IqTestAnalyzing";
 import { IqTestChooser } from "@/components/iq-test/IqTestChooser";
@@ -20,12 +20,23 @@ import type {
   IqTestPhase,
   IqTestResult,
 } from "@/lib/iq-test/types";
+import { resolveStoredOrLatestAttempt } from "@/lib/resolve-test-attempt";
+import {
+  IQ_TEST_ATTEMPT_STORAGE_KEY,
+  clearStoredAttemptId,
+  getStoredAttemptId,
+  setStoredAttemptId,
+} from "@/lib/test-attempt-storage";
 import { useToolAccess } from "@/lib/use-tool-access";
 import { LightBulbIcon } from "@heroicons/react/24/outline";
 
 type ScoreFetchResult =
   | { ok: true; result: IqTestResult }
   | { ok: false; status: number; code?: string };
+
+function answerCount(answers: IqTestAnswers | null | undefined): number {
+  return Object.keys(answers ?? {}).length;
+}
 
 async function fetchIqScore(
   answers: IqTestAnswers,
@@ -35,6 +46,7 @@ async function fetchIqScore(
   const res = await fetch("/api/iq-test/score", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    credentials: "include",
     body: JSON.stringify({
       answers: clientAnswersToSelected(answers),
       elapsedSeconds,
@@ -82,6 +94,9 @@ async function saveAttempt(payload: {
     });
     if (!res.ok) return null;
     const data = (await res.json()) as { attempt: IqAttemptPublic };
+    if (data.attempt?.id) {
+      setStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY, data.attempt.id);
+    }
     return data.attempt;
   } catch {
     return null;
@@ -109,7 +124,6 @@ export default function IqTestPage() {
     null,
   );
   const [bootstrapping, setBootstrapping] = useState(true);
-  const attachDone = useRef(false);
 
   const hasAccess = useMemo(() => {
     if (status !== "authenticated" || !session) return false;
@@ -119,7 +133,7 @@ export default function IqTestPage() {
     );
   }, [session, status]);
 
-  // Attach guest attempts after login, then load latest for chooser.
+  // Prefer localStorage attempt (claim on login), else latest DB, else start UI.
   useEffect(() => {
     if (status === "loading") return;
 
@@ -127,25 +141,78 @@ export default function IqTestPage() {
 
     (async () => {
       try {
-        if (status === "authenticated" && !attachDone.current) {
-          attachDone.current = true;
-          await fetch("/api/iq-test/attempts/attach", {
-            method: "POST",
-            credentials: "include",
-          });
-        }
-
-        const res = await fetch("/api/iq-test/attempts/latest", {
-          credentials: "include",
+        const storedId = getStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
+        const attempt = await resolveStoredOrLatestAttempt<IqAttemptPublic>({
+          storageKey: IQ_TEST_ATTEMPT_STORAGE_KEY,
+          authenticated: status === "authenticated",
+          attachUrl: "/api/iq-test/attempts/attach",
+          latestUrl: "/api/iq-test/attempts/latest",
+          attemptUrl: (id) => `/api/iq-test/attempts/${id}`,
         });
-        if (!res.ok) return;
-        const data = (await res.json()) as {
-          attempt: IqAttemptPublic | null;
-        };
-        if (cancelled) return;
+        if (cancelled || !attempt) return;
 
-        if (data.attempt) {
-          setLatestAttempt(data.attempt);
+        setLatestAttempt(attempt);
+
+        if (storedId && attempt.id === storedId) {
+          setAttemptId(attempt.id);
+          setAnswers(attempt.answers ?? {});
+          setElapsedSeconds(attempt.elapsedSeconds ?? 0);
+          setScoreError(null);
+          setTimerRunning(false);
+
+          if (attempt.status === "in_progress") {
+            setResult(attempt.result);
+            const answered = answerCount(attempt.answers);
+            const idx = Math.min(answered, IQ_TEST_TOTAL - 1);
+            setQuestionIndex(Math.max(0, idx));
+            setPhase("quiz");
+            setTimerRunning(true);
+            return;
+          }
+
+          // Subscribed but empty/legacy attempt: don't trap on a dead results wall.
+          if (
+            hasAccess &&
+            !attempt.result &&
+            answerCount(attempt.answers) === 0
+          ) {
+            clearStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
+            setAttemptId(null);
+            setResult(null);
+            setPhase("chooser");
+            return;
+          }
+
+          // Soft paywall: only show score when unlocked; auto-score if subscribed.
+          setResult(hasAccess ? attempt.result : null);
+          setPhase("results");
+
+          if (
+            hasAccess &&
+            !attempt.result &&
+            attempt.status === "completed" &&
+            answerCount(attempt.answers) > 0
+          ) {
+            setScoring(true);
+            try {
+              const scored = await fetchIqScore(
+                attempt.answers,
+                attempt.elapsedSeconds,
+                attempt.id,
+              );
+              if (cancelled) return;
+              if (scored.ok === true) {
+                setResult(scored.result);
+              } else {
+                setScoreError(
+                  "Could not calculate your score. Please try again.",
+                );
+              }
+            } finally {
+              if (!cancelled) setScoring(false);
+            }
+          }
+        } else {
           setPhase("chooser");
         }
       } catch {
@@ -158,6 +225,8 @@ export default function IqTestPage() {
     return () => {
       cancelled = true;
     };
+    // Re-bootstrap on auth status only (login / logout / session ready).
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- hasAccess read when status settles
   }, [status]);
 
   useEffect(() => {
@@ -167,6 +236,7 @@ export default function IqTestPage() {
   }, [timerRunning]);
 
   const resetToIntro = () => {
+    clearStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
     setAttemptId(null);
     setLatestAttempt(null);
     setPhase("intro");
@@ -179,6 +249,7 @@ export default function IqTestPage() {
   };
 
   const handleStart = () => {
+    clearStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
     setAttemptId(null);
     setPhase("quiz");
     setQuestionIndex(0);
@@ -193,12 +264,12 @@ export default function IqTestPage() {
     setAttemptId(attempt.id);
     setAnswers(attempt.answers ?? {});
     setElapsedSeconds(attempt.elapsedSeconds ?? 0);
-    setResult(attempt.result);
     setScoreError(null);
     setTimerRunning(false);
 
     if (attempt.status === "in_progress") {
-      const answered = Object.keys(attempt.answers ?? {}).length;
+      setResult(attempt.result);
+      const answered = answerCount(attempt.answers);
       const idx = Math.min(answered, IQ_TEST_TOTAL - 1);
       setQuestionIndex(Math.max(0, idx));
       setPhase("quiz");
@@ -206,7 +277,19 @@ export default function IqTestPage() {
       return;
     }
 
-    // completed or scored → results (paywall if no result / no access)
+    // Empty attempt (no score, no answers): clear restore id and offer a new test.
+    if (hasAccess && !attempt.result && answerCount(attempt.answers) === 0) {
+      clearStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
+      setAttemptId(null);
+      setResult(null);
+      setScoreError(
+        "This attempt has no saved report. Please start a new test.",
+      );
+      setPhase("results");
+      return;
+    }
+
+    setResult(hasAccess ? attempt.result : null);
     setPhase("results");
 
     // Subscribed user with saved answers but no score yet → score now
@@ -214,7 +297,7 @@ export default function IqTestPage() {
       hasAccess &&
       !attempt.result &&
       attempt.status === "completed" &&
-      Object.keys(attempt.answers ?? {}).length > 0
+      answerCount(attempt.answers) > 0
     ) {
       setScoring(true);
       try {
@@ -225,6 +308,8 @@ export default function IqTestPage() {
         );
         if (scored.ok === true) {
           setResult(scored.result);
+        } else {
+          setScoreError("Could not calculate your score. Please try again.");
         }
       } finally {
         setScoring(false);
@@ -234,6 +319,17 @@ export default function IqTestPage() {
 
   const handleViewLast = () => {
     if (!latestAttempt) return;
+    // Empty scored/completed attempt: skip the dead wall — start a new test.
+    if (
+      hasAccess &&
+      !latestAttempt.result &&
+      answerCount(latestAttempt.answers) === 0 &&
+      (latestAttempt.status === "completed" ||
+        latestAttempt.status === "scored")
+    ) {
+      resetToIntro();
+      return;
+    }
     void applyAttempt(latestAttempt);
   };
 
@@ -336,20 +432,69 @@ export default function IqTestPage() {
     setScoring(true);
     setScoreError(null);
     try {
-      let id = attemptId;
+      // Already scored in UI (e.g. race) or restored from attempt
+      if (result) {
+        setPhase("results");
+        return;
+      }
+      if (latestAttempt?.result) {
+        setResult(latestAttempt.result);
+        setPhase("results");
+        return;
+      }
+
+      let id = attemptId ?? latestAttempt?.id ?? null;
+      let answersToScore = answers;
+      let elapsed = elapsedSeconds;
+
+      // Refetch attempt in case attach/bootstrap raced ahead of local state
+      if (id) {
+        const res = await fetch(`/api/iq-test/attempts/${id}`, {
+          credentials: "include",
+        }).catch(() => null);
+        if (res?.ok) {
+          const data = (await res.json()) as { attempt?: IqAttemptPublic };
+          if (data.attempt?.result) {
+            setLatestAttempt(data.attempt);
+            setResult(data.attempt.result);
+            setPhase("results");
+            return;
+          }
+          if (data.attempt && answerCount(answersToScore) === 0) {
+            answersToScore = data.attempt.answers ?? {};
+            elapsed = data.attempt.elapsedSeconds ?? 0;
+            setAnswers(answersToScore);
+            setElapsedSeconds(elapsed);
+            setLatestAttempt(data.attempt);
+          }
+        }
+      }
+
+      if (answerCount(answersToScore) === 0) {
+        // No scoreable answers — clear stale id so Retry / Start new works.
+        clearStoredAttemptId(IQ_TEST_ATTEMPT_STORAGE_KEY);
+        setAttemptId(null);
+        setScoreError(
+          "This attempt has no saved report. Please start a new test.",
+        );
+        setPhase("results");
+        return;
+      }
+
       if (!id) {
         const saved = await saveAttempt({
-          answers,
-          elapsedSeconds,
+          answers: answersToScore,
+          elapsedSeconds: elapsed,
           status: "completed",
         });
         if (saved) {
           id = saved.id;
           setAttemptId(saved.id);
+          setLatestAttempt(saved);
         }
       }
 
-      const scored = await fetchIqScore(answers, elapsedSeconds, id);
+      const scored = await fetchIqScore(answersToScore, elapsed, id);
       if (scored.ok === true) {
         setResult(scored.result);
       } else {
@@ -385,8 +530,8 @@ export default function IqTestPage() {
 
   return (
     <DashboardLayout fullWidth>
-      <div className="min-h-[calc(100vh-8rem)] bg-[#f5f3ef] px-4 py-8 dark:bg-slate-950">
-        <div className="mx-auto max-w-5xl">
+      <div className="min-h-[calc(100vh-8rem)] bg-[#f5f3ef] px-4 py-6 sm:py-8 dark:bg-slate-950">
+        <div className="mx-auto w-full min-w-0 max-w-5xl">
           {showMinimalHeader && (
             <div className="mb-8 flex items-center justify-center gap-2">
               <div className="flex size-9 items-center justify-center rounded-full bg-slate-900 text-white dark:bg-white dark:text-slate-900">

@@ -9,13 +9,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
-// Declare dataLayer for TypeScript
-declare global {
-  interface Window {
-    dataLayer: any[];
-  }
-}
-
 function GoogleIcon() {
   return (
     <svg className="size-5" viewBox="0 0 24 24">

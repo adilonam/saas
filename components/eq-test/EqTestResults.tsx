@@ -85,26 +85,26 @@ export default function EqTestResults({
 
   if (!hasAccess) {
     return (
-      <div className="mx-auto w-full max-w-5xl space-y-8">
+      <div className="mx-auto w-full min-w-0 max-w-5xl space-y-6 sm:space-y-8">
         <div className="flex items-center justify-between">
           <p className="text-sm text-slate-500">
             Available until {deadline}
           </p>
         </div>
 
-        <h2 className="text-center text-3xl font-bold text-slate-900 dark:text-white">
+        <h2 className="text-center text-2xl font-bold text-pretty text-slate-900 sm:text-3xl dark:text-white">
           Your EQ score report is ready!
         </h2>
 
-        <div className="grid gap-8 lg:grid-cols-2">
-          <div className="rounded-3xl border border-slate-200 bg-slate-50 p-6 dark:border-slate-700 dark:bg-slate-900/50">
-            <div className="mb-4 rounded-xl bg-teal-50 px-4 py-2 text-sm text-teal-800 dark:bg-teal-950/40 dark:text-teal-200">
+        <div className="grid gap-6 sm:gap-8 lg:grid-cols-2">
+          <div className="rounded-2xl border border-slate-200 bg-slate-50 p-4 sm:rounded-3xl sm:p-6 dark:border-slate-700 dark:bg-slate-900/50">
+            <div className="mb-4 rounded-xl bg-teal-50 px-3 py-2 text-sm text-pretty text-teal-800 sm:px-4 dark:bg-teal-950/40 dark:text-teal-200">
               {proof.name} just unlocked their report · EQ score: {proof.score}
             </div>
 
-            <div className="rounded-2xl border border-slate-200 bg-white p-6 dark:border-slate-700 dark:bg-slate-900">
-              <div className="flex items-start justify-between gap-4">
-                <div>
+            <div className="rounded-2xl border border-slate-200 bg-white p-4 sm:p-6 dark:border-slate-700 dark:bg-slate-900">
+              <div className="flex items-start justify-between gap-3 sm:gap-4">
+                <div className="min-w-0">
                   <h3 className="text-lg font-bold text-slate-900 dark:text-white">
                     Premium EQ score report
                   </h3>
@@ -112,7 +112,7 @@ export default function EqTestResults({
                     Full access with your subscription
                   </p>
                 </div>
-                <div className="flex size-16 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 dark:bg-teal-950/40 dark:text-teal-300">
+                <div className="flex size-14 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-teal-700 sm:size-16 dark:bg-teal-950/40 dark:text-teal-300">
                   <CheckCircleIcon className="size-8" />
                 </div>
               </div>
@@ -133,7 +133,7 @@ export default function EqTestResults({
               </ul>
 
               <Button
-                className="mt-6 w-full bg-emerald-600 hover:bg-emerald-700"
+                className="mt-6 h-12 w-full bg-emerald-600 hover:bg-emerald-700"
                 size="lg"
                 onClick={onUnlock}
                 disabled={unlocking}
@@ -145,9 +145,17 @@ export default function EqTestResults({
                 <p className="mt-3 text-center text-sm text-red-600">{error}</p>
               )}
 
-              <div className="mt-4 flex flex-wrap items-center justify-center gap-4 text-xs text-slate-500">
+              <Button
+                variant="outline"
+                className="mt-3 h-12 w-full"
+                onClick={onStartNew}
+              >
+                Start new test
+              </Button>
+
+              <div className="mt-4 flex flex-wrap items-center justify-center gap-3 text-xs text-slate-500 sm:gap-4">
                 <span className="flex items-center gap-1">
-                  <ShieldCheckIcon className="size-4" />
+                  <ShieldCheckIcon className="size-4 shrink-0" />
                   Subscription required
                 </span>
                 <span>100% secure</span>
@@ -155,7 +163,7 @@ export default function EqTestResults({
             </div>
           </div>
 
-          <div>
+          <div className="min-w-0">
             <h3 className="mb-6 text-xl font-bold text-slate-900 dark:text-white">
               What you will receive
             </h3>
@@ -178,11 +186,11 @@ export default function EqTestResults({
                   text: "See which domains to strengthen next for clearer interpersonal impact.",
                 },
               ].map((item) => (
-                <div key={item.title} className="flex gap-4">
+                <div key={item.title} className="flex gap-3 sm:gap-4">
                   <div className="flex size-12 shrink-0 items-center justify-center rounded-xl bg-slate-100 dark:bg-slate-800">
                     <CheckCircleIcon className="size-6 text-teal-600" />
                   </div>
-                  <div>
+                  <div className="min-w-0">
                     <p className="font-semibold text-slate-900 dark:text-white">
                       {item.title}
                     </p>
@@ -200,14 +208,14 @@ export default function EqTestResults({
   }
 
   return (
-    <div className="mx-auto w-full max-w-3xl space-y-8">
+    <div className="mx-auto w-full min-w-0 max-w-3xl space-y-6 sm:space-y-8">
       {!result ? (
         <div className="text-center">
           <p className="text-slate-600 dark:text-slate-300">
             {error ?? "Loading your report…"}
           </p>
           {error && (
-            <Button className="mt-4" onClick={onUnlock} disabled={unlocking}>
+            <Button className="mt-4" onClick={onStartNew}>
               Retry
             </Button>
           )}
@@ -218,10 +226,10 @@ export default function EqTestResults({
             <p className="text-sm font-medium uppercase tracking-wide text-teal-600">
               Your emotional intelligence profile
             </p>
-            <h2 className="mt-2 text-4xl font-bold text-slate-900 dark:text-white">
+            <h2 className="mt-2 text-3xl font-bold text-slate-900 sm:text-4xl dark:text-white">
               EQ {result.eq}
             </h2>
-            <p className="mt-2 text-slate-600 dark:text-slate-300">
+            <p className="mt-2 text-sm text-pretty text-slate-600 sm:text-base dark:text-slate-300">
               You scored higher than {result.percentile}% of the population ·{" "}
               {result.accuracy}% response quality ·{" "}
               {Math.floor(result.elapsedSeconds / 60)}m{" "}
@@ -229,18 +237,18 @@ export default function EqTestResults({
             </p>
           </div>
 
-          <div className="rounded-3xl border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+          <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm sm:rounded-3xl sm:p-6 dark:border-slate-700 dark:bg-slate-900">
             <h3 className="mb-4 text-lg font-bold text-slate-900 dark:text-white">
               EQ dimensions
             </h3>
             <div className="space-y-4">
               {result.dimensions.map((dim) => (
-                <div key={dim.label}>
-                  <div className="mb-1 flex items-center justify-between text-sm">
-                    <span className="font-medium text-slate-800 dark:text-slate-200">
+                <div key={dim.label} className="min-w-0">
+                  <div className="mb-1 flex items-center justify-between gap-2 text-sm">
+                    <span className="min-w-0 font-medium text-slate-800 dark:text-slate-200">
                       {dim.label}
                     </span>
-                    <span className="text-slate-500">{dim.score}/99</span>
+                    <span className="shrink-0 text-slate-500">{dim.score}/99</span>
                   </div>
                   <div className="h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                     <div
@@ -248,19 +256,21 @@ export default function EqTestResults({
                       style={{ width: `${dim.score}%` }}
                     />
                   </div>
-                  <p className="mt-1 text-xs text-slate-500">{dim.description}</p>
+                  <p className="mt-1 text-xs text-pretty text-slate-500">
+                    {dim.description}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
 
-          <div className="flex flex-col items-center gap-3">
-            <div className="flex flex-wrap justify-center gap-3">
+          <div className="flex flex-col items-stretch gap-3 sm:items-center">
+            <div className="flex w-full flex-col gap-3 sm:w-auto sm:flex-row sm:flex-wrap sm:justify-center">
               <Button
                 variant="outline"
                 onClick={handlePrintPdf}
                 disabled={printing}
-                className="gap-2"
+                className="h-12 w-full gap-2 sm:w-auto"
               >
                 {printing ? (
                   <>
@@ -275,7 +285,7 @@ export default function EqTestResults({
                 )}
               </Button>
               <Button
-                className="bg-emerald-600 hover:bg-emerald-700"
+                className="h-12 w-full bg-emerald-600 hover:bg-emerald-700 sm:w-auto"
                 onClick={onStartNew}
               >
                 Start new test

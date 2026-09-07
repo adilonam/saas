@@ -13,6 +13,9 @@ import { ADS_TOOLS } from "components/tools/adsToolsConfig";
 const SEARCHABLE_FEATURES = [
   { title: "Home", href: "/", keywords: "home dashboard main eprod tools" },
   { title: "Legal & Business", href: "/legal", keywords: "legal business apexridgelytics consulting llc operator company" },
+  { title: "Privacy Policy", href: "/privacy", keywords: "privacy policy data protection cookies gdpr personal information" },
+  { title: "Terms and Conditions", href: "/terms-and-conditions", keywords: "terms conditions of service tos legal agreement subscription" },
+  { title: "ApexRidgeLytics Consulting", href: "/apexridgelytics", keywords: "apexridgelytics consulting llc agency ai software upwork fiverr freelancer whatsapp telegram adilonam" },
   { title: "Contact us", href: "/contact", keywords: "contact support email info eprod" },
   { title: "AI Summarize", href: "/summarize-pdf", keywords: "summarize pdf ai extract insights" },
   { title: "Generate PDF", href: "/generate-pdf", keywords: "generate pdf latex ai document compile report" },
@@ -155,6 +158,7 @@ const SEARCHABLE_FEATURES = [
   { title: "Coin Flip", href: "/coin-flip", keywords: "coin flip heads tails random chance decision" },
   { title: "IQ Test", href: "/iq-test", keywords: "iq test intelligence quotient cognitive assessment puzzle score report" },
   { title: "EQ Test", href: "/eq-test", keywords: "eq test emotional intelligence empathy self awareness social skills score report" },
+  { title: "DNA Test", href: "/dna-test", keywords: "dna test ancestry selfie ethnicity country origins flag fun entertainment" },
   { title: "Dice Roller", href: "/dice-roller", keywords: "dice roll d6 d20 tabletop rpg game random" },
   { title: "Random Name Picker", href: "/random-name-picker", keywords: "random name picker winner draw list raffle" },
   { title: "Truth or Dare Generator", href: "/truth-or-dare-generator", keywords: "truth or dare party game generator prompts" },

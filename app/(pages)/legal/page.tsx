@@ -70,6 +70,30 @@ export default function LegalPage() {
             .
           </p>
         </div>
+
+        <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/50 p-5 sm:p-8">
+          <p className="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400 mb-3">
+            Policies
+          </p>
+          <ul className="space-y-2 text-sm sm:text-base">
+            <li>
+              <Link
+                href="/privacy"
+                className="font-semibold text-dashboard-primary hover:underline"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/terms-and-conditions"
+                className="font-semibold text-dashboard-primary hover:underline"
+              >
+                Terms and Conditions
+              </Link>
+            </li>
+          </ul>
+        </div>
       </div>
     </DashboardLayout>
   );

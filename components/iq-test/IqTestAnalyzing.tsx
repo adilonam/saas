@@ -78,19 +78,19 @@ export default function IqTestAnalyzing({
   }, [onComplete]);
 
   return (
-    <div className="mx-auto w-full max-w-2xl space-y-8">
+    <div className="mx-auto w-full min-w-0 max-w-2xl space-y-8">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
+        <h2 className="text-xl font-bold text-slate-900 sm:text-2xl dark:text-white">
           Calculating your IQ score…
         </h2>
       </div>
 
-      <div className="rounded-3xl border border-slate-200 bg-white px-6 py-8 shadow-sm dark:border-slate-700 dark:bg-slate-900">
+      <div className="rounded-2xl border border-slate-200 bg-white px-4 py-6 shadow-sm sm:rounded-3xl sm:px-6 sm:py-8 dark:border-slate-700 dark:bg-slate-900">
         <div className="space-y-6">
           {ANALYSIS_STEPS.map((step, i) => (
-            <div key={step.title} className="space-y-2">
-              <div className="flex items-center justify-between gap-4">
-                <div>
+            <div key={step.title} className="min-w-0 space-y-2">
+              <div className="flex min-w-0 items-center justify-between gap-4">
+                <div className="min-w-0">
                   <p
                     className={`font-semibold ${
                       i <= stepIndex
@@ -100,7 +100,9 @@ export default function IqTestAnalyzing({
                   >
                     {step.title}
                   </p>
-                  <p className="text-sm text-slate-500">{step.description}</p>
+                  <p className="text-sm text-pretty text-slate-500">
+                    {step.description}
+                  </p>
                 </div>
               </div>
               <div className="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">

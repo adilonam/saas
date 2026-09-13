@@ -68,8 +68,6 @@ const BENEFITS = [
 ];
 
 export default function ContextlyPage() {
-  const storeReady = CHROME_WEB_STORE_URL !== "#";
-
   const handleChromeInstallClick = (buttonText: string) => {
     trackContextlyEvent({
       event: "contextly_chrome_install_click",
@@ -106,35 +104,24 @@ export default function ContextlyPage() {
               rewrites, summaries, professional replies, and more.
             </p>
             <div className="mt-6 flex flex-wrap items-center gap-3">
-              {storeReady ? (
-                <Button
-                  asChild
-                  size="lg"
-                  className="gap-2 rounded-xl text-white hover:opacity-90"
-                  style={{ backgroundColor: CONTEXTLY_GREEN }}
+              <Button
+                asChild
+                size="lg"
+                className="gap-2 rounded-xl text-white hover:opacity-90"
+                style={{ backgroundColor: CONTEXTLY_GREEN }}
+              >
+                <a
+                  href={CHROME_WEB_STORE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() =>
+                    handleChromeInstallClick("Get Contextly for Chrome")
+                  }
                 >
-                  <a
-                    href={CHROME_WEB_STORE_URL}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={() =>
-                      handleChromeInstallClick("Get Contextly for Chrome")
-                    }
-                  >
-                    Get Contextly for Chrome
-                    <ArrowTopRightOnSquareIcon className="size-4" />
-                  </a>
-                </Button>
-              ) : (
-                <Button
-                  size="lg"
-                  disabled
-                  className="gap-2 rounded-xl text-white opacity-80"
-                  style={{ backgroundColor: CONTEXTLY_GREEN }}
-                >
-                  Chrome Web Store — coming soon
-                </Button>
-              )}
+                  Get Contextly for Chrome
+                  <ArrowTopRightOnSquareIcon className="size-4" />
+                </a>
+              </Button>
               <Button
                 asChild
                 variant="outline"
@@ -293,32 +280,22 @@ export default function ContextlyPage() {
                 Install Contextly for Chrome from the Chrome Web Store.
               </p>
             </div>
-            {storeReady ? (
-              <Button
-                asChild
-                size="lg"
-                className="shrink-0 gap-2 rounded-xl bg-white hover:bg-white/90"
-                style={{ color: CONTEXTLY_GREEN }}
+            <Button
+              asChild
+              size="lg"
+              className="shrink-0 gap-2 rounded-xl bg-white hover:bg-white/90"
+              style={{ color: CONTEXTLY_GREEN }}
+            >
+              <a
+                href={CHROME_WEB_STORE_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => handleChromeInstallClick("Get Contextly")}
               >
-                <a
-                  href={CHROME_WEB_STORE_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => handleChromeInstallClick("Get Contextly")}
-                >
-                  Get Contextly
-                  <ArrowTopRightOnSquareIcon className="size-4" />
-                </a>
-              </Button>
-            ) : (
-              <Button
-                size="lg"
-                disabled
-                className="shrink-0 gap-2 rounded-xl bg-white/90 text-[#20724C] opacity-90"
-              >
-                Coming soon
-              </Button>
-            )}
+                Get Contextly
+                <ArrowTopRightOnSquareIcon className="size-4" />
+              </a>
+            </Button>
           </div>
         </section>
       </div>

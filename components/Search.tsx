@@ -16,6 +16,8 @@ const SEARCHABLE_FEATURES = [
   { title: "Privacy Policy", href: "/privacy", keywords: "privacy policy data protection cookies gdpr personal information" },
   { title: "Terms and Conditions", href: "/terms-and-conditions", keywords: "terms conditions of service tos legal agreement subscription" },
   { title: "ApexRidgeLytics Consulting", href: "/apexridgelytics", keywords: "apexridgelytics consulting llc agency ai software upwork fiverr freelancer whatsapp telegram adilonam" },
+  { title: "Contextly", href: "/contextly", keywords: "contextly chrome extension writing assistant prompts rewrite grammar tone summary overlay" },
+  { title: "Contextly Privacy", href: "/contextly/privacy", keywords: "contextly privacy policy chrome extension data selected text jwt" },
   { title: "Contact us", href: "/contact", keywords: "contact support email info eprod" },
   { title: "AI Summarize", href: "/summarize-pdf", keywords: "summarize pdf ai extract insights" },
   { title: "Generate PDF", href: "/generate-pdf", keywords: "generate pdf latex ai document compile report" },

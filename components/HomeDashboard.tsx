@@ -94,7 +94,6 @@ import {
 } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 import { ADS_TOOLS } from "components/tools/adsToolsConfig";
-import { TRADING_TOOLS } from "@/lib/trading-tools";
 import { LEGAL_BUSINESS_NAME, SITE_BRAND } from "@/lib/business";
 
 const chromeExtensions = [
@@ -197,24 +196,6 @@ const popularTools = [
     comingSoon: true,
   },
 ];
-
-const tradingTools = TRADING_TOOLS.slice(0, 8).map((tool) => ({
-  href: `/${tool.path}`,
-  title: tool.title,
-  description: tool.shortDescription,
-  icon: ChartBarIcon,
-  iconBg: "bg-amber-100 dark:bg-amber-900/30 text-amber-600",
-}));
-
-const tradingProduct = {
-  href: "/forex-trading-app",
-  title: "Forex Trading Web App",
-  description:
-    "Production-ready trading platform with live charts and risk tools. Preview the demo — $499 one-time license.",
-  icon: ComputerDesktopIcon,
-  iconBg: "bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600",
-  price: "$499",
-};
 
 const aiWritingTools = [
   {
@@ -2933,62 +2914,6 @@ export default function HomeDashboard() {
                 </Link>
               )
           )}
-        </div>
-      </section>
-
-      {/* Trading Tools */}
-      <section className="mb-14">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="size-10 rounded-xl bg-amber-100 dark:bg-amber-900/20 flex items-center justify-center text-amber-600">
-            <ChartBarIcon className="size-5" />
-          </div>
-          <h3 className="text-xl font-bold">Trading Tools</h3>
-          <Link
-            href="/trading-tools"
-            className="ml-auto text-sm font-semibold text-dashboard-primary hover:underline"
-          >
-            View all
-          </Link>
-        </div>
-        <Link
-          href={tradingProduct.href}
-          className="tool-card group mb-6 flex flex-col gap-4 rounded-4xl border border-emerald-200 bg-gradient-to-br from-emerald-50 to-white p-6 dark:border-emerald-900/40 dark:from-emerald-950/30 dark:to-slate-900/40 sm:flex-row sm:items-center"
-        >
-          <div
-            className={`flex size-16 shrink-0 items-center justify-center rounded-2xl transition-transform group-hover:scale-110 ${tradingProduct.iconBg}`}
-          >
-            <ComputerDesktopIcon className="size-8" />
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="font-bold text-lg">{tradingProduct.title}</p>
-              <span className="rounded-full bg-emerald-600 px-2.5 py-0.5 text-xs font-semibold text-white">
-                {tradingProduct.price}
-              </span>
-            </div>
-            <p className="mt-2 text-sm leading-relaxed text-slate-500">
-              {tradingProduct.description}
-            </p>
-          </div>
-        </Link>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {tradingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
-            <Link
-              key={title}
-              href={href}
-              className="tool-card group flex flex-col p-6 rounded-4xl bg-slate-50/50 dark:bg-slate-900/40 text-left"
-            >
-              <div
-                className={`size-14 rounded-2xl flex items-center justify-center mb-6 transition-transform group-hover:scale-110 ${iconBg}`}
-              >
-                <Icon className="size-8" />
-              </div>
-              <p className="font-bold text-lg">{title}</p>
-              <p className="text-sm text-slate-500 mt-2 leading-relaxed">
-                {description}
-              </p>
-            </Link>
-          ))}
         </div>
       </section>
 

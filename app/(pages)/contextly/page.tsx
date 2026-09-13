@@ -15,10 +15,22 @@ import {
   UserCircleIcon,
 } from "@heroicons/react/24/outline";
 
-/** Replace with the Chrome Web Store listing URL when available. */
-const CHROME_WEB_STORE_URL = "#";
+const CHROME_WEB_STORE_URL =
+  "https://chromewebstore.google.com/detail/contextly/lemgaoapgihhicjnkcpibpkpiaacklof";
 
 const CONTEXTLY_GREEN = "#20724C";
+
+function trackContextlyEvent(payload: {
+  event: string;
+  eventCategory: string;
+  eventAction: string;
+  eventLabel: string;
+  [key: string]: unknown;
+}) {
+  if (typeof window !== "undefined" && window.dataLayer) {
+    window.dataLayer.push(payload);
+  }
+}
 
 const HOW_IT_WORKS = [
   {
@@ -58,6 +70,19 @@ const BENEFITS = [
 export default function ContextlyPage() {
   const storeReady = CHROME_WEB_STORE_URL !== "#";
 
+  const handleChromeInstallClick = (buttonText: string) => {
+    trackContextlyEvent({
+      event: "contextly_chrome_install_click",
+      eventCategory: "Contextly",
+      eventAction: "Chrome Install Click",
+      eventLabel: buttonText,
+      button_text: buttonText,
+      destination: CHROME_WEB_STORE_URL,
+      page: "/contextly",
+      product: "contextly",
+    });
+  };
+
   return (
     <DashboardLayout>
       <div className="mx-auto max-w-5xl space-y-10">
@@ -92,6 +117,9 @@ export default function ContextlyPage() {
                     href={CHROME_WEB_STORE_URL}
                     target="_blank"
                     rel="noopener noreferrer"
+                    onClick={() =>
+                      handleChromeInstallClick("Get Contextly for Chrome")
+                    }
                   >
                     Get Contextly for Chrome
                     <ArrowTopRightOnSquareIcon className="size-4" />
@@ -127,10 +155,11 @@ export default function ContextlyPage() {
               style={{ boxShadow: `0 12px 40px ${CONTEXTLY_GREEN}22` }}
             >
               <Image
-                src="/products/contextly-icon.png"
+                src="/products/contextly-icon-high.png"
                 alt="Contextly"
-                width={320}
-                height={128}
+                width={256}
+                height={256}
+                quality={100}
                 className="h-auto w-56 sm:w-72"
                 priority
               />
@@ -261,7 +290,7 @@ export default function ContextlyPage() {
                 Ready to write better on the web?
               </h2>
               <p className="mt-1 text-sm text-white/85 sm:text-base">
-                Install Contextly for Chrome when the store listing is available.
+                Install Contextly for Chrome from the Chrome Web Store.
               </p>
             </div>
             {storeReady ? (
@@ -275,6 +304,7 @@ export default function ContextlyPage() {
                   href={CHROME_WEB_STORE_URL}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={() => handleChromeInstallClick("Get Contextly")}
                 >
                   Get Contextly
                   <ArrowTopRightOnSquareIcon className="size-4" />

@@ -93,7 +93,15 @@ export default function ContextlyPage() {
             >
               Chrome extension
             </p>
-            <h1 className="mt-2 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+            <h1 className="mt-2 flex items-center gap-3 text-3xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-4xl">
+              <Image
+                src="/products/contextly-icon.png"
+                alt=""
+                width={36}
+                height={36}
+                className="size-8 sm:size-9"
+                aria-hidden
+              />
               Contextly
             </h1>
             <p className="mt-3 max-w-2xl text-lg text-slate-500 dark:text-slate-400">
@@ -141,14 +149,15 @@ export default function ContextlyPage() {
               className="overflow-hidden rounded-2xl border border-slate-200 bg-white p-6 shadow-xl dark:border-slate-700 dark:bg-slate-900/50"
               style={{ boxShadow: `0 12px 40px ${CONTEXTLY_GREEN}22` }}
             >
-              <Image
-                src="/products/contextly-icon-high.png"
-                alt="Contextly"
-                width={256}
-                height={256}
-                quality={100}
-                className="h-auto w-56 sm:w-72"
-                priority
+              <video
+                src="/products/contextly-tuto.mp4"
+                className="h-auto w-80 sm:w-[28rem]"
+                autoPlay
+                muted
+                loop
+                playsInline
+                aria-label="Contextly tutorial"
+                title="Contextly tutorial"
               />
             </div>
           </div>

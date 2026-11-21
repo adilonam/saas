@@ -1,10 +1,13 @@
 import { Suspense } from "react";
-import HomeDashboard from "components/HomeDashboard";
+import ImprovedHomeDashboard from "components/ImprovedHomeDashboard";
+import ResponsiveDashboardLayout from "components/ResponsiveDashboardLayout";
 
 export default function Page() {
   return (
     <Suspense fallback={null}>
-      <HomeDashboard />
+      <ResponsiveDashboardLayout fullWidth>
+        <ImprovedHomeDashboard />
+      </ResponsiveDashboardLayout>
     </Suspense>
   );
 }

@@ -1,7 +1,7 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Merge PDF Online";
+const toolName = "Merge PDF – Combine Multiple PDFs Online (Free)";
 const toolDescription = "Free PDF merger tool. Combine multiple PDF files into one document online. Merge PDFs in any order quickly and securely in your browser. No file size limits.";
 const toolPath = "/merge-pdf";
 

@@ -1,7 +1,7 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "YouTube Title Length Checker";
+const toolName = "YouTube Title Checker – Optimize Length (Free)";
 const toolDescription = "Free YouTube title length checker. Count characters including emoji against YouTube's 100-character title limit. Ensure your video titles display properly in search results and recommendations.";
 const toolPath = "/youtube-title-length-checker";
 

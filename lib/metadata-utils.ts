@@ -19,11 +19,11 @@ export function generateToolMetadata({
   keywords = [],
   category = 'Tools',
 }: ToolMetadataParams): Metadata {
-  const fullTitle = `${title} – ${SITE_NAME}`;
+  // Don't add site name here - root layout template handles it
   const url = `${SITE_URL}${path}`;
   
   return {
-    title: fullTitle,
+    title: title,
     description,
     keywords: keywords.length > 0 ? keywords.join(', ') : undefined,
     authors: [{ name: SITE_NAME }],
@@ -33,7 +33,7 @@ export function generateToolMetadata({
       canonical: url,
     },
     openGraph: {
-      title: fullTitle,
+      title: `${title} | ${SITE_NAME}`,
       description,
       url,
       siteName: SITE_NAME,
@@ -42,7 +42,7 @@ export function generateToolMetadata({
     },
     twitter: {
       card: 'summary',
-      title: fullTitle,
+      title: `${title} | ${SITE_NAME}`,
       description,
     },
     robots: {

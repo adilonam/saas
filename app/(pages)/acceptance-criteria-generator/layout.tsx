@@ -1,7 +1,7 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Acceptance Criteria Generator";
+const toolName = "Acceptance Criteria Generator – User Stories (Free)";
 const toolDescription = "Free acceptance criteria generator for user stories. Create Given/When/Then scenarios and engineering checklists. Generate quality acceptance criteria for agile development and software requirements.";
 const toolPath = "/acceptance-criteria-generator";
 

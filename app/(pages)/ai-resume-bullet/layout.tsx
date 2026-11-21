@@ -1,7 +1,7 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "AI Resume Bullet Point Generator";
+const toolName = "Resume Bullet Point Generator – AI (Free)";
 const toolDescription = "Free AI resume bullet point generator. Transform job descriptions into impactful resume bullet points using AI. Create achievement-focused resume content that stands out to recruiters and ATS systems.";
 const toolPath = "/ai-resume-bullet";
 

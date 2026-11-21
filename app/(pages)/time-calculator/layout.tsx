@@ -1,7 +1,7 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Time Calculator";
+const toolName = "Time Calculator – Add & Subtract Hours (Free)";
 const toolDescription = "Free online time calculator. Add, subtract, and convert time durations with precision. Calculate hours, minutes, seconds, and time differences between dates. Perfect for time tracking and scheduling.";
 const toolPath = "/time-calculator";
 

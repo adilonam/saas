@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
-import prisma from "@/lib/prisma";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = "gpt-4o";
@@ -21,27 +19,7 @@ Do not invent credentials. If the paste is unclear, say what's missing.`;
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscriptionExpiresAt: true },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    const hasActive =
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date();
-    if (!hasActive) {
-      return NextResponse.json(
-        { error: "Active subscription required", code: "subscription_required" },
-        { status: 403 },
-      );
-    }
+    // Auth removed - API is now public for all users
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {

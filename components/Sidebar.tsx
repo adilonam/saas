@@ -5,6 +5,7 @@ import Image from "next/image";
 import { usePathname } from "next/navigation";
 import {
   HomeIcon,
+  Squares2X2Icon,
   CurrencyDollarIcon,
   EnvelopeIcon,
   BuildingOffice2Icon,
@@ -15,6 +16,7 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { href: "/", label: "Home", icon: HomeIcon },
+  { href: "/blog", label: "Blog", icon: Squares2X2Icon },
   { href: "/pricing", label: "Pricing", icon: CurrencyDollarIcon },
   { href: "/contact", label: "Contact us", icon: EnvelopeIcon },
   { href: "/legal", label: "Legal", icon: BuildingOffice2Icon },

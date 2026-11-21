@@ -1,0 +1,217 @@
+import prisma from "./prisma";
+import { Metadata } from "next";
+
+const SITE_NAME = "eProd";
+const SITE_URL = "https://www.eprod.io";
+
+export interface BlogPost {
+  id: string;
+  slug: string;
+  title: string;
+  metaDescription: string | null;
+  keywords: string | null;
+  content: string;
+  coverImage: string | null;
+  relatedTools: string | null;
+  category: string | null;
+  status: "DRAFT" | "PUBLISHED" | "ARCHIVED";
+  publishedAt: Date | null;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface RelatedTool {
+  slug: string;
+  title: string;
+  description?: string;
+}
+
+const TOOL_MAP: Record<string, RelatedTool> = {
+  "youtube-title-length-checker": {
+    slug: "youtube-title-length-checker",
+    title: "YouTube Title Length Checker",
+    description: "Check if your YouTube title fits within the optimal character limit"
+  },
+  "sign-pdf": {
+    slug: "sign-pdf",
+    title: "Sign PDF",
+    description: "Add your signature to PDF documents online for free"
+  },
+  "merge-pdf": {
+    slug: "merge-pdf",
+    title: "Merge PDF",
+    description: "Combine multiple PDF files into a single document"
+  },
+  "age-calculator": {
+    slug: "age-calculator",
+    title: "Age Calculator",
+    description: "Calculate age from date of birth with precision"
+  },
+  "acceptance-criteria-generator": {
+    slug: "acceptance-criteria-generator",
+    title: "Acceptance Criteria Generator",
+    description: "Generate clear acceptance criteria for user stories"
+  },
+  "ai-email-subject-line": {
+    slug: "ai-email-subject-line",
+    title: "AI Email Subject Line Generator",
+    description: "Create compelling email subject lines with AI"
+  },
+  "ai-resume-bullet": {
+    slug: "ai-resume-bullet",
+    title: "AI Resume Bullet Generator",
+    description: "Generate impactful resume bullet points with AI"
+  },
+  "wealth-comparison-calculator": {
+    slug: "wealth-comparison-calculator",
+    title: "Wealth Comparison Calculator",
+    description: "Compare wealth and income across different demographics"
+  },
+  "win-probability-calculator": {
+    slug: "win-probability-calculator",
+    title: "Win Probability Calculator",
+    description: "Calculate winning probabilities for games and competitions"
+  },
+};
+
+export async function getPublishedPosts(page = 1, pageSize = 12): Promise<{
+  posts: BlogPost[];
+  totalPages: number;
+  totalPosts: number;
+}> {
+  const skip = (page - 1) * pageSize;
+
+  const [posts, totalPosts] = await Promise.all([
+    prisma.blogPost.findMany({
+      where: { status: "PUBLISHED" },
+      orderBy: { publishedAt: "desc" },
+      skip,
+      take: pageSize,
+    }),
+    prisma.blogPost.count({
+      where: { status: "PUBLISHED" },
+    }),
+  ]);
+
+  return {
+    posts,
+    totalPages: Math.ceil(totalPosts / pageSize),
+    totalPosts,
+  };
+}
+
+export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
+  return prisma.blogPost.findUnique({
+    where: { slug, status: "PUBLISHED" },
+  });
+}
+
+export async function getAllPostSlugs(): Promise<string[]> {
+  const posts = await prisma.blogPost.findMany({
+    where: { status: "PUBLISHED" },
+    select: { slug: true },
+  });
+  return posts.map((p) => p.slug);
+}
+
+export function parseRelatedTools(relatedToolsString: string | null): RelatedTool[] {
+  if (!relatedToolsString) return [];
+  
+  const slugs = relatedToolsString.split(",").map((s) => s.trim()).filter(Boolean);
+  return slugs
+    .map((slug) => TOOL_MAP[slug])
+    .filter((tool): tool is RelatedTool => tool !== undefined);
+}
+
+export function generateBlogPostMetadata(post: BlogPost): Metadata {
+  const url = `${SITE_URL}/blog/${post.slug}`;
+  const title = `${post.title} – ${SITE_NAME}`;
+  const description = post.metaDescription || post.title;
+
+  return {
+    title,
+    description,
+    keywords: post.keywords || undefined,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      siteName: SITE_NAME,
+      locale: "en_US",
+      type: "article",
+      publishedTime: post.publishedAt?.toISOString(),
+      images: post.coverImage ? [{ url: post.coverImage }] : undefined,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: post.coverImage ? [post.coverImage] : undefined,
+    },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-video-preview": -1,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+      },
+    },
+  };
+}
+
+export function generateBlogPostJsonLd(post: BlogPost) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    headline: post.title,
+    description: post.metaDescription || post.title,
+    image: post.coverImage || undefined,
+    datePublished: post.publishedAt?.toISOString(),
+    dateModified: post.updatedAt.toISOString(),
+    author: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: SITE_NAME,
+      url: SITE_URL,
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${SITE_URL}/blog/${post.slug}`,
+    },
+  };
+}
+
+export function generateBreadcrumbJsonLd(post: BlogPost) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: SITE_URL,
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Blog",
+        item: `${SITE_URL}/blog`,
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: post.title,
+        item: `${SITE_URL}/blog/${post.slug}`,
+      },
+    ],
+  };
+}

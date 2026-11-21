@@ -17,10 +17,7 @@ import {
 
 const navItems = [
   { href: "/", label: "Home", icon: HomeIcon },
-  { href: "#categories", label: "Tools", icon: Squares2X2Icon, onClick: () => {
-    const section = document.getElementById('all-tools');
-    section?.scrollIntoView({ behavior: 'smooth' });
-  }},
+  { href: "/blog", label: "Blog", icon: Squares2X2Icon },
   { href: "#search", label: "Search", icon: MagnifyingGlassIcon, onClick: () => {
     const searchInput = document.querySelector('input[type="search"]') as HTMLInputElement;
     searchInput?.focus();

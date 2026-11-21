@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -93,9 +93,9 @@ interface FileTransfer {
 
 const CHUNK_SIZE = 16 * 1024; // 16KB chunks
 
-export default function SharePage() {
+function SharePageContent() {
   const searchParams = useSearchParams();
-  const autoJoinRoom = searchParams?.get("room");
+  const autoJoinRoom = searchParams?.get("room") || null;
 
   const [mode, setMode] = useState<"create" | "join" | null>(null);
   const [roomCode, setRoomCode] = useState("");
@@ -630,5 +630,21 @@ export default function SharePage() {
         </div>
       </div>
     </DashboardLayout>
+  );
+}
+
+export default function SharePage() {
+  return (
+    <Suspense fallback={
+      <DashboardLayout>
+        <div className="max-w-4xl mx-auto">
+          <div className="flex items-center justify-center h-64">
+            <p className="text-slate-500">Loading...</p>
+          </div>
+        </div>
+      </DashboardLayout>
+    }>
+      <SharePageContent />
+    </Suspense>
   );
 }

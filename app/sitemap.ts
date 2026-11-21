@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next'
 import prisma from 'lib/prisma'
 
-export const revalidate = 3600
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://www.eprod.io'

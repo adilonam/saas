@@ -1,5 +1,5 @@
 import { redirect } from 'next/navigation';
 
-export default function FileShareRedirect() {
+export default async function FileShareRedirect() {
   redirect('/share');
 }

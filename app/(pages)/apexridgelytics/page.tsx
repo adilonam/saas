@@ -207,7 +207,7 @@ function GlassPanel({
 }
 
 export default function ApexRidgeLyticsPage() {
-  const { assertAccess, status } = useSubscribedToolAccess("/apexridgelytics");
+  const { assertAccess } = useSubscribedToolAccess("/apexridgelytics");
   const [projectBrief, setProjectBrief] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
@@ -524,14 +524,14 @@ export default function ApexRidgeLyticsPage() {
                       placeholder="Tell us about your app idea, timeline, and budget…"
                       value={projectBrief}
                       onChange={(e) => setProjectBrief(e.target.value)}
-                      disabled={isSubmitting || status === "loading"}
+                      disabled={isSubmitting}
                     />
                     <p className="mt-2 text-xs text-[#8b90a0]">
                       Sign in with an active subscription to submit your inquiry.
                     </p>
                     <Button
                       onClick={handleSubmit}
-                      disabled={isSubmitting || status === "loading"}
+                      disabled={isSubmitting}
                       className="mt-4 w-full gap-2 rounded-lg bg-[#adc6ff] text-[#002e69] hover:bg-[#4b8eff] hover:text-[#00285c] sm:w-auto"
                       size="lg"
                     >

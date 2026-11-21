@@ -94,7 +94,18 @@ Calculate ROI, analyze financial metrics, plan budgets, generate reports
 
 Most tools work entirely in the browser. Some AI-powered features require authentication.
 
+## Blog
+
+Visit our productivity blog at /blog for tips, guides, and tutorials on:
+- Productivity techniques and workflows
+- How to use specific tools effectively
+- PDF management best practices
+- Calculator guides and examples
+- AI tool tutorials
+- Business metrics and analytics guides
+
 ## Contact
 
 Website: https://www.eprod.io
+Blog: https://www.eprod.io/blog
 Support available through website contact form

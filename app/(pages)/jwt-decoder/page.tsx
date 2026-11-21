@@ -95,13 +95,7 @@ export default function JWTDecoderPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!token.trim()) return;
     setResultUnlocked(true);
   };

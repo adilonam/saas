@@ -41,13 +41,7 @@ export default function BMICalculatorPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bmi-calculator")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setResultUnlocked(true);
   };
 

@@ -26,13 +26,7 @@ export default function ReadingTimeEstimatorPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     const n = Number.parseInt(wpm, 10);
     setResult(estimateReadingTime(text, Number.isFinite(n) ? n : 200));
     setUnlocked(true);

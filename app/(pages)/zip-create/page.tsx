@@ -75,13 +75,7 @@ export default function ZipCreatePage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     if (selectedFiles.length === 0) {
       setError("Please select at least one file.");

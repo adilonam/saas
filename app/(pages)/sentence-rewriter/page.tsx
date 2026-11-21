@@ -34,13 +34,7 @@ export default function SentenceRewriterPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!text.trim()) {
       setError("Please enter text to rewrite.");
       return;

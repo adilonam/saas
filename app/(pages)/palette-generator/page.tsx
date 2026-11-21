@@ -27,13 +27,7 @@ export default function PaletteGeneratorPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     const trimmed = description.trim();
     if (!trimmed) {

@@ -33,13 +33,7 @@ export default function GeneratePDFPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     const trimmed = prompt.trim();
     if (!trimmed) {
@@ -85,13 +79,7 @@ export default function GeneratePDFPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     if (!latex.trim()) {
       setError("Generate LaTeX first, or paste LaTeX code.");

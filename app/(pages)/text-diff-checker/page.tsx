@@ -23,13 +23,7 @@ export default function TextDiffCheckerPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/text-diff-checker")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setDiff(lineBasedDiff(left, right));
     setUnlocked(true);
   };

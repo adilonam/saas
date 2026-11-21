@@ -27,13 +27,7 @@ export default function MetaDescriptionGeneratorPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!text.trim()) {
       setError("Please describe the page or paste key content.");
       return;

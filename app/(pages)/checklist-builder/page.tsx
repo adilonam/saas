@@ -23,13 +23,7 @@ export default function ChecklistBuilderPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/checklist-builder")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setCreated(true);
   };
 

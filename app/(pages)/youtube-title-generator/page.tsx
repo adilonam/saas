@@ -25,13 +25,7 @@ export default function YouTubeTitleGeneratorPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     if (!prompt.trim()) {
       setError("Please enter your video topic or description.");

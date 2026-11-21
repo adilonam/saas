@@ -62,13 +62,7 @@ export default function MergePDFPage() {
       return;
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     if (selectedFiles.length < 2) {
       setError("Please select at least 2 PDF files to merge");

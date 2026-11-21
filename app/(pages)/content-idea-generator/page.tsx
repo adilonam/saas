@@ -35,13 +35,7 @@ export default function ContentIdeaGeneratorPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!topic.trim()) {
       setError("Enter a topic.");
       return;

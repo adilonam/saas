@@ -24,13 +24,7 @@ export default function DiscountCalculatorPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/discount-calculator")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setResultUnlocked(true);
   };
 

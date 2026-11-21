@@ -29,13 +29,7 @@ export default function PasswordGeneratorPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/password-generator")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setGenError(null);
     try {
       setPassword(

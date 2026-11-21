@@ -25,13 +25,7 @@ export default function BulkZipBuilderPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bulk-zip-builder")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!files.length) {
       setError("Please choose at least one file.");
       return;

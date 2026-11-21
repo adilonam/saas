@@ -28,13 +28,7 @@ export default function MeetingAgendaBuilderPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/meeting-agenda-builder")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setBuilt(true);
   };
 

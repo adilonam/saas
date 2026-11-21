@@ -26,13 +26,7 @@ export default function SqlQueryGeneratorPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     if (!question.trim()) {
       setError("Please describe the query you need.");
       return;

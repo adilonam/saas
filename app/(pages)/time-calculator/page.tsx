@@ -76,13 +76,7 @@ export default function DurationCalculatorPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/time-calculator")}`);
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     setResultUnlocked(true);
   };
 

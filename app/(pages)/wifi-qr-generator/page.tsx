@@ -37,20 +37,14 @@ export default function WifiQrGeneratorPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = useCallback(async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/wifi-qr-generator")}`,
+  const handleSubmit = () => {
+    // All tools are now free - no auth required
+    setResultUnlocked(true);
+  };`,
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
 
     if (!ssid.trim()) {
       setError("Please enter the network name (SSID).");

@@ -27,13 +27,7 @@ export default function RemoveDuplicateLinesPage() {
       );
       return;
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // Subscription check removed - tool is free
     const before = text.split(/\r\n|\r|\n/).length;
     const result = removeDuplicateLines(text, { trimEach, ignoreCase });
     const after = result.split(/\r\n|\r|\n/).length;

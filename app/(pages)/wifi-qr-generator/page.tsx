@@ -65,7 +65,7 @@ export default function WifiQrGeneratorPage() {
       setError("Could not generate QR code. Please try again.");
       setQrDataUrl(null);
     }
-  }, [session, status, router, pathname, ssid, password, security, hidden]);
+  };
 
   return (
     <DashboardLayout>

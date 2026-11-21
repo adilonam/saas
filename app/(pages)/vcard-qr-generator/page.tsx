@@ -67,18 +67,7 @@ export default function VcardQrGeneratorPage() {
       setError("Could not generate QR code. Try shortening the content.");
       setQrDataUrl(null);
     }
-  }, [
-    session,
-    status,
-    router,
-    pathname,
-    fullName,
-    org,
-    title,
-    phone,
-    email,
-    url,
-  ]);
+  };
 
   return (
     <DashboardLayout>

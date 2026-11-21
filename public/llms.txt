@@ -1,0 +1,100 @@
+# eProd.io - Free Online Productivity Tools
+
+> https://www.eprod.io
+
+eProd provides free online tools for productivity, business, and personal use. No signup required for most tools.
+
+## About
+
+eProd is a comprehensive collection of free online utilities including:
+- PDF tools (sign, merge, convert, compress, OCR, translate)
+- Calculators (financial, trading, conversion, health)
+- Generators (content, code, design)
+- Converters (file formats, units, data)
+- AI-powered tools (summarization, text generation, image analysis)
+- Developer tools (regex, API formatters, code helpers)
+- Business tools (ROI calculators, marketing analytics)
+- Trading tools (position sizing, risk calculators, backtesting)
+
+## Top Tools
+
+### PDF Tools
+- Sign PDF: /sign-pdf - Digital signature for PDF documents
+- Merge PDF: /merge-pdf - Combine multiple PDFs into one
+- PDF to Word: /pdf-to-word - Convert PDF to editable Word document
+- Summarize PDF: /summarize-pdf - AI-powered PDF summarization
+- Compress PDF: /compress-pdf - Reduce PDF file size
+
+### Calculators
+- Age Calculator: /age-calculator - Calculate age from birthdate
+- BMI Calculator: /bmi-calculator - Body Mass Index calculator
+- Compound Interest Calculator: /compound-interest-calculator
+- Win Probability Calculator: /win-probability-calculator
+- ROI Calculator: /roi-calculator
+
+### Generators
+- YouTube Title Generator: /youtube-title-generator
+- Hashtag Generator: /hashtag-generator
+- Password Generator: /password-generator
+- QR Code Generator: /qr-generate
+- Acceptance Criteria Generator: /acceptance-criteria-generator
+
+### Content Tools
+- YouTube Title Length Checker: /youtube-title-length-checker - Verify title character limits
+- Keyword Density Checker: /keyword-density-checker
+- Meta Description Generator: /meta-description-generator
+- Text Summarizer: /text-summarizer
+
+### Developer Tools
+- Regex Tester: /regex-tester - Test regular expressions
+- JSON to CSV: /json-to-csv - Convert JSON to CSV format
+- API Response Formatter: /api-response-formatter
+- JWT Decoder: /jwt-decoder
+- SQL Formatter: /sql-formatter
+
+### Business & Marketing
+- CAC Calculator: /cac-calculator - Customer acquisition cost
+- ROAS Calculator: /roas-calculator - Return on ad spend
+- LTV Calculator: /ltv-calculator - Customer lifetime value
+- Ad ROI Calculator: /ad-roi-calculator
+
+### Trading Tools
+- Position Size Calculator: /position-size-calculator
+- Risk Reward Ratio Calculator: /risk-reward-ratio-calculator
+- Forex Position Size Calculator: /forex-position-size-calculator
+- Kelly Criterion Calculator: /kelly-criterion-calculator
+- Expectancy Calculator: /expectancy-calculator
+
+## Key Features
+
+All tools are:
+- Free to use (no payment required for basic features)
+- Browser-based (no installation needed)
+- Privacy-focused (client-side processing when possible)
+- Mobile-friendly (responsive design)
+
+## Use Cases
+
+### For Content Creators
+Check YouTube title lengths, generate hashtags, optimize meta descriptions, create content outlines
+
+### For Developers
+Format code, test regex patterns, convert data formats, decode tokens, generate documentation
+
+### For Marketers
+Calculate marketing metrics (CAC, LTV, ROAS), analyze campaign performance, optimize budgets
+
+### For Traders
+Calculate position sizes, analyze risk/reward, track performance, backtest strategies
+
+### For Business
+Calculate ROI, analyze financial metrics, plan budgets, generate reports
+
+## API
+
+Most tools work entirely in the browser. Some AI-powered features require authentication.
+
+## Contact
+
+Website: https://www.eprod.io
+Support available through website contact form

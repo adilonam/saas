@@ -6,22 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ShoppingCartIcon, PlusIcon, XMarkIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Black Friday Discount Calculator - Stack & Compare Deals | Eprod.io",
-  description: "Calculate stacked Black Friday discounts with multiple percentages, coupon codes, and tax. Compare up to 3 deals side-by-side to find the best price.",
-  alternates: {
-    canonical: "https://www.eprod.io/black-friday-discount-calculator",
-  },
-  openGraph: {
-    title: "Black Friday Discount Calculator - Stack & Compare Deals",
-    description: "Stack multiple discounts and compare Black Friday deals to find the best price.",
-    url: "https://www.eprod.io/black-friday-discount-calculator",
-    type: "website",
-  },
-};
 
 interface Deal {
   id: string;

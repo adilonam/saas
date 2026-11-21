@@ -4,22 +4,8 @@ import { useState, useEffect, useMemo } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { GiftIcon, ShareIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Christmas Countdown 2026 - Days Until Christmas | Eprod.io",
-  description: "Live countdown to Christmas Day 2026. See exactly how many days, hours, minutes and seconds until December 25th. Share your countdown with friends and family.",
-  alternates: {
-    canonical: "https://www.eprod.io/christmas-countdown",
-  },
-  openGraph: {
-    title: "Christmas Countdown 2026 - Days Until Christmas",
-    description: "Live countdown to Christmas Day 2026. Share your countdown with friends!",
-    url: "https://www.eprod.io/christmas-countdown",
-    type: "website",
-  },
-};
+import Head from "next/head";
 
 interface TimeRemaining {
   days: number;

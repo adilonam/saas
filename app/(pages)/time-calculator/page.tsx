@@ -8,15 +8,6 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { ClockIcon, CalculatorIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "Time Duration Calculator - Calculate Hours, Minutes & Days Between Two Times | Eprod.io",
-  description: "Free online calculator to find the exact duration between two dates and times. Get results in days, hours, minutes, and seconds. Perfect for time tracking, scheduling, and planning.",
-  alternates: {
-    canonical: "https://www.eprod.io/time-calculator",
-  },
-};
 
 function parseDate(value: string): Date | null {
   if (!value.trim()) return null;

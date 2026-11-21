@@ -5,22 +5,7 @@ import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { CalendarIcon, PrinterIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "2027 Calendar - Printable Year & Month Views | Eprod.io",
-  description: "Free printable 2027 calendar with yearly and monthly views. Choose Monday or Sunday week start. Download as PDF via browser print.",
-  alternates: {
-    canonical: "https://www.eprod.io/2027-calendar",
-  },
-  openGraph: {
-    title: "2027 Calendar - Printable Year & Month Views",
-    description: "Free printable 2027 calendar. Choose your week start and download as PDF.",
-    url: "https://www.eprod.io/2027-calendar",
-    type: "website",
-  },
-};
 
 const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 

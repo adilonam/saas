@@ -5,22 +5,7 @@ import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { SparklesIcon, ShareIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "New Year Countdown 2027 - Days Until New Year | Eprod.io",
-  description: "Live countdown to New Year's Day 2027 with timezone selector. See exactly how many days, hours, minutes and seconds until January 1st in your timezone.",
-  alternates: {
-    canonical: "https://www.eprod.io/new-year-countdown",
-  },
-  openGraph: {
-    title: "New Year Countdown 2027 - Days Until New Year",
-    description: "Live countdown to New Year's Day 2027 with timezone support. Share your countdown!",
-    url: "https://www.eprod.io/new-year-countdown",
-    type: "website",
-  },
-};
 
 interface TimeRemaining {
   days: number;

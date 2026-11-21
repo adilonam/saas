@@ -6,22 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GiftIcon, PlusIcon, XMarkIcon, SparklesIcon, ClipboardDocumentCheckIcon } from "@heroicons/react/24/outline";
-import type { Metadata } from "next";
 import Link from "next/link";
-
-export const metadata: Metadata = {
-  title: "Secret Santa Generator - Random Gift Exchange Pairs | Eprod.io",
-  description: "Generate random Secret Santa pairs with optional exclusions and budget settings. Perfect for holiday gift exchanges. No server storage - completely private.",
-  alternates: {
-    canonical: "https://www.eprod.io/secret-santa-generator",
-  },
-  openGraph: {
-    title: "Secret Santa Generator - Random Gift Exchange Pairs",
-    description: "Generate random Secret Santa pairs for your holiday gift exchange. Add exclusions and set budgets.",
-    url: "https://www.eprod.io/secret-santa-generator",
-    type: "website",
-  },
-};
 
 interface Participant {
   id: string;

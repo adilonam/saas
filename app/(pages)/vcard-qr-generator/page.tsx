@@ -44,14 +44,8 @@ export default function VcardQrGeneratorPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
+  const handleGenerate = () => {
     // All tools are now free - no auth required
-    setResultUnlocked(true);
-  };`,
-      );
-      return;
-    }
-    // Subscription check removed - tool is free
 
     if (!fullName.trim() && !email.trim() && !phone.trim()) {
       setError("Enter at least a name, phone, or email.");

@@ -48,14 +48,8 @@ export default function BarcodeGeneratorPage() {
   const [generated, setGenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
+  const handleSubmit = useCallback(async () => {
     // All tools are now free - no auth required
-    setResultUnlocked(true);
-  };`,
-      );
-      return;
-    }
-    // Subscription check removed - tool is free
 
     const v = format === "CODE128" || format === "CODE39" ? value.trim() : value.replace(/\s/g, "");
     const validationError = validateValue(format, v);

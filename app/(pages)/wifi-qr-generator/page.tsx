@@ -37,14 +37,8 @@ export default function WifiQrGeneratorPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = () => {
+  const handleGenerate = () => {
     // All tools are now free - no auth required
-    setResultUnlocked(true);
-  };`,
-      );
-      return;
-    }
-    // Subscription check removed - tool is free
 
     if (!ssid.trim()) {
       setError("Please enter the network name (SSID).");

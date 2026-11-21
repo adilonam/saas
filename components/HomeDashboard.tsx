@@ -2814,9 +2814,6 @@ export default function HomeDashboard() {
             <SparklesIcon className="size-5" />
           </div>
           <h3 className="text-xl font-bold">AI PDF Assistant</h3>
-          <span className="bg-indigo-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
-            Premium
-          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {aiTools.map(({ href, title, description, icon: Icon, iconBg, comingSoon }) =>
@@ -3172,9 +3169,6 @@ export default function HomeDashboard() {
             <PencilIcon className="size-5" />
           </div>
           <h3 className="text-xl font-bold">AI Writing & Social</h3>
-          <span className="bg-amber-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
-            Premium
-          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {aiWritingTools.map(({ href, title, description, icon: Icon, iconBg }) => (
@@ -3206,9 +3200,6 @@ export default function HomeDashboard() {
             <VideoCameraIcon className="size-5" />
           </div>
           <h3 className="text-xl font-bold">Creator tools</h3>
-          <span className="bg-rose-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
-            Premium
-          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {creatorTools.map(({ href, title, description, icon: Icon, iconBg }) => (
@@ -3240,9 +3231,6 @@ export default function HomeDashboard() {
             <TableCellsIcon className="size-5" />
           </div>
           <h3 className="text-xl font-bold">Workshop &amp; desk</h3>
-          <span className="bg-teal-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
-            Premium
-          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {workshopDeskTools.map(({ href, title, description, icon: Icon, iconBg }) => (
@@ -3539,9 +3527,6 @@ export default function HomeDashboard() {
             <PhotoIcon className="size-5" />
           </div>
           <h3 className="text-xl font-bold">AI Image Tool</h3>
-          <span className="bg-violet-600 text-white text-[10px] px-2.5 py-1 rounded-full font-bold uppercase tracking-widest ml-2">
-            Premium
-          </span>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {aiImageTools.map(({ href, title, description, icon: Icon, iconBg }) => (

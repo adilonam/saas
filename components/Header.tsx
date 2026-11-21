@@ -2,7 +2,6 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { useSession } from "next-auth/react";
 import { Menu } from "lucide-react";
 import {
   NavigationMenu,
@@ -19,17 +18,12 @@ import {
   DropdownMenuContent,
   DropdownMenuGroup,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { cn } from "components/lib/utils";
 import ThemeSwitch from "./ThemeSwitch";
-import UserMenu from "./UserMenu";
 
 export default function Header() {
-  const { data: session } = useSession();
-
   const navigationItems = [
     { title: "Sign PDF", href: "/sign-pdf" },
     { title: "Merge PDF", href: "/merge-pdf" },
@@ -71,37 +65,6 @@ export default function Header() {
           </div>
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center gap-2 sm:gap-4 shrink-0">
-            {session?.user ? (
-              <div className="ml-1 sm:ml-2 flex items-center gap-2">
-                <UserMenu user={session.user} />
-                <Button
-                  variant="outline"
-                  size="sm"
-                  asChild
-                  className="text-xs sm:text-sm"
-                >
-                  <Link href="/pricing">Pricing</Link>
-                </Button>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 sm:gap-3 ml-1 sm:ml-2">
-                <Button
-                  asChild
-                  variant="ghost"
-                  size="sm"
-                  className="text-xs sm:text-sm"
-                >
-                  <Link href="/signin">Sign In</Link>
-                </Button>
-                <Button
-                  asChild
-                  size="sm"
-                  className="text-xs sm:text-sm"
-                >
-                  <Link href="/signup">Sign Up</Link>
-                </Button>
-              </div>
-            )}
             <ThemeSwitch />
           </nav>
           {/* Mobile Menu */}
@@ -122,58 +85,6 @@ export default function Header() {
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                {session?.user ? (
-                  <DropdownMenuGroup>
-                    <DropdownMenuLabel>
-                      <div className="flex flex-col space-y-1">
-                        <p className="text-sm font-medium leading-none">
-                          {session.user.name || "User"}
-                        </p>
-                        {session.user.email && (
-                          <p className="text-xs leading-none text-muted-foreground">
-                            {session.user.email}
-                          </p>
-                        )}
-                        <p className="text-xs leading-none text-muted-foreground mt-1">
-                          {session.user.subscriptionExpiresAt &&
-                          new Date(session.user.subscriptionExpiresAt) > new Date()
-                            ? `Expires ${new Date(session.user.subscriptionExpiresAt).toLocaleDateString()}`
-                            : "No subscription"}
-                        </p>
-                      </div>
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href="/pricing" className="cursor-pointer w-full">
-                        Pricing
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem
-                      onClick={async () => {
-                        const { signOut } = await import("next-auth/react");
-                        await signOut({ callbackUrl: "/signin" });
-                      }}
-                      className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
-                    >
-                      Logout
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                ) : (
-                  <DropdownMenuGroup>
-                    <DropdownMenuItem asChild>
-                      <Link href="/signin" className="w-full">
-                        Sign In
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem asChild>
-                      <Link href="/signup" className="w-full">
-                        Sign Up
-                      </Link>
-                    </DropdownMenuItem>
-                  </DropdownMenuGroup>
-                )}
               </DropdownMenuContent>
             </DropdownMenu>
           </div>

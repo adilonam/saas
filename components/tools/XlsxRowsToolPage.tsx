@@ -53,26 +53,7 @@ export default function XlsxRowsToolPage({ mode }: { mode: XlsxMode }) {
   }, [rows]);
 
   const ensureAccess = (): boolean => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  const handleSubmit = async () => {
-    setError(null);
-    setRows([]);
-    setChartJson("");
-
-    if (!ensureAccess()) return;
+    // All tools are now free - no auth required
     if (!file) {
       setError("Please choose one .xlsx file.");
       return;

@@ -19,17 +19,9 @@ export default function ChecklistBuilderPage() {
   const items = useMemo(() => steps.split("\n").map((s) => s.trim()).filter(Boolean), [steps]);
 
   const handleCreate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/checklist-builder")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setCreated(true);
   };
 

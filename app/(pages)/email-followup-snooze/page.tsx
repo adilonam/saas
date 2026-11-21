@@ -47,36 +47,7 @@ export default function EmailFollowupSnoozePage() {
   const [hydrated, setHydrated] = useState(false);
 
   const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/email-followup-snooze")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      setItems(loadItems());
-      setHydrated(true);
-    });
-  }, []);
-
-  const sync = useCallback((next: SnoozeItem[]) => {
-    setItems(next);
-    saveItems(next);
-  }, []);
-
-  const handleOpen = () => {
-    if (!gate()) return;
+    // All tools are now free - no auth required
     setUnlocked(true);
   };
 

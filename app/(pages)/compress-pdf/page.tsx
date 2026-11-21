@@ -54,20 +54,11 @@ export default function CompressPDFPage() {
   };
 
   const handleCompress = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/compress-pdf")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!file) {
       setError("Please select a PDF first.");

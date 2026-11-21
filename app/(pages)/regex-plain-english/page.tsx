@@ -22,22 +22,7 @@ export default function RegexPlainEnglishPage() {
   const [error, setError] = useState<string | null>(null);
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/regex-plain-english")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  const handleExplain = async () => {
-    if (!ensureAuth()) return;
+    // All tools are now free - no auth required
     const p = pattern.trim();
     if (!p) {
       setError("Enter a regex pattern.");

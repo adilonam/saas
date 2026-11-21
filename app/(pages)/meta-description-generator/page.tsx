@@ -21,19 +21,10 @@ export default function MetaDescriptionGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/meta-description-generator")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     if (!text.trim()) {
       setError("Please describe the page or paste key content.");
       return;
@@ -58,7 +49,7 @@ export default function MetaDescriptionGeneratorPage() {
           data.code === "subscription_required" ||
           data.error === "Active subscription required"
         ) {
-          router.push("/pricing");
+          // All tools are now free - no auth required
           return;
         }
         setError(data.error || "Something went wrong.");

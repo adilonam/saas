@@ -134,44 +134,7 @@ export default function CsvRowsToolPage({ mode }: { mode: CsvMode }) {
   }, [rows]);
 
   const ensureAccess = (): boolean => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  const fetchRows = async (file: File): Promise<string[][]> => {
-    const formData = new FormData();
-    formData.append("file", file);
-    if (delimiter.trim()) formData.append("delimiter", delimiter.trim());
-    if (maxRows.trim()) formData.append("max_rows", maxRows.trim());
-
-    const res = await fetch("/api/csv-to-json", { method: "POST", body: formData });
-    const data = (await res.json().catch(() => null)) as CsvRowsResponse | CsvRowsErrorResponse | null;
-    if (!res.ok) {
-      const message =
-        (data as CsvRowsErrorResponse | null)?.error ||
-        (data as CsvRowsErrorResponse | null)?.detail ||
-        "Failed to process CSV";
-      throw new Error(message);
-    }
-    return hasRows(data) && Array.isArray(data.rows) ? data.rows : [];
-  };
-
-  const handleSubmit = async () => {
-    setError(null);
-    setRows([]);
-    setMarkdown("");
-
-    if (!ensureAccess()) return;
+    // All tools are now free - no auth required
     if (!hasFile) {
       setError("Please choose at least one .csv file.");
       return;

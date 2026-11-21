@@ -20,17 +20,9 @@ export default function DiscountCalculatorPage() {
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/discount-calculator")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setResultUnlocked(true);
   };
 

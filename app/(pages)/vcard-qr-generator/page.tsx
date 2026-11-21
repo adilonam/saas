@@ -45,19 +45,10 @@ export default function VcardQrGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/vcard-qr-generator")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!fullName.trim() && !email.trim() && !phone.trim()) {
       setError("Enter at least a name, phone, or email.");

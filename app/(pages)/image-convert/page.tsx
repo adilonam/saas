@@ -64,20 +64,11 @@ export default function ImageConvertPage() {
   };
 
   const handleConvert = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/image-convert")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!file) {
       setError("Please select an image first.");

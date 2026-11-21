@@ -39,19 +39,10 @@ export default function SaaSPricingSimulatorPage() {
   }, [mrr, customers, churnPct, arpu]);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/saas-pricing-simulator")}`
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setResultUnlocked(true);
   };
 

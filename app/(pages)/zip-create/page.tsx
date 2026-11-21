@@ -70,18 +70,11 @@ export default function ZipCreatePage() {
   };
 
   const handleZip = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/zip-create")}`);
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (selectedFiles.length === 0) {
       setError("Please select at least one file.");

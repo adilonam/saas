@@ -16,17 +16,9 @@ export default function ApiResponseFormatterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleFormat = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setError(null);
     try {
       const parsed = JSON.parse(rawInput);
@@ -37,17 +29,9 @@ export default function ApiResponseFormatterPage() {
   };
 
   const handleMinify = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setError(null);
     try {
       const parsed = JSON.parse(rawInput);

@@ -44,51 +44,7 @@ export default function CsvToJsonPage() {
   }, [response]);
 
   const validateBeforeConvert = (): boolean => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/csv-to-json")}`);
-      return false;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-
-    if (!file) {
-      setError("Please select a .csv file first.");
-      return false;
-    }
-
-    if (!file.name.toLowerCase().endsWith(".csv")) {
-      setError("Selected file must be a .csv");
-      return false;
-    }
-
-    const d = delimiter.trim();
-    if (d.length !== 1) {
-      setError("Delimiter must be a single character (e.g. , or ;).");
-      return false;
-    }
-
-    if (maxRows.trim()) {
-      const n = Number(maxRows.trim());
-      if (!Number.isFinite(n) || n < 0 || !Number.isInteger(n)) {
-        setError("Max rows must be a non-negative integer (or empty for default).");
-        return false;
-      }
-    }
-
-    return true;
-  };
-
-  const handleConvert = async () => {
-    setError(null);
-    setResponse(null);
-
-    if (!validateBeforeConvert()) return;
+    // All tools are now free - no auth required
 
     setIsConverting(true);
     try {

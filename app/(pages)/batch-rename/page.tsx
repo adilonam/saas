@@ -28,17 +28,10 @@ export default function BatchRenamePage() {
   }, [files, prefix, startAt]);
 
   const handleGenerate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/batch-rename")}`);
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setGenerated(true);
   };
 

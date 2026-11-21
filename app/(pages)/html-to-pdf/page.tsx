@@ -20,18 +20,11 @@ export default function HtmlToPdfPage() {
   const handleRender = async () => {
     setError(null);
 
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/html-to-pdf")}`);
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     const trimmed = html.trim();
     if (!trimmed) {

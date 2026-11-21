@@ -37,22 +37,11 @@ export default function PDFExtractImagesPage() {
   };
 
   const handleExtract = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(
-          pathname || "/pdf-extract-images"
-        )}`
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!file) {
       setError("Please select a PDF first.");
@@ -79,7 +68,7 @@ export default function PDFExtractImagesPage() {
           (errorData.error === "Insufficient tokens" ||
             errorData.error === "Active subscription required")
         ) {
-          router.push("/pricing");
+          // All tools are now free - no auth required
           return;
         }
         setError(errorData?.error || errorData?.detail || "Failed to extract images");

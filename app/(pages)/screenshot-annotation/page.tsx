@@ -158,19 +158,10 @@ export default function ScreenshotAnnotationPage() {
   };
 
   const handleDownload = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/screenshot-annotation")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     const c = canvasRef.current;
     if (!c) {
       setError("No image to download.");

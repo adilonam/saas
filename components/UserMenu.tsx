@@ -25,8 +25,7 @@ export default function UserMenu({ user }: UserMenuProps) {
     await signOut({ callbackUrl: "/signin" });
   };
 
-  const hasActiveSubscription =
-    user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) > new Date();
+  
 
   const renderSubtitle = () => {
     if (hasActiveSubscription) {

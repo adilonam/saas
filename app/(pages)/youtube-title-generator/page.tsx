@@ -18,20 +18,11 @@ export default function YouTubeTitleGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/youtube-title-generator")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!prompt.trim()) {
       setError("Please enter your video topic or description.");
@@ -53,7 +44,7 @@ export default function YouTubeTitleGeneratorPage() {
 
       if (!res.ok) {
         if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
+          // All tools are now free - no payment required
           return;
         }
         setError(data.error || "Failed to generate titles");

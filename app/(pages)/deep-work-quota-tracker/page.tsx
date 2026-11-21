@@ -54,52 +54,7 @@ export default function DeepWorkQuotaTrackerPage() {
   const weekKey = useMemo(() => isoWeekKey(new Date()), []);
 
   const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/deep-work-quota-tracker")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  useEffect(() => {
-    queueMicrotask(() => {
-      const s = readStore();
-      const current = isoWeekKey(new Date());
-      if (s && s.weekKey === current) {
-        setTarget(String(s.target));
-        setLogged(String(s.logged));
-      } else if (s && s.weekKey !== current) {
-        setTarget(String(s.target));
-        setLogged("0");
-        writeStore({ weekKey: current, target: s.target, logged: 0 });
-      }
-      setHydrated(true);
-    });
-  }, []);
-
-  const persist = useCallback(
-    (nextTarget: number, nextLogged: number) => {
-      const current = isoWeekKey(new Date());
-      writeStore({ weekKey: current, target: nextTarget, logged: nextLogged });
-    },
-    [],
-  );
-
-  const targetNum = Math.max(parseFloat(target) || 0, 0);
-  const loggedNum = Math.max(parseFloat(logged) || 0, 0);
-  const pct = targetNum > 0 ? Math.min(100, (loggedNum / targetNum) * 100) : 0;
-
-  const handleSaveTarget = () => {
-    if (!gate()) return;
+    // All tools are now free - no auth required
     setUnlocked(true);
     const t = Math.max(parseFloat(target) || 0, 0);
     const l = Math.max(parseFloat(logged) || 0, 0);

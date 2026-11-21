@@ -64,19 +64,10 @@ export default function SignPDFPage() {
 
   const downloadSignedPDF = async () => {
     // Check authentication — send to signup with callback so they can sign up or sign in and return here
-    if (status === "unauthenticated" || !session) {
-      const callbackUrl = pathname || "/sign-pdf";
-      router.push(`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-      return;
-    }
+    // All tools are now free - no auth required
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!pdfFile || !signatureImage || signaturePositions.length === 0) {
       alert("Please upload a PDF, create a signature, and place it on the PDF");
@@ -97,7 +88,7 @@ export default function SignPDFPage() {
           signCheckResponse.status === 403 &&
           errData.error === "Active subscription required"
         ) {
-          router.push("/pricing");
+          // All tools are now free - no payment required
           setIsLoading(false);
           return;
         }

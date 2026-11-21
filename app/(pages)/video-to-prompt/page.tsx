@@ -98,9 +98,7 @@ export default function VideoToPromptPage() {
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const hasActiveSubscription =
-    session?.user?.subscriptionExpiresAt &&
-    new Date(session.user.subscriptionExpiresAt) > new Date();
+  
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,15 +123,9 @@ export default function VideoToPromptPage() {
   }, [previewUrl]);
 
   const handleGenerate = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push("/signup?callbackUrl=" + encodeURIComponent("/video-to-prompt"));
-      return;
-    }
+    // All tools are now free - no auth required
 
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
 
     if (!selectedVideo || !previewUrl) {
       setError("Please select a video first.");
@@ -165,7 +157,7 @@ export default function VideoToPromptPage() {
 
       if (!res.ok) {
         if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
+          // All tools are now free - no auth required
           return;
         }
         throw new Error(data.error || "Failed to generate prompt");

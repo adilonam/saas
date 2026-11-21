@@ -46,19 +46,10 @@ export default function TimezoneMeetingPlannerPage() {
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/timezone-meeting-planner")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setResultUnlocked(true);
   };
 

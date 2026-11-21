@@ -70,17 +70,27 @@ export default function SignatureOptionsPanel({
             </button>
             <button
               type="button"
-              onClick={() => {}}
-              disabled
-              className="flex-1 flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 opacity-50 cursor-not-allowed relative"
+              onClick={() => onSignatureTypeChange("digital")}
+              className={`flex-1 flex flex-col items-center gap-1 sm:gap-2 p-3 sm:p-4 rounded-xl border-2 transition ${
+                signatureType === "digital"
+                  ? "border-dashboard-primary bg-dashboard-primary/10"
+                  : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+              }`}
             >
-              <div className="absolute top-1 right-1 sm:top-2 sm:right-2">
-                <span className="text-[10px] sm:text-xs bg-amber-500 text-white px-1.5 py-0.5 rounded-full font-medium">
-                  Premium
-                </span>
-              </div>
-              <ShieldCheckIcon className="size-5 sm:size-6 text-slate-400" />
-              <span className="text-xs sm:text-sm font-medium text-slate-600 dark:text-slate-400">
+              <ShieldCheckIcon
+                className={`size-5 sm:size-6 ${
+                  signatureType === "digital"
+                    ? "text-dashboard-primary"
+                    : "text-slate-400"
+                }`}
+              />
+              <span
+                className={`text-xs sm:text-sm font-medium ${
+                  signatureType === "digital"
+                    ? "text-dashboard-primary"
+                    : "text-slate-600 dark:text-slate-400"
+                }`}
+              >
                 Digital signature
               </span>
             </button>

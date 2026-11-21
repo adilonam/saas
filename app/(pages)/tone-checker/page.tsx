@@ -37,22 +37,7 @@ export default function ToneCheckerPage() {
   }, [text]);
 
   const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/tone-checker")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  const handleHeuristics = () => {
-    if (!gate()) return;
+    // All tools are now free - no auth required
     setUnlocked(true);
     setAiResult(null);
     setError(null);

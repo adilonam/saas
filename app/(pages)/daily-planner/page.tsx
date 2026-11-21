@@ -23,17 +23,9 @@ export default function DailyPlannerPage() {
   }, [tasks]);
 
   const handleGenerate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/daily-planner")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setGenerated(true);
   };
 

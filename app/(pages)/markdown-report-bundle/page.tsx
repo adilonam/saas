@@ -25,17 +25,9 @@ export default function MarkdownReportBundlePage() {
   const handleBuild = async () => {
     setError(null);
 
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/markdown-report-bundle")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     if (!segments.length) {
       setError("Please add at least one markdown report.");
       return;

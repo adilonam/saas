@@ -18,17 +18,9 @@ export default function WordCounterPage() {
   const [stats, setStats] = useState<ReturnType<typeof countTextStats> | null>(null);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/word-counter")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    // All tools are now free - no auth required
+    
+    
     setStats(countTextStats(text));
     setUnlocked(true);
   };

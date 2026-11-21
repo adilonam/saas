@@ -26,19 +26,10 @@ export default function TextCaseConverterPage() {
   const [output, setOutput] = useState("");
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/text-case-converter")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setOutput(convertTextCase(text, mode));
     setUnlocked(true);
   };

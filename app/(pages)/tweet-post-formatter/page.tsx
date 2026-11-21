@@ -18,20 +18,11 @@ export default function TweetPostFormatterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/tweet-post-formatter")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!prompt.trim()) {
       setError("Please enter the content to format.");
@@ -53,7 +44,7 @@ export default function TweetPostFormatterPage() {
 
       if (!res.ok) {
         if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
+          // All tools are now free - no auth required
           return;
         }
         setError(data.error || "Failed to format post");

@@ -24,22 +24,7 @@ export default function ActionItemsExtractorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/action-items-extractor")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
-  const handleExtract = async () => {
-    if (!gate()) return;
+    // All tools are now free - no auth required
     setError(null);
     setUnlocked(true);
 

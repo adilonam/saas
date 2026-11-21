@@ -41,20 +41,11 @@ export default function AiTextToolPage({
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     const trimmed = text.trim();
     if (!trimmed) {
@@ -80,7 +71,7 @@ export default function AiTextToolPage({
           data.code === "subscription_required" ||
           data.error === "Active subscription required"
         ) {
-          router.push("/pricing");
+          // All tools are now free - no auth required
           return;
         }
         setError(data.error || "Something went wrong.");

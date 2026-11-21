@@ -25,18 +25,10 @@ export default function PdfToTextPage() {
     setText("");
     setTotalPages(null);
 
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-text")}`);
-      return;
-    }
+    // All tools are now free - no auth required
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!file) {
       setError("Please select a PDF file.");

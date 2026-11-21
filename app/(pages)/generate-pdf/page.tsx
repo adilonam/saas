@@ -26,20 +26,11 @@ export default function GeneratePDFPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateLatex = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/generate-pdf")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     const trimmed = prompt.trim();
     if (!trimmed) {
@@ -78,20 +69,11 @@ export default function GeneratePDFPage() {
   };
 
   const handleGetPdf = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/generate-pdf")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!latex.trim()) {
       setError("Generate LaTeX first, or paste LaTeX code.");

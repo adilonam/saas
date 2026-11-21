@@ -68,19 +68,10 @@ export default function TimezoneOverlapCheckerPage() {
   }, [unlocked, dateYmd, participants]);
 
   const handleSubmit = useCallback(() => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/timezone-overlap-checker")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setUnlocked(true);
   }, [session, status, router, pathname]);
 

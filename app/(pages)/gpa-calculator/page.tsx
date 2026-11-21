@@ -38,17 +38,10 @@ export default function GPACalculatorPage() {
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/gpa-calculator")}`);
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setResultUnlocked(true);
   };
 

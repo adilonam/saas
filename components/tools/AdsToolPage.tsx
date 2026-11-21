@@ -42,17 +42,10 @@ export default function AdsToolPage({ slug }: Props) {
     config?.inputs.every((input) => (parseFloat(values[input.key]) || 0) > 0) ?? false;
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || `/${slug}`)}`);
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     setResultUnlocked(true);
   };
 

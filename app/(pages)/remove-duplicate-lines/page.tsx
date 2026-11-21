@@ -21,19 +21,10 @@ export default function RemoveDuplicateLinesPage() {
   const [removed, setRemoved] = useState(0);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/remove-duplicate-lines")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     const before = text.split(/\r\n|\r|\n/).length;
     const result = removeDuplicateLines(text, { trimEach, ignoreCase });
     const after = result.split(/\r\n|\r|\n/).length;

@@ -55,20 +55,11 @@ export default function MergePDFPage() {
   };
 
   const handleMerge = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/merge-pdf")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (selectedFiles.length < 2) {
       setError("Please select at least 2 PDF files to merge");
@@ -97,7 +88,7 @@ export default function MergePDFPage() {
             (errorData.error === "Insufficient tokens" ||
               errorData.error === "Active subscription required")
           ) {
-            router.push("/pricing");
+            // All tools are now free - no auth required
             setIsMerging(false);
             return;
           }

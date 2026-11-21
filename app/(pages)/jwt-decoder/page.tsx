@@ -89,19 +89,10 @@ export default function JWTDecoderPage() {
   const hasResult = decoded.header !== null || decoded.payload !== null;
 
   const handleDecode = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/jwt-decoder")}`
-      );
-      return;
+    // All tools are now free - no auth required
     }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
     if (!token.trim()) return;
     setResultUnlocked(true);
   };

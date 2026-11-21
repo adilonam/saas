@@ -59,20 +59,11 @@ export default function PDFToWordPage() {
   };
 
   const handleConvert = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-word")}`,
-      );
-      return;
+    // All tools are now free - no auth required
     }
 
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
+    
+    
 
     if (!selectedFile) {
       setError("Please select a PDF file to convert.");
@@ -99,7 +90,7 @@ export default function PDFToWordPage() {
             (errorData.error === "Active subscription required" ||
               errorData.error === "Insufficient tokens")
           ) {
-            router.push("/pricing");
+            // All tools are now free - no payment required
             setIsConverting(false);
             return;
           }

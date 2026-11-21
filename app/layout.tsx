@@ -13,9 +13,57 @@ const interTight = Inter_Tight({
 });
 
 export const metadata: Metadata = {
-  title: "eProd – Productivity Tools Online",
+  metadataBase: new URL('https://www.eprod.io'),
+  title: {
+    default: "eProd – Free Online Productivity Tools & Calculators",
+    template: "%s | eProd",
+  },
   description:
-    "Productivity online tools for images, PDFs, and AI: PDF signing, merge, convert to Word, AI summarization, image to prompt, and more. eprod.io",
+    "Free online productivity tools: PDF tools (sign, merge, convert), calculators, AI-powered generators, converters, and developer utilities. 500+ free tools for work and personal use.",
+  keywords: [
+    "online tools",
+    "free calculator",
+    "pdf tools",
+    "productivity tools",
+    "online converter",
+    "ai tools",
+    "free utilities",
+  ],
+  authors: [{ name: "eProd" }],
+  creator: "eProd",
+  publisher: "eProd",
+  alternates: {
+    canonical: "https://www.eprod.io",
+  },
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "https://www.eprod.io",
+    siteName: "eProd",
+    title: "eProd – Free Online Productivity Tools & Calculators",
+    description:
+      "Free online productivity tools: PDF tools, calculators, AI-powered generators, converters, and developer utilities. 500+ free tools for work and personal use.",
+  },
+  twitter: {
+    card: "summary",
+    title: "eProd – Free Online Productivity Tools",
+    description:
+      "Free online productivity tools: PDF tools, calculators, AI-powered generators, and more. 500+ free tools.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION,
+  },
 };
 
 export default function RootLayout({
@@ -87,6 +135,20 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
       <body
         className={`${interTight.variable} font-sans bg-white dark:bg-black min-h-screen`}
       >
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "eProd",
+              url: "https://www.eprod.io",
+              logo: "https://www.eprod.io/images/logo/apple-touch-icon.png",
+              description: "Free online productivity tools for work and personal use",
+              sameAs: [],
+            }),
+          }}
+        />
         {/* Google Tag Manager (noscript) */}
         {gtmId && (
           <noscript>

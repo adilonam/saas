@@ -39,4 +39,4 @@ prisma/generated
 ssh-key/
 
 
-.pnpm-store/
+.pnpm-store/*tsbuildinfo

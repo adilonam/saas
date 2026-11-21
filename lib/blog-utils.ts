@@ -79,39 +79,59 @@ export async function getPublishedPosts(page = 1, pageSize = 12): Promise<{
   totalPages: number;
   totalPosts: number;
 }> {
-  const skip = (page - 1) * pageSize;
+  try {
+    const skip = (page - 1) * pageSize;
 
-  const [posts, totalPosts] = await Promise.all([
-    prisma.blogPost.findMany({
-      where: { status: "PUBLISHED" },
-      orderBy: { publishedAt: "desc" },
-      skip,
-      take: pageSize,
-    }),
-    prisma.blogPost.count({
-      where: { status: "PUBLISHED" },
-    }),
-  ]);
+    const [posts, totalPosts] = await Promise.all([
+      prisma.blogPost.findMany({
+        where: { status: "PUBLISHED" },
+        orderBy: { publishedAt: "desc" },
+        skip,
+        take: pageSize,
+      }),
+      prisma.blogPost.count({
+        where: { status: "PUBLISHED" },
+      }),
+    ]);
 
-  return {
-    posts,
-    totalPages: Math.ceil(totalPosts / pageSize),
-    totalPosts,
-  };
+    return {
+      posts,
+      totalPages: Math.ceil(totalPosts / pageSize),
+      totalPosts,
+    };
+  } catch (error) {
+    console.error("Error fetching blog posts:", error);
+    // Return empty state if table doesn't exist yet
+    return {
+      posts: [],
+      totalPages: 0,
+      totalPosts: 0,
+    };
+  }
 }
 
 export async function getPostBySlug(slug: string): Promise<BlogPost | null> {
-  return prisma.blogPost.findUnique({
-    where: { slug, status: "PUBLISHED" },
-  });
+  try {
+    return await prisma.blogPost.findUnique({
+      where: { slug, status: "PUBLISHED" },
+    });
+  } catch (error) {
+    console.error("Error fetching blog post:", error);
+    return null;
+  }
 }
 
 export async function getAllPostSlugs(): Promise<string[]> {
-  const posts = await prisma.blogPost.findMany({
-    where: { status: "PUBLISHED" },
-    select: { slug: true },
-  });
-  return posts.map((p) => p.slug);
+  try {
+    const posts = await prisma.blogPost.findMany({
+      where: { status: "PUBLISHED" },
+      select: { slug: true },
+    });
+    return posts.map((p) => p.slug);
+  } catch (error) {
+    console.error("Error fetching blog post slugs:", error);
+    return [];
+  }
 }
 
 export function parseRelatedTools(relatedToolsString: string | null): RelatedTool[] {

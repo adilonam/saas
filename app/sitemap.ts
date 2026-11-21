@@ -1684,6 +1684,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }
   } catch (error) {
     console.error('Error fetching blog posts for sitemap:', error)
+    // Gracefully handle case where BlogPost table doesn't exist yet
   }
 
   return routes

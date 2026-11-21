@@ -46,22 +46,7 @@ export default function ColdEmailOpenerLibraryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/cold-email-opener-library")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
+  // Auth removed - all tools now free
 
   const handleOpen = () => {
     if (!gate()) return;

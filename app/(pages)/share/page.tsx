@@ -126,7 +126,9 @@ function SharePageContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [textInput, setTextInput] = useState("");
   const [qrUrl, setQrUrl] = useState("");
-  const [wsUrl, setWsUrl] = useState("");
+  const wsUrl = typeof window !== 'undefined' 
+    ? (process.env.NEXT_PUBLIC_SHARE_WS_URL ?? 'wss://saas-backend-326a81a69453.herokuapp.com/ws/share/ws')
+    : '';
   const [usingRelay, setUsingRelay] = useState(false);
   const [receivedFiles, setReceivedFiles] = useState<ReceivedFile[]>([]);
   const [sendProgress, setSendProgress] = useState<{fileName: string, progress: number} | null>(null);
@@ -143,19 +145,6 @@ function SharePageContent() {
   const isInitiatorRef = useRef(false);
   const webrtcTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    fetch('/api/config/share-ws')
-      .then(res => res.json())
-      .then(data => {
-        if (data.wsUrl) {
-          setWsUrl(data.wsUrl);
-        }
-      })
-      .catch(err => {
-        console.error('Failed to fetch WS config:', err);
-      });
-  }, []);
 
   useEffect(() => {
     if (autoJoinRoom && !mode && wsUrl) {

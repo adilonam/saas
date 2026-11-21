@@ -57,6 +57,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/jsbarcode": "^3.11.4",
     "@types/node": "^22.10.5",

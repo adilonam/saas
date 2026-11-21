@@ -55,6 +55,7 @@ const SEARCHABLE_FEATURES = [
   { title: "Secret Santa Generator", href: "/secret-santa-generator", keywords: "secret santa generator gift exchange pairs exclusions budget holiday christmas" },
   { title: "Black Friday Discount Calculator", href: "/black-friday-discount-calculator", keywords: "black friday discount calculator stack deals compare percentage coupon tax shopping" },
   { title: "2027 Calendar", href: "/2027-calendar", keywords: "2027 calendar printable year month view pdf download monday sunday week" },
+  { title: "Secure File Sharing", href: "/share", keywords: "file share send transfer p2p peer encrypted secure text files room code qr e2e encryption" },
   { title: "Picker Wheel", href: "/picker-wheel", keywords: "picker wheel spinner random choice weighted spin" },
   { title: "Win Probability Calculator", href: "/win-probability-calculator", keywords: "win probability win rate odds implied probability calculator" },
   { title: "Compound Interest Calculator", href: "/compound-interest-calculator", keywords: "compound interest future value savings calculator" },

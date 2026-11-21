@@ -9,27 +9,7 @@ const SYSTEM = `You polish LinkedIn headlines. The user sends a draft headline (
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscriptionExpiresAt: true },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    const hasActive =
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date();
-    if (!hasActive) {
-      return NextResponse.json(
-        { error: "Active subscription required", code: "subscription_required" },
-        { status: 403 },
-      );
-    }
+    // Auth removed - API is now public for all users
 
     const apiKey = process.env.OPENAI_API_KEY;
     if (!apiKey) {

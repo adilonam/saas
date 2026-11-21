@@ -21,10 +21,17 @@ export default function BulkZipBuilderPage() {
   const handleBuild = async () => {
     setError(null);
 
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bulk-zip-builder")}`);
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!files.length) {
       setError("Please choose at least one file.");
       return;

@@ -41,11 +41,20 @@ export default function PDFMetadataPage() {
   };
 
   const handleExtract = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-metadata")}`
+      );
+      return;
     }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!file) {
       setError("Please select a PDF first.");
@@ -72,7 +81,7 @@ export default function PDFMetadataPage() {
           (errorData.error === "Insufficient tokens" ||
             errorData.error === "Active subscription required")
         ) {
-          // All tools are now free - no auth required
+          router.push("/pricing");
           return;
         }
         setError(errorData?.error || errorData?.detail || "Failed to extract metadata");

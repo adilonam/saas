@@ -125,7 +125,7 @@ export default function PersonalDashboardPage() {
       const data = await res.json();
       if (!res.ok) {
         if (data.code === "subscription_required") {
-          // All tools are now free - no auth required
+          router.push("/pricing");
           return;
         }
         return;

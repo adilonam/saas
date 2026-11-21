@@ -30,7 +30,24 @@ export default function MeetingAgendaTimerPage() {
   const [secondsLeft, setSecondsLeft] = useState(0);
 
   const gate = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/meeting-agenda-timer")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const currentMinutesStr = topics[activeIndex]?.minutes ?? "1";
+
+  useEffect(() => {
+    if (!unlocked) return;
     const m = Number.parseInt(currentMinutesStr, 10) || 1;
     setSecondsLeft(Math.max(1, m * 60));
   }, [activeIndex, unlocked, currentMinutesStr]);

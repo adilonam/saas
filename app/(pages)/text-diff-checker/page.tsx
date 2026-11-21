@@ -19,10 +19,17 @@ export default function TextDiffCheckerPage() {
   const [diff, setDiff] = useState<DiffLine[]>([]);
 
   const handleSubmit = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/text-diff-checker")}`);
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setDiff(lineBasedDiff(left, right));
     setUnlocked(true);
   };

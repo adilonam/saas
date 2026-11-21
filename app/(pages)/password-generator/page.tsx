@@ -25,10 +25,17 @@ export default function PasswordGeneratorPage() {
   const [copied, setCopied] = useState(false);
 
   const handleSubmit = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/password-generator")}`);
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setGenError(null);
     try {
       setPassword(

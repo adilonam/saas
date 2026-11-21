@@ -57,9 +57,17 @@ export default function JsonToCsvPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleConvert = () => {
-    // All tools are now free - no auth required
-    
-    
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/json-to-csv")}`);
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setError(null);
     try {
       const csv = jsonToCsv(jsonInput);

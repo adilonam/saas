@@ -20,10 +20,19 @@ export default function SqlQueryGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/sql-query-generator")}`,
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!question.trim()) {
       setError("Please describe the query you need.");
       return;
@@ -48,7 +57,7 @@ export default function SqlQueryGeneratorPage() {
           data.code === "subscription_required" ||
           data.error === "Active subscription required"
         ) {
-          // All tools are now free - no payment required
+          router.push("/pricing");
           return;
         }
         setError(data.error || "Something went wrong.");

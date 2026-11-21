@@ -19,7 +19,23 @@ export default function ZipNotesPackagerPage() {
   const [error, setError] = useState<string | null>(null);
 
   const ensureAccess = (): boolean => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/zip-notes-packager")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async () => {
+    setError(null);
+    if (!ensureAccess()) return;
 
     const noteChunks = notesRaw
       .split("\n---\n")

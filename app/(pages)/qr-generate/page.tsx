@@ -30,11 +30,20 @@ export default function QrGeneratePage() {
   }, [resultUrl]);
 
   const handleGenerate = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/qr-generate")}`,
+      );
+      return;
     }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     const trimmed = text.trim();
     if (!trimmed) {

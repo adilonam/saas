@@ -18,11 +18,20 @@ export default function AIResumeBulletPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/ai-resume-bullet")}`,
+      );
+      return;
     }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!prompt.trim()) {
       setError("Please enter your role and experience details.");
@@ -44,7 +53,7 @@ export default function AIResumeBulletPage() {
 
       if (!res.ok) {
         if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          // All tools are now free - no auth required
+          router.push("/pricing");
           return;
         }
         setError(data.error || "Failed to generate resume bullets");

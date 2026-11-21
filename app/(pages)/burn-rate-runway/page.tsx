@@ -19,7 +19,96 @@ export default function BurnRateRunwayPage() {
   const [unlocked, setUnlocked] = useState(false);
 
   const gate = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/burn-rate-runway")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const result = useMemo(() => {
+    const balance = parseFloat(cash) || 0;
+    const exp = parseFloat(monthlyExpenses) || 0;
+    const inc = parseFloat(monthlyIncome) || 0;
+    const netBurn = exp - inc;
+    if (balance < 0) return { kind: "invalid" as const };
+    if (netBurn <= 0) {
+      return {
+        kind: "surplus" as const,
+        netBurn,
+        monthlyNet: inc - exp,
+      };
+    }
+    const months = balance / netBurn;
+    return { kind: "runway" as const, netBurn, months };
+  }, [cash, monthlyExpenses, monthlyIncome]);
+
+  return (
+    <DashboardLayout>
+      <div className="max-w-2xl mx-auto">
+        <div className="flex items-center gap-3 mb-8">
+          <div className="size-12 rounded-2xl bg-rose-100 dark:bg-rose-900/30 flex items-center justify-center text-rose-600">
+            <PresentationChartLineIcon className="size-7" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight">Burn rate runway</h1>
+            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
+              Cash ÷ average monthly net burn (expenses minus income). Planning only.
+            </p>
+          </div>
+        </div>
+
+        <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 p-6 sm:p-8 space-y-6">
+          <div className="space-y-2">
+            <Label htmlFor="cash">Cash on hand</Label>
+            <Input
+              id="cash"
+              type="number"
+              min="0"
+              step="100"
+              placeholder="e.g. 24000"
+              value={cash}
+              onChange={(e) => setCash(e.target.value)}
+              className="rounded-xl h-11"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="exp">Average monthly expenses</Label>
+            <Input
+              id="exp"
+              type="number"
+              min="0"
+              step="100"
+              placeholder="e.g. 6500"
+              value={monthlyExpenses}
+              onChange={(e) => setMonthlyExpenses(e.target.value)}
+              className="rounded-xl h-11"
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="inc">Average monthly income (optional)</Label>
+            <Input
+              id="inc"
+              type="number"
+              min="0"
+              step="100"
+              placeholder="e.g. 4000 — leave 0 if none"
+              value={monthlyIncome}
+              onChange={(e) => setMonthlyIncome(e.target.value)}
+              className="rounded-xl h-11"
+            />
+          </div>
+
+          <Button
+            onClick={() => {
+              if (!gate()) return;
               setUnlocked(true);
             }}
             className="gap-2"

@@ -21,10 +21,19 @@ export default function AIColdOutreachPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/ai-cold-outreach")}`
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     const trimmed = prompt.trim();
     if (!trimmed) {

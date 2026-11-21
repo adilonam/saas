@@ -35,10 +35,17 @@ export default function SubjectLineAbLabPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleOpen = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/subject-line-ab-lab")}`);
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setUnlocked(true);
   };
 

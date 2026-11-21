@@ -28,10 +28,19 @@ export default function SentenceRewriterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/sentence-rewriter")}`,
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!text.trim()) {
       setError("Please enter text to rewrite.");
       return;
@@ -53,7 +62,7 @@ export default function SentenceRewriterPage() {
           data.code === "subscription_required" ||
           data.error === "Active subscription required"
         ) {
-          // All tools are now free - no payment required
+          router.push("/pricing");
           return;
         }
         setError(data.error || "Something went wrong.");

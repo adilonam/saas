@@ -62,10 +62,18 @@ export default function SummarizePDFPage() {
   };
 
   const handleSummarize = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push("/signup?callbackUrl=" + encodeURIComponent("/summarize-pdf"));
+      return;
+    }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (selectedFiles.length === 0) {
       setError("Please select at least one PDF file");
@@ -95,7 +103,7 @@ export default function SummarizePDFPage() {
             (errorData.error === "Insufficient tokens" ||
               errorData.error === "Active subscription required")
           ) {
-            // All tools are now free - no auth required
+            router.push("/pricing");
             setIsSummarizing(false);
             return;
           }

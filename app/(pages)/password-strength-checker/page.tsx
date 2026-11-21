@@ -19,10 +19,19 @@ export default function PasswordStrengthCheckerPage() {
   const [result, setResult] = useState<ReturnType<typeof analyzePasswordStrength> | null>(null);
 
   const handleSubmit = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/password-strength-checker")}`,
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setResult(analyzePasswordStrength(password));
     setUnlocked(true);
   };

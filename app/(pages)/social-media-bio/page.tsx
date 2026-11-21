@@ -34,10 +34,19 @@ export default function SocialMediaBioPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/social-media-bio")}`,
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!name.trim() && !niche.trim()) {
       setError("Enter your name or niche.");
       return;
@@ -57,7 +66,7 @@ export default function SocialMediaBioPage() {
 
       if (!res.ok) {
         if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          // All tools are now free - no payment required
+          router.push("/pricing");
           return;
         }
         setError(data.error || "Failed to generate bios");

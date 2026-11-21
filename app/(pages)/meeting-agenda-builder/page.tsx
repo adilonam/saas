@@ -24,10 +24,17 @@ export default function MeetingAgendaBuilderPage() {
   }, [topics, duration]);
 
   const handleBuild = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/meeting-agenda-builder")}`);
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setBuilt(true);
   };
 

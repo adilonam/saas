@@ -35,7 +35,22 @@ export default function ConventionalCommitHelperPage() {
   }, [type, scope, breaking, subject, body, footer]);
 
   const ensureAuth = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/conventional-commit-helper")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const handleCopy = () => {
+    if (!ensureAuth() || !message) return;
     void navigator.clipboard.writeText(message);
   };
 

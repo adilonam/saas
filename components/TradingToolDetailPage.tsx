@@ -31,11 +31,18 @@ export default function TradingToolDetailPage({ pathSegment: pathSegmentProp }: 
   const tool = getTradingToolByPath(pathSegment);
 
   const handleRun = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/trading-tools")}`);
+      return;
     }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     setResultUnlocked(true);
   };

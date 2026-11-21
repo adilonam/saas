@@ -47,11 +47,20 @@ export default function ImageToPDFPage() {
   };
 
   const handleConvert = async () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/image-to-pdf")}`
+      );
+      return;
     }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!file) {
       setError("Please select an image first.");
@@ -85,7 +94,7 @@ export default function ImageToPDFPage() {
           (errorData.error === "Insufficient tokens" ||
             errorData.error === "Active subscription required")
         ) {
-          // All tools are now free - no payment required
+          router.push("/pricing");
           return;
         }
         setError(errorData?.error || errorData?.detail || "Failed to convert image to PDF");

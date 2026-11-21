@@ -20,10 +20,19 @@ export default function ReadingTimeEstimatorPage() {
   const [result, setResult] = useState<ReturnType<typeof estimateReadingTime> | null>(null);
 
   const handleSubmit = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/reading-time-estimator")}`,
+      );
+      return;
     }
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     const n = Number.parseInt(wpm, 10);
     setResult(estimateReadingTime(text, Number.isFinite(n) ? n : 200));
     setUnlocked(true);

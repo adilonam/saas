@@ -20,10 +20,18 @@ export default function MarkdownToPdfPage() {
   const handleRender = async () => {
     setError(null);
 
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/markdown-to-pdf")}`);
+      return;
+    }
 
-    
-    
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     const trimmed = markdown.trim();
     if (!trimmed) {

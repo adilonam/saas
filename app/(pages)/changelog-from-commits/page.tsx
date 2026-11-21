@@ -27,7 +27,22 @@ export default function ChangelogFromCommitsPage() {
   const [parsedCount, setParsedCount] = useState<number | null>(null);
 
   const ensureAuth = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/changelog-from-commits")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const handleGenerate = () => {
+    if (!ensureAuth()) return;
     setError(null);
     const commits = parseConventionalBlock(input);
     if (commits.length === 0) {

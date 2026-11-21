@@ -20,7 +20,22 @@ export default function ReleaseNotesPolisherPage() {
   const [error, setError] = useState<string | null>(null);
 
   const ensureAuth = () => {
-    // All tools are now free - no auth required
+    if (status === "unauthenticated" || !session) {
+      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/release-notes-polisher")}`);
+      return false;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return false;
+    }
+    return true;
+  };
+
+  const handlePolish = async () => {
+    if (!ensureAuth()) return;
     const t = draft.trim();
     if (!t) {
       setError("Paste release notes first.");

@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import { MagnifyingGlassIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { Input } from "@/components/ui/input";
 import { useIsMobile } from "components/hooks/use-mobile";
-import { TRADING_TOOLS } from "@/lib/trading-tools";
 import { getTradingCalculatorSearchEntries } from "components/tradingToolsConfig";
 import { ADS_TOOLS } from "components/tools/adsToolsConfig";
 
@@ -36,8 +35,6 @@ const SEARCHABLE_FEATURES = [
   { title: "Image Batch to PDF", href: "/image-batch-to-pdf", keywords: "image batch to pdf zip create" },
   { title: "Markdown to Branded PDF", href: "/markdown-brand-pdf", keywords: "markdown branded pdf brand report" },
   { title: "HTML Invoice to PDF", href: "/html-invoice-to-pdf", keywords: "html invoice to pdf invoice generator" },
-  { title: "Trading Signal", href: "/trading-signal", keywords: "trading signal chart analyze bitcoin crypto entry stop loss take profit" },
-  { title: "Forex Trading Web App", href: "/forex-trading-app", keywords: "forex trading web app buy purchase license platform demo video 499" },
   { title: "Sign PDF", href: "/sign-pdf", keywords: "sign signature sign pdf" },
   { title: "Merge PDFs", href: "/merge-pdf", keywords: "merge combine pdf multiple" },
   { title: "Convert PDF", href: "/pdf-to-word", keywords: "convert word docx excel image" },
@@ -399,12 +396,6 @@ const SEARCHABLE_FEATURES = [
     title: tool.title,
     href: `/${tool.slug}`,
     keywords: `${tool.title.toLowerCase()} ads marketing ppc performance calculator`,
-  })),
-  { title: "Trading Tools", href: "/trading-tools", keywords: "trading tools risk execution journal futures forex stocks crypto" },
-  ...TRADING_TOOLS.map((tool) => ({
-    title: tool.title,
-    href: `/${tool.path}`,
-    keywords: `${tool.keywords} trading tool`,
   })),
 ];
 

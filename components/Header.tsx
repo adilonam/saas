@@ -37,7 +37,6 @@ export default function Header() {
     { title: "Summarize PDF", href: "/summarize-pdf" },
     { title: "Image to Prompt", href: "/image-to-prompt" },
     { title: "Video to Prompt", href: "/video-to-prompt" },
-    { title: "Trading Signal", href: "/trading-signal" },
   ];
 
   return (

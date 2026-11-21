@@ -123,6 +123,7 @@ function SharePageContent() {
   const [inputCode, setInputCode] = useState("");
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState("Disconnected");
+  const [transportReady, setTransportReady] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [textInput, setTextInput] = useState("");
   const [qrUrl, setQrUrl] = useState("");
@@ -243,15 +244,24 @@ function SharePageContent() {
     if (msg.type === 'connected') {
       peerIdRef.current = msg.peer_id;
     } else if (msg.type === 'peer_joined') {
+      console.log('Peer joined, setting up connection...');
       setStatus('Peer joined, connecting...');
       if (!forceRelay) {
         await setupWebRTC();
       } else {
+        console.log('Using relay mode (forced)');
         setUsingRelay(true);
-        setConnected(true);
-        setStatus('Connected');
         await exchangeKeys();
-        processQueue();
+        // Wait a bit for key exchange to complete
+        setTimeout(async () => {
+          if (sharedKeyRef.current) {
+            console.log('Relay ready with shared key');
+            setConnected(true);
+            setTransportReady(true);
+            setStatus('Connected (relay)');
+            await processQueue();
+          }
+        }, 1000);
       }
     } else if (msg.type === 'peer_left') {
       setStatus('Peer left');
@@ -286,18 +296,25 @@ function SharePageContent() {
     });
     rtcRef.current = rtc;
 
-    webrtcTimeoutRef.current = setTimeout(() => {
+    webrtcTimeoutRef.current = setTimeout(async () => {
       if (!dataChannelRef.current || dataChannelRef.current.readyState !== 'open') {
-        console.log('WebRTC timeout, falling back to relay');
+        console.log('WebRTC timeout after 10s, falling back to relay');
         setUsingRelay(true);
-        setStatus('Connected (relay)');
         if (rtc) {
           rtc.close();
         }
         rtcRef.current = null;
-        setConnected(true);
-        exchangeKeys();
-        processQueue();
+        await exchangeKeys();
+        // Wait for key exchange
+        setTimeout(async () => {
+          if (sharedKeyRef.current) {
+            console.log('Relay fallback ready with shared key');
+            setConnected(true);
+            setTransportReady(true);
+            setStatus('Connected (relay)');
+            await processQueue();
+          }
+        }, 1000);
       }
     }, WEBRTC_TIMEOUT);
 
@@ -333,16 +350,25 @@ function SharePageContent() {
   const setupDataChannel = (channel: RTCDataChannel) => {
     dataChannelRef.current = channel;
 
-    channel.onopen = () => {
+    channel.onopen = async () => {
       if (webrtcTimeoutRef.current) {
         clearTimeout(webrtcTimeoutRef.current);
       }
-      console.log('DataChannel opened');
-      setConnected(true);
+      console.log('DataChannel opened, state:', channel.readyState);
       setUsingRelay(false);
-      setStatus('Connected');
-      exchangeKeys();
-      processQueue();
+      await exchangeKeys();
+      // Wait for key exchange to complete
+      setTimeout(async () => {
+        if (sharedKeyRef.current) {
+          console.log('DataChannel ready with shared key');
+          setConnected(true);
+          setTransportReady(true);
+          setStatus('Connected (P2P)');
+          await processQueue();
+        } else {
+          console.error('DataChannel open but no shared key!');
+        }
+      }, 1000);
     };
 
     channel.onmessage = async (event) => {
@@ -415,24 +441,53 @@ function SharePageContent() {
   };
 
   const handleKeyExchange = async (publicKeyString: string) => {
-    if (!keyPairRef.current) return;
+    if (!keyPairRef.current) {
+      console.error('No key pair for key exchange!');
+      return;
+    }
 
-    const peerPublicKey = await importPublicKey(publicKeyString);
-    const sharedKey = await deriveSharedKey(keyPairRef.current.privateKey, peerPublicKey);
-    sharedKeyRef.current = sharedKey;
+    try {
+      console.log('Receiving peer public key, deriving shared secret...');
+      const peerPublicKey = await importPublicKey(publicKeyString);
+      const sharedKey = await deriveSharedKey(keyPairRef.current.privateKey, peerPublicKey);
+      sharedKeyRef.current = sharedKey;
+      console.log('Shared key established ✓');
+      
+      // Check if we should mark as ready now
+      if ((dataChannelRef.current?.readyState === 'open' || usingRelay) && !transportReady) {
+        console.log('Transport becoming ready after key exchange');
+        setTransportReady(true);
+        setConnected(true);
+        await processQueue();
+      }
+    } catch (e) {
+      console.error('Key exchange failed:', e);
+    }
   };
 
   const processQueue = async () => {
-    if (!connected || !sharedKeyRef.current) return;
+    if (!sharedKeyRef.current) {
+      console.log('Cannot process queue: no shared key yet');
+      return;
+    }
     
+    if (queuedItems.length === 0) {
+      console.log('Queue is empty');
+      return;
+    }
+    
+    console.log(`Processing queue: ${queuedItems.length} items`);
     for (const item of queuedItems) {
       if (item.type === "text" && item.data) {
+        console.log('Sending queued text:', item.data.substring(0, 50));
         await sendTextNow(item.data);
       } else if (item.type === "file" && item.file) {
+        console.log('Sending queued file:', item.file.name);
         await sendFileNow(item.file);
       }
     }
     setQueuedItems([]);
+    console.log('Queue processed ✓');
   };
 
   const handleDataMessage = async (msg: any) => {
@@ -455,12 +510,17 @@ function SharePageContent() {
   };
 
   const handleTextMessage = async (encryptedData: string) => {
-    if (!sharedKeyRef.current) return;
+    if (!sharedKeyRef.current) {
+      console.error('Cannot decrypt text: no shared key');
+      return;
+    }
     
     try {
+      console.log('Decrypting received text message...');
       const encryptedBuffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
       const decrypted = await decryptData(encryptedBuffer.buffer, sharedKeyRef.current);
       const text = new TextDecoder().decode(decrypted);
+      console.log('Text decrypted successfully:', text.substring(0, 50));
       setMessages(prev => [...prev, { 
         type: "text", 
         content: text, 
@@ -469,6 +529,7 @@ function SharePageContent() {
       }]);
     } catch (e) {
       console.error("Text decryption failed:", e);
+      setStatus('Decryption error');
     }
   };
 
@@ -536,9 +597,13 @@ function SharePageContent() {
   };
 
   const sendTextNow = async (text: string) => {
-    if (!sharedKeyRef.current) return;
+    if (!sharedKeyRef.current) {
+      console.error('Cannot send text: no shared key');
+      return;
+    }
 
     try {
+      console.log('Sending text via', dataChannelRef.current?.readyState === 'open' ? 'DataChannel' : 'WebSocket');
       const textData = new TextEncoder().encode(text);
       const encrypted = await encryptData(textData.buffer, sharedKeyRef.current);
       const encryptedString = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
@@ -546,8 +611,10 @@ function SharePageContent() {
 
       if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
         dataChannelRef.current.send(msg);
+        console.log('Text sent via DataChannel');
       } else if (wsRef.current) {
         wsRef.current.send(msg);
+        console.log('Text sent via WebSocket');
       }
 
       setMessages(prev => prev.map(m => 
@@ -582,8 +649,12 @@ function SharePageContent() {
   };
 
   const sendFileNow = async (file: File) => {
-    if (!sharedKeyRef.current) return;
+    if (!sharedKeyRef.current) {
+      console.error('Cannot send file: no shared key');
+      return;
+    }
 
+    console.log(`Sending file ${file.name} (${file.size} bytes) via ${usingRelay ? 'relay' : 'P2P'}`);
     setSendProgress({ fileName: file.name, progress: 0 });
 
     const fileData = await file.arrayBuffer();
@@ -604,6 +675,7 @@ function SharePageContent() {
     }
 
     let offset = 0;
+    const CHUNK_SIZE = usingRelay ? 64 * 1024 : 128 * 1024; // 64KB for relay, 128KB for P2P
 
     const sendNextChunk = async () => {
       if (offset >= file.size) {

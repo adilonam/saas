@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import { getPublishedPosts } from "lib/blog-utils";
-import ResponsiveDashboardLayout from "components/ResponsiveDashboardLayout";
+import UnifiedLayout from "components/UnifiedLayout";
 import { CalendarIcon, TagIcon } from "@heroicons/react/24/outline";
 
 export const revalidate = 3600;
@@ -16,7 +16,7 @@ export default async function BlogPage(props: PageProps) {
   const { posts, totalPages, totalPosts } = await getPublishedPosts(page, 12);
 
   return (
-    <ResponsiveDashboardLayout>
+    <UnifiedLayout>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -115,6 +115,6 @@ export default async function BlogPage(props: PageProps) {
           </>
         )}
       </div>
-    </ResponsiveDashboardLayout>
+    </UnifiedLayout>
   );
 }

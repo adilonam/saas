@@ -10,7 +10,7 @@ import {
   generateBreadcrumbJsonLd,
   parseRelatedTools,
 } from "lib/blog-utils";
-import ResponsiveDashboardLayout from "components/ResponsiveDashboardLayout";
+import UnifiedLayout from "components/UnifiedLayout";
 import { CalendarIcon, TagIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 export const revalidate = 3600;
@@ -40,7 +40,7 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
   const breadcrumbJsonLd = generateBreadcrumbJsonLd(post);
 
   return (
-    <ResponsiveDashboardLayout>
+    <UnifiedLayout>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleJsonLd) }}
@@ -156,6 +156,6 @@ export default async function BlogPostPage(props: { params: Promise<{ slug: stri
           </Link>
         </div>
       </article>
-    </ResponsiveDashboardLayout>
+    </UnifiedLayout>
   );
 }

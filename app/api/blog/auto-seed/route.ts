@@ -1,6 +1,10 @@
 import { NextResponse } from "next/server";
 import prisma from "lib/prisma";
-import seedData from "scripts/seed-blog-posts.json";
+import * as fs from "fs";
+import * as path from "path";
+
+const seedDataPath = path.join(process.cwd(), "scripts", "seed-blog-posts.json");
+const seedData = JSON.parse(fs.readFileSync(seedDataPath, "utf-8"));
 
 // Auto-seed endpoint - no auth required, idempotent
 export async function POST() {

@@ -5,7 +5,13 @@ import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ShareIcon } from "@heroicons/react/24/outline";
+import { 
+  PaperAirplaneIcon, 
+  ArrowDownTrayIcon,
+  ShareIcon,
+  DocumentArrowDownIcon,
+  XMarkIcon 
+} from "@heroicons/react/24/outline";
 import { useSearchParams } from "next/navigation";
 
 // Crypto utilities for E2E encryption (ECDH + AES-GCM)
@@ -68,10 +74,24 @@ async function decryptData(data: ArrayBuffer, key: CryptoKey): Promise<ArrayBuff
   );
 }
 
-// Hash for file integrity verification
 async function hashData(data: ArrayBuffer): Promise<string> {
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);
   return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
+}
+
+interface Message {
+  type: "text" | "file-start" | "file-complete";
+  content: string;
+  from: "you" | "peer";
+  timestamp: number;
+}
+
+interface ReceivedFile {
+  fileName: string;
+  fileSize: number;
+  fileType: string;
+  blob: Blob;
+  timestamp: number;
 }
 
 interface FileTransfer {
@@ -84,24 +104,34 @@ interface FileTransfer {
   hash?: string;
 }
 
-const CHUNK_SIZE = 128 * 1024; // 128KB chunks for fallback (under 256KB limit)
-const WEBRTC_TIMEOUT = 10000; // 10s to establish WebRTC
+interface QueuedItem {
+  type: "text" | "file";
+  data?: string;
+  file?: File;
+}
+
+const CHUNK_SIZE = 128 * 1024;
+const WEBRTC_TIMEOUT = 10000;
 
 function SharePageContent() {
   const searchParams = useSearchParams();
   const autoJoinRoom = searchParams?.get("room") || null;
   const forceRelay = searchParams?.get("relay") === "1";
 
-  const [mode, setMode] = useState<"create" | "join" | null>(null);
+  const [mode, setMode] = useState<"send" | "receive" | null>(null);
   const [roomCode, setRoomCode] = useState("");
   const [inputCode, setInputCode] = useState("");
   const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState("Disconnected");
-  const [messages, setMessages] = useState<Array<{type: string, content: string, from: string}>>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [textInput, setTextInput] = useState("");
   const [qrUrl, setQrUrl] = useState("");
   const [wsUrl, setWsUrl] = useState("");
   const [usingRelay, setUsingRelay] = useState(false);
+  const [receivedFiles, setReceivedFiles] = useState<ReceivedFile[]>([]);
+  const [sendProgress, setSendProgress] = useState<{fileName: string, progress: number} | null>(null);
+  const [receiveProgress, setReceiveProgress] = useState<{fileName: string, progress: number} | null>(null);
+  const [queuedItems, setQueuedItems] = useState<QueuedItem[]>([]);
 
   const wsRef = useRef<WebSocket | null>(null);
   const rtcRef = useRef<RTCPeerConnection | null>(null);
@@ -112,9 +142,9 @@ function SharePageContent() {
   const peerIdRef = useRef<string>("");
   const isInitiatorRef = useRef(false);
   const webrtcTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    // Fetch WebSocket URL
     fetch('/api/config/share-ws')
       .then(res => res.json())
       .then(data => {
@@ -124,14 +154,14 @@ function SharePageContent() {
       })
       .catch(err => {
         console.error('Failed to fetch WS config:', err);
-        setStatus('Configuration error');
       });
   }, []);
 
   useEffect(() => {
     if (autoJoinRoom && !mode && wsUrl) {
+      // Auto-join as receiver from QR code
+      setMode("receive");
       setInputCode(autoJoinRoom);
-      setMode("join");
       setTimeout(() => joinRoom(autoJoinRoom), 500);
     }
   }, [autoJoinRoom, mode, wsUrl]);
@@ -140,19 +170,18 @@ function SharePageContent() {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  const createRoom = async () => {
+  const startSending = async () => {
     if (!wsUrl) {
-      setStatus("WebSocket not configured");
+      setStatus("Configuration error");
       return;
     }
 
-    setStatus("Creating room...");
     const code = generateRoomCode();
     setRoomCode(code);
-    setMode("create");
+    setMode("send");
     isInitiatorRef.current = true;
+    setStatus("Waiting for receiver...");
 
-    // Generate E2E encryption keys
     const keyPair = await generateKeyPair();
     keyPairRef.current = keyPair;
 
@@ -162,24 +191,26 @@ function SharePageContent() {
     connectWebSocket(code);
   };
 
+  const startReceiving = () => {
+    setMode("receive");
+  };
+
   const joinRoom = async (code?: string) => {
     const joinCode = code || inputCode;
     if (!joinCode || joinCode.length !== 6) {
-      setStatus("Invalid room code");
+      setStatus("Invalid code");
       return;
     }
 
     if (!wsUrl) {
-      setStatus("WebSocket not configured");
+      setStatus("Configuration error");
       return;
     }
 
-    setStatus("Joining room...");
+    setStatus("Joining...");
     setRoomCode(joinCode);
-    setMode("join");
     isInitiatorRef.current = false;
 
-    // Generate E2E encryption keys
     const keyPair = await generateKeyPair();
     keyPairRef.current = keyPair;
 
@@ -192,7 +223,6 @@ function SharePageContent() {
 
     ws.onopen = () => {
       console.log('WebSocket connected');
-      setStatus("Waiting for peer...");
     };
 
     ws.onmessage = async (event) => {
@@ -200,7 +230,6 @@ function SharePageContent() {
         const msg = JSON.parse(event.data);
         await handleSignalingMessage(msg);
       } else {
-        // Binary frame (fallback relay)
         await handleBinaryFrame(event.data);
       }
     };
@@ -213,7 +242,7 @@ function SharePageContent() {
     ws.onclose = () => {
       console.log('WebSocket closed');
       setConnected(false);
-      setStatus('Disconnected');
+      setStatus('Peer left');
       if (rtcRef.current) {
         rtcRef.current.close();
         rtcRef.current = null;
@@ -222,20 +251,18 @@ function SharePageContent() {
   };
 
   const handleSignalingMessage = async (msg: any) => {
-    console.log('Signaling message:', msg.type);
-
     if (msg.type === 'connected') {
       peerIdRef.current = msg.peer_id;
-      setStatus(`Connected to room (${msg.peers_in_room} peer${msg.peers_in_room > 1 ? 's' : ''})`);
     } else if (msg.type === 'peer_joined') {
-      setStatus('Peer joined, establishing connection...');
+      setStatus('Peer joined, connecting...');
       if (!forceRelay) {
         await setupWebRTC();
       } else {
         setUsingRelay(true);
-        setStatus('Using relay mode (forced)');
         setConnected(true);
+        setStatus('Connected');
         await exchangeKeys();
+        processQueue();
       }
     } else if (msg.type === 'peer_left') {
       setStatus('Peer left');
@@ -247,7 +274,7 @@ function SharePageContent() {
     } else if (msg.type === 'error') {
       setStatus(`Error: ${msg.error}`);
     } else if (msg.type === 'ping') {
-      // Ignore or send pong
+      // Ignore
     } else if (msg.type === 'offer' && msg.offer) {
       await handleOffer(msg.offer);
     } else if (msg.type === 'answer' && msg.answer) {
@@ -270,18 +297,18 @@ function SharePageContent() {
     });
     rtcRef.current = rtc;
 
-    // Set timeout to fall back to relay
     webrtcTimeoutRef.current = setTimeout(() => {
       if (!dataChannelRef.current || dataChannelRef.current.readyState !== 'open') {
         console.log('WebRTC timeout, falling back to relay');
         setUsingRelay(true);
-        setStatus('WebRTC failed, using relay');
+        setStatus('Connected (relay)');
         if (rtc) {
           rtc.close();
         }
         rtcRef.current = null;
         setConnected(true);
         exchangeKeys();
+        processQueue();
       }
     }, WEBRTC_TIMEOUT);
 
@@ -324,8 +351,9 @@ function SharePageContent() {
       console.log('DataChannel opened');
       setConnected(true);
       setUsingRelay(false);
-      setStatus('Connected via WebRTC (E2E encrypted)');
+      setStatus('Connected');
       exchangeKeys();
+      processQueue();
     };
 
     channel.onmessage = async (event) => {
@@ -337,7 +365,6 @@ function SharePageContent() {
           await handleDataMessage(msg);
         }
       } else {
-        // Binary data (encrypted chunk)
         await handleBinaryChunk(event.data);
       }
     };
@@ -349,7 +376,7 @@ function SharePageContent() {
     channel.onclose = () => {
       console.log('DataChannel closed');
       setConnected(false);
-      setStatus('Disconnected');
+      setStatus('Peer left');
     };
   };
 
@@ -404,9 +431,19 @@ function SharePageContent() {
     const peerPublicKey = await importPublicKey(publicKeyString);
     const sharedKey = await deriveSharedKey(keyPairRef.current.privateKey, peerPublicKey);
     sharedKeyRef.current = sharedKey;
+  };
+
+  const processQueue = async () => {
+    if (!connected || !sharedKeyRef.current) return;
     
-    const mode = usingRelay ? 'relay' : 'WebRTC';
-    setStatus(`Connected via ${mode} (E2E encrypted)`);
+    for (const item of queuedItems) {
+      if (item.type === "text" && item.data) {
+        await sendTextNow(item.data);
+      } else if (item.type === "file" && item.file) {
+        await sendFileNow(item.file);
+      }
+    }
+    setQueuedItems([]);
   };
 
   const handleDataMessage = async (msg: any) => {
@@ -422,11 +459,7 @@ function SharePageContent() {
         total: msg.fileSize,
         hash: msg.hash
       };
-      setMessages(prev => [...prev, {
-        type: "file-start",
-        content: `Receiving ${msg.fileName} (${(msg.fileSize / 1024).toFixed(1)} KB)...`,
-        from: "peer"
-      }]);
+      setReceiveProgress({ fileName: msg.fileName, progress: 0 });
     } else if (msg.type === 'file-complete') {
       await completeFileTransfer();
     }
@@ -439,7 +472,12 @@ function SharePageContent() {
       const encryptedBuffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
       const decrypted = await decryptData(encryptedBuffer.buffer, sharedKeyRef.current);
       const text = new TextDecoder().decode(decrypted);
-      setMessages(prev => [...prev, { type: "text", content: text, from: "peer" }]);
+      setMessages(prev => [...prev, { 
+        type: "text", 
+        content: text, 
+        from: "peer",
+        timestamp: Date.now()
+      }]);
     } catch (e) {
       console.error("Text decryption failed:", e);
     }
@@ -454,14 +492,16 @@ function SharePageContent() {
       fileTransferRef.current.received += decrypted.byteLength;
 
       const progress = Math.round((fileTransferRef.current.received / fileTransferRef.current.total) * 100);
-      setStatus(`Receiving: ${progress}%`);
+      setReceiveProgress({ 
+        fileName: fileTransferRef.current.fileName, 
+        progress 
+      });
     } catch (e) {
       console.error("Chunk decryption failed:", e);
     }
   };
 
   const handleBinaryFrame = async (data: ArrayBuffer) => {
-    // Binary frame from WebSocket relay
     await handleBinaryChunk(data);
   };
 
@@ -469,45 +509,48 @@ function SharePageContent() {
     if (!fileTransferRef.current) return;
 
     const blob = new Blob(fileTransferRef.current.chunks, { type: fileTransferRef.current.fileType });
-    const receivedData = await blob.arrayBuffer();
-
-    // Verify hash if provided
-    if (fileTransferRef.current.hash) {
-      const receivedHash = await hashData(receivedData);
-      if (receivedHash !== fileTransferRef.current.hash) {
-        setMessages(prev => [...prev, {
-          type: "error",
-          content: `File ${fileTransferRef.current!.fileName} failed integrity check`,
-          from: "system"
-        }]);
-        fileTransferRef.current = null;
-        return;
-      }
-    }
-
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = fileTransferRef.current.fileName;
-    a.click();
-    URL.revokeObjectURL(url);
+    
+    setReceivedFiles(prev => [...prev, {
+      fileName: fileTransferRef.current!.fileName,
+      fileSize: fileTransferRef.current!.fileSize,
+      fileType: fileTransferRef.current!.fileType,
+      blob: blob,
+      timestamp: Date.now()
+    }]);
 
     setMessages(prev => [...prev, {
       type: "file-complete",
-      content: `Received ${fileTransferRef.current!.fileName}`,
-      from: "peer"
+      content: fileTransferRef.current!.fileName,
+      from: "peer",
+      timestamp: Date.now()
     }]);
 
-    const mode = usingRelay ? 'relay' : 'WebRTC';
-    setStatus(`Connected via ${mode} (E2E encrypted)`);
+    setReceiveProgress(null);
     fileTransferRef.current = null;
   };
 
-  const sendText = async () => {
-    if (!textInput.trim() || !sharedKeyRef.current) return;
+  const queueText = () => {
+    if (!textInput.trim()) return;
+    
+    if (connected && sharedKeyRef.current) {
+      sendTextNow(textInput);
+    } else {
+      setQueuedItems(prev => [...prev, { type: "text", data: textInput }]);
+      setMessages(prev => [...prev, {
+        type: "text",
+        content: textInput + " (queued)",
+        from: "you",
+        timestamp: Date.now()
+      }]);
+    }
+    setTextInput("");
+  };
+
+  const sendTextNow = async (text: string) => {
+    if (!sharedKeyRef.current) return;
 
     try {
-      const textData = new TextEncoder().encode(textInput);
+      const textData = new TextEncoder().encode(text);
       const encrypted = await encryptData(textData.buffer, sharedKeyRef.current);
       const encryptedString = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
       const msg = JSON.stringify({ type: 'text', data: encryptedString });
@@ -518,23 +561,45 @@ function SharePageContent() {
         wsRef.current.send(msg);
       }
 
-      setMessages(prev => [...prev, { type: "text", content: textInput, from: "you" }]);
-      setTextInput("");
+      setMessages(prev => prev.map(m => 
+        m.content === text + " (queued)" ? { ...m, content: text } : m
+      ));
+      
+      if (!messages.some(m => m.content === text + " (queued)")) {
+        setMessages(prev => [...prev, { 
+          type: "text", 
+          content: text, 
+          from: "you",
+          timestamp: Date.now()
+        }]);
+      }
     } catch (e) {
       console.error("Send text failed:", e);
     }
   };
 
-  const sendFile = async (file: File) => {
+  const queueFile = (file: File) => {
+    if (connected && sharedKeyRef.current) {
+      sendFileNow(file);
+    } else {
+      setQueuedItems(prev => [...prev, { type: "file", file }]);
+      setMessages(prev => [...prev, {
+        type: "file-start",
+        content: `${file.name} (queued)`,
+        from: "you",
+        timestamp: Date.now()
+      }]);
+    }
+  };
+
+  const sendFileNow = async (file: File) => {
     if (!sharedKeyRef.current) return;
 
-    setStatus(`Sending ${file.name}...`);
+    setSendProgress({ fileName: file.name, progress: 0 });
 
-    // Calculate hash for integrity
     const fileData = await file.arrayBuffer();
     const fileHash = await hashData(fileData);
 
-    // Send metadata
     const metaMsg = JSON.stringify({
       type: 'file-meta',
       fileName: file.name,
@@ -549,14 +614,10 @@ function SharePageContent() {
       wsRef.current.send(metaMsg);
     }
 
-    // Send file in encrypted chunks
     let offset = 0;
-    let chunkIndex = 0;
-    const totalChunks = Math.ceil(file.size / CHUNK_SIZE);
 
     const sendNextChunk = async () => {
       if (offset >= file.size) {
-        // Send completion message
         const completeMsg = JSON.stringify({ type: 'file-complete' });
         if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
           dataChannelRef.current.send(completeMsg);
@@ -564,13 +625,20 @@ function SharePageContent() {
           wsRef.current.send(completeMsg);
         }
 
-        const mode = usingRelay ? 'relay' : 'WebRTC';
-        setStatus(`Connected via ${mode} (E2E encrypted)`);
-        setMessages(prev => [...prev, {
-          type: "file-sent",
-          content: `Sent ${file.name}`,
-          from: "you"
-        }]);
+        setMessages(prev => prev.map(m =>
+          m.content === `${file.name} (queued)` ? { ...m, content: file.name, type: "file-complete" as const } : m
+        ));
+        
+        if (!messages.some(m => m.content.includes(file.name))) {
+          setMessages(prev => [...prev, {
+            type: "file-complete",
+            content: file.name,
+            from: "you",
+            timestamp: Date.now()
+          }]);
+        }
+
+        setSendProgress(null);
         return;
       }
 
@@ -585,11 +653,9 @@ function SharePageContent() {
       }
 
       offset += CHUNK_SIZE;
-      chunkIndex++;
       const progress = Math.round((offset / file.size) * 100);
-      setStatus(`Sending: ${Math.min(progress, 100)}%`);
+      setSendProgress({ fileName: file.name, progress: Math.min(progress, 100) });
 
-      // Rate limiting for relay mode (stay under 100 msgs/60s = ~600ms/msg)
       const delay = usingRelay ? 100 : 10;
       setTimeout(sendNextChunk, delay);
     };
@@ -600,187 +666,255 @@ function SharePageContent() {
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (files && files.length > 0) {
-      sendFile(files[0]);
+      queueFile(files[0]);
     }
   };
 
-  return (
-    <DashboardLayout>
-      <script type="application/ld+json" dangerouslySetInnerHTML={{
-        __html: JSON.stringify({
-          "@context": "https://schema.org",
-          "@type": "WebApplication",
-          "name": "Secure File & Text Sharing",
-          "description": "End-to-end encrypted file and text sharing via WebRTC or secure relay",
-          "url": "https://www.eprod.io/share",
-          "applicationCategory": "UtilityApplication",
-          "operatingSystem": "Any",
-          "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
-        })
-      }} />
+  const handleFileDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files && files.length > 0) {
+      queueFile(files[0]);
+    }
+  };
 
-      <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-3 mb-8">
-          <div className="size-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400">
-            <ShareIcon className="size-7" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight">Secure File & Text Sharing</h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-              End-to-end encrypted - WebRTC or secure relay
+  const downloadFile = (file: ReceivedFile) => {
+    const url = URL.createObjectURL(file.blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = file.fileName;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
+  if (!mode) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-8">
+            <h1 className="text-3xl font-bold mb-2">Secure File & Text Share</h1>
+            <p className="text-slate-600 dark:text-slate-400">
+              End-to-end encrypted • No server storage
             </p>
           </div>
-        </div>
 
-        {!mode && (
-          <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 p-8 space-y-6">
-            <div className="grid sm:grid-cols-2 gap-4">
-              <Button onClick={createRoom} className="h-32 flex-col gap-3" size="lg">
-                <ShareIcon className="h-8 w-8" />
-                <div>
-                  <p className="font-semibold">Create Room</p>
-                  <p className="text-xs font-normal opacity-80">Get a code & QR</p>
+          <div className="grid sm:grid-cols-2 gap-4">
+            <button
+              onClick={startSending}
+              className="p-8 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="size-16 rounded-full bg-indigo-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <PaperAirplaneIcon className="size-8" />
                 </div>
-              </Button>
-              <div className="space-y-3">
-                <Label>Join Room</Label>
-                <Input
-                  type="text"
-                  placeholder="Enter 6-digit code"
-                  value={inputCode}
-                  onChange={(e) => setInputCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
-                  className="h-12 text-center text-2xl tracking-widest"
-                  maxLength={6}
-                />
-                <Button onClick={() => joinRoom()} disabled={inputCode.length !== 6} className="w-full">
-                  Join Room
-                </Button>
+                <div>
+                  <p className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">Send</p>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
+                    Get a code to share
+                  </p>
+                </div>
               </div>
-            </div>
+            </button>
 
-            <div className="pt-6 border-t border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-600 dark:text-slate-300">
-                🔒 <strong>End-to-end encrypted</strong> - Secure WebRTC or relay transfer
-              </p>
+            <button
+              onClick={startReceiving}
+              className="p-8 rounded-2xl border-2 border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-emerald-100 dark:from-emerald-950 dark:to-emerald-900 hover:border-emerald-300 dark:hover:border-emerald-700 transition-all group"
+            >
+              <div className="flex flex-col items-center gap-4">
+                <div className="size-16 rounded-full bg-emerald-500 text-white flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <ArrowDownTrayIcon className="size-8" />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">Receive</p>
+                  <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
+                    Enter a code to join
+                  </p>
+                </div>
+              </div>
+            </button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  if (mode === "receive" && !roomCode) {
+    return (
+      <DashboardLayout>
+        <div className="max-w-md mx-auto">
+          <div className="text-center mb-8">
+            <h2 className="text-2xl font-bold">Enter Code</h2>
+            <p className="text-slate-600 dark:text-slate-400 mt-2">
+              Enter the 6-digit code from the sender
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <Input
+              type="text"
+              placeholder="000000"
+              value={inputCode}
+              onChange={(e) => setInputCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              className="h-16 text-center text-3xl tracking-widest"
+              maxLength={6}
+              autoFocus
+            />
+            <Button 
+              onClick={() => joinRoom()} 
+              disabled={inputCode.length !== 6}
+              className="w-full h-12 text-lg"
+            >
+              Join
+            </Button>
+            <Button 
+              onClick={() => setMode(null)}
+              variant="ghost"
+              className="w-full"
+            >
+              Back
+            </Button>
+          </div>
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  return (
+    <DashboardLayout>
+      <div className="max-w-4xl mx-auto">
+        {/* Header with code and status */}
+        <div className="mb-6 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <p className="text-sm text-slate-600 dark:text-slate-400">Room Code</p>
+              <p className="text-3xl font-bold tracking-widest">{roomCode}</p>
+            </div>
+            <div className={`px-4 py-2 rounded-full text-sm font-medium ${
+              connected 
+                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+            }`}>
+              {status}
             </div>
           </div>
-        )}
 
-        {mode && (
-          <div className="space-y-6">
-            <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40 p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <p className="text-sm text-slate-600 dark:text-slate-400">Room Code</p>
-                  <p className="text-3xl font-bold tracking-widest">{roomCode}</p>
-                </div>
-                <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-                  connected 
-                    ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-                }`}>
-                  {status}
-                </div>
+          {mode === "send" && qrUrl && (
+            <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 text-center">Scan to join:</p>
+              <div className="flex justify-center">
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}`}
+                  alt="QR Code"
+                  className="w-40 h-40"
+                />
               </div>
+            </div>
+          )}
+        </div>
 
-              {mode === "create" && qrUrl && (
-                <div className="mt-6 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-                  <p className="text-sm text-slate-600 dark:text-slate-400 mb-3">Scan to join:</p>
-                  <div className="flex justify-center">
-                    <div className="bg-white p-4 rounded-lg">
-                      <img 
-                        src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}`}
-                        alt="QR Code"
-                        className="w-48 h-48"
-                      />
-                    </div>
-                  </div>
-                  <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-3">
-                    {qrUrl}
-                  </p>
-                </div>
-              )}
+        <div className="grid lg:grid-cols-2 gap-4">
+          {/* Send panel */}
+          <div className="space-y-4">
+            <h3 className="font-semibold text-lg">Send</h3>
+            
+            <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-3">
+              <textarea
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                placeholder="Type a message..."
+                className="w-full min-h-[100px] px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 resize-none"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && !e.shiftKey) {
+                    e.preventDefault();
+                    queueText();
+                  }
+                }}
+              />
+              <Button onClick={queueText} disabled={!textInput.trim()} className="w-full">
+                <PaperAirplaneIcon className="h-4 w-4 mr-2" />
+                Send Text
+              </Button>
             </div>
 
-            {connected && (
-              <div className="space-y-4">
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6 space-y-4">
-                  <Label>Send Text</Label>
-                  <textarea
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    placeholder="Type a message..."
-                    className="w-full min-h-[100px] px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800"
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && !e.shiftKey) {
-                        e.preventDefault();
-                        sendText();
-                      }
-                    }}
-                  />
-                  <Button onClick={sendText} disabled={!textInput.trim()}>
-                    Send Text
-                  </Button>
-                </div>
+            <div 
+              className="p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/40 text-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors"
+              onClick={() => fileInputRef.current?.click()}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={handleFileDrop}
+            >
+              <DocumentArrowDownIcon className="h-12 w-12 mx-auto text-slate-400 mb-2" />
+              <p className="text-sm font-medium">Click or drag file here</p>
+              <p className="text-xs text-slate-500 mt-1">Encrypted end-to-end</p>
+              <input
+                ref={fileInputRef}
+                type="file"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+            </div>
 
-                <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
-                  <Label className="mb-4 block">Send File</Label>
-                  <input
-                    type="file"
-                    onChange={handleFileSelect}
-                    className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+            {sendProgress && (
+              <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800">
+                <p className="text-sm font-medium mb-2">{sendProgress.fileName}</p>
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-indigo-500 h-2 rounded-full transition-all"
+                    style={{ width: `${sendProgress.progress}%` }}
                   />
-                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                    {usingRelay ? 'Files sent via encrypted relay (slower for large files)' : 'Files sent via WebRTC DataChannel (fast & direct)'}
-                  </p>
                 </div>
-
-                {messages.length > 0 && (
-                  <div className="rounded-3xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-6">
-                    <Label className="mb-4 block">Messages & Files</Label>
-                    <div className="space-y-2 max-h-64 overflow-y-auto">
-                      {messages.map((msg, i) => (
-                        <div key={i} className={`p-3 rounded-lg text-sm ${
-                          msg.from === "you"
-                            ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100 ml-12"
-                            : msg.from === "system"
-                            ? "bg-red-50 dark:bg-red-900/20 text-red-900 dark:text-red-100"
-                            : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100 mr-12"
-                        }`}>
-                          <p className="text-xs opacity-60 mb-1">{msg.from}</p>
-                          <p className="break-words">{msg.content}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <p className="text-xs text-right mt-1">{sendProgress.progress}%</p>
               </div>
             )}
           </div>
-        )}
 
-        {/* FAQ */}
-        <div className="mt-12 space-y-6">
-          <h2 className="text-2xl font-bold">Frequently Asked Questions</h2>
+          {/* Receive panel */}
           <div className="space-y-4">
-            <div className="p-6 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold mb-2">Is file sharing secure?</h3>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">
-                Yes! All data is end-to-end encrypted using ECDH key exchange and AES-GCM. Files transfer via WebRTC (peer-to-peer) or secure relay, and are never stored on servers.
-              </p>
-            </div>
-            <div className="p-6 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold mb-2">What if WebRTC doesn't work?</h3>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">
-                The system automatically falls back to a secure relay if WebRTC cannot establish a connection within 10 seconds. Relay mode is slower for large files but works reliably.
-              </p>
-            </div>
-            <div className="p-6 rounded-2xl bg-slate-50/50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700">
-              <h3 className="font-semibold mb-2">How do I share files?</h3>
-              <p className="text-slate-600 dark:text-slate-300 text-sm">
-                Create a room to get a 6-digit code and QR code. Share the code with your recipient. They join by entering the code or scanning the QR. Then send text and files directly.
-              </p>
-            </div>
+            <h3 className="font-semibold text-lg">Received</h3>
+
+            {messages.length > 0 && (
+              <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 max-h-64 overflow-y-auto space-y-2">
+                {messages.map((msg, i) => (
+                  <div key={i} className={`p-3 rounded-lg text-sm ${
+                    msg.from === "you"
+                      ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100"
+                      : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                  }`}>
+                    <p className="text-xs opacity-60 mb-1">{msg.from === "you" ? "You" : "Peer"}</p>
+                    <p className="break-words">{msg.content}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {receiveProgress && (
+              <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
+                <p className="text-sm font-medium mb-2">{receiveProgress.fileName}</p>
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
+                  <div 
+                    className="bg-emerald-500 h-2 rounded-full transition-all"
+                    style={{ width: `${receiveProgress.progress}%` }}
+                  />
+                </div>
+                <p className="text-xs text-right mt-1">{receiveProgress.progress}%</p>
+              </div>
+            )}
+
+            {receivedFiles.length > 0 && (
+              <div className="space-y-2">
+                <Label>Files</Label>
+                {receivedFiles.map((file, i) => (
+                  <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium truncate">{file.fileName}</p>
+                      <p className="text-xs text-slate-500">{(file.fileSize / 1024).toFixed(1)} KB</p>
+                    </div>
+                    <Button size="sm" onClick={() => downloadFile(file)}>
+                      <ArrowDownTrayIcon className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

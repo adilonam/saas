@@ -32,7 +32,13 @@ export default function TextCaseConverterPage() {
       );
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setOutput(convertTextCase(text, mode));
     setUnlocked(true);
   };

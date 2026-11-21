@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
@@ -37,8 +37,20 @@ export default function WifiQrGeneratorPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    // All tools are now free - no auth required
+  const handleSubmit = useCallback(async () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/wifi-qr-generator")}`,
+      );
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!ssid.trim()) {
       setError("Please enter the network name (SSID).");
@@ -65,7 +77,7 @@ export default function WifiQrGeneratorPage() {
       setError("Could not generate QR code. Please try again.");
       setQrDataUrl(null);
     }
-  };
+  }, [session, status, router, pathname, ssid, password, security, hidden]);
 
   return (
     <DashboardLayout>

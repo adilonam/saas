@@ -22,7 +22,13 @@ export default function WordCounterPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/word-counter")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setStats(countTextStats(text));
     setUnlocked(true);
   };

@@ -25,7 +25,13 @@ export default function AIProductDescriptionPage() {
       return;
     }
 
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!prompt.trim()) {
       setError("Please enter product details.");

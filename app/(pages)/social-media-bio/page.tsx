@@ -40,7 +40,13 @@ export default function SocialMediaBioPage() {
       );
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!name.trim() && !niche.trim()) {
       setError("Enter your name or niche.");
       return;

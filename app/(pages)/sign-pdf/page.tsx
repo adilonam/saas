@@ -70,7 +70,13 @@ export default function SignPDFPage() {
       return;
     }
 
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!pdfFile || !signatureImage || signaturePositions.length === 0) {
       alert("Please upload a PDF, create a signature, and place it on the PDF");

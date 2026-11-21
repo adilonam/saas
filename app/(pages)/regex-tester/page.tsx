@@ -39,7 +39,13 @@ export default function RegexTesterPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/regex-tester")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setResultUnlocked(true);
   };
 

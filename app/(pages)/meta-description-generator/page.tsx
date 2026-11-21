@@ -27,7 +27,13 @@ export default function MetaDescriptionGeneratorPage() {
       );
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!text.trim()) {
       setError("Please describe the page or paste key content.");
       return;

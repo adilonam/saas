@@ -41,7 +41,13 @@ export default function TaskPrioritizerPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/task-prioritizer")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setRan(true);
   };
 

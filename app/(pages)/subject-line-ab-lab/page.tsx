@@ -39,7 +39,13 @@ export default function SubjectLineAbLabPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/subject-line-ab-lab")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setUnlocked(true);
   };
 

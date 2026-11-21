@@ -27,7 +27,13 @@ export default function SalaryAfterTaxCalculatorPage() {
       );
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setResultUnlocked(true);
   };
 

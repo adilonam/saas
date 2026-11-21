@@ -164,7 +164,13 @@ export default function ScreenshotAnnotationPage() {
       );
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     const c = canvasRef.current;
     if (!c) {
       setError("No image to download.");

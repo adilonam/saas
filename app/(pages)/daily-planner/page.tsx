@@ -27,7 +27,13 @@ export default function DailyPlannerPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/daily-planner")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setGenerated(true);
   };
 

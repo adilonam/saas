@@ -40,7 +40,13 @@ export default function DataProfilerPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/data-profiler")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     if (!file) {
       setError("Please select a CSV or XLSX file.");
       return;

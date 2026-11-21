@@ -20,7 +20,13 @@ export default function ApiResponseFormatterPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setError(null);
     try {
       const parsed = JSON.parse(rawInput);
@@ -35,7 +41,13 @@ export default function ApiResponseFormatterPage() {
       router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
       return;
     }
-    // Subscription check removed - tool is free
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
     setError(null);
     try {
       const parsed = JSON.parse(rawInput);

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
@@ -44,8 +44,20 @@ export default function VcardQrGeneratorPage() {
   const [qrDataUrl, setQrDataUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const handleGenerate = () => {
-    // All tools are now free - no auth required
+  const handleSubmit = useCallback(async () => {
+    if (status === "unauthenticated" || !session) {
+      router.push(
+        `/signup?callbackUrl=${encodeURIComponent(pathname || "/vcard-qr-generator")}`,
+      );
+      return;
+    }
+    const hasActiveSubscription =
+      session.user.subscriptionExpiresAt &&
+      new Date(session.user.subscriptionExpiresAt) > new Date();
+    if (!hasActiveSubscription) {
+      router.push("/pricing");
+      return;
+    }
 
     if (!fullName.trim() && !email.trim() && !phone.trim()) {
       setError("Enter at least a name, phone, or email.");
@@ -67,7 +79,18 @@ export default function VcardQrGeneratorPage() {
       setError("Could not generate QR code. Try shortening the content.");
       setQrDataUrl(null);
     }
-  };
+  }, [
+    session,
+    status,
+    router,
+    pathname,
+    fullName,
+    org,
+    title,
+    phone,
+    email,
+    url,
+  ]);
 
   return (
     <DashboardLayout>

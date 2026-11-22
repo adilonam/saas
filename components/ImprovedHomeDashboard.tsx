@@ -27,10 +27,14 @@ const TOOL_CATEGORIES = {
     { path: "loan-payment-calculator", title: "Loan Payment" },
     { path: "roi-calculator", title: "ROI Calculator" },
     { path: "discount-calculator", title: "Discount Calculator" },
+    { path: "black-friday-discount-calculator", title: "Black Friday Calculator" },
     { path: "tip-split-calculator", title: "Tip Split Calculator" },
     { path: "time-calculator", title: "Time Calculator" },
     { path: "calorie-calculator", title: "Calorie Calculator" },
     { path: "probability-calculator", title: "Probability" },
+    { path: "christmas-countdown", title: "Christmas Countdown" },
+    { path: "new-year-countdown", title: "New Year Countdown" },
+    { path: "2027-calendar", title: "2027 Calendar" },
   ],
   "Generators": [
     { path: "password-generator", title: "Password Generator" },
@@ -83,6 +87,8 @@ const TOOL_CATEGORIES = {
     { path: "goal-progress-tracker", title: "Goal Progress" },
     { path: "meeting-agenda-builder", title: "Meeting Agenda" },
     { path: "daily-planner", title: "Daily Planner" },
+    { path: "secret-santa-generator", title: "Secret Santa Generator" },
+    { path: "share", title: "Share Files Securely" },
   ],
   "Business": [
     { path: "cac-calculator", title: "CAC Calculator" },

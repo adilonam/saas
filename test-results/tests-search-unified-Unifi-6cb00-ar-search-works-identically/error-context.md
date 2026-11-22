@@ -1,0 +1,305 @@
+# Instructions
+
+- Following Playwright test failed.
+- Explain why, be concise, respect Playwright best practices.
+- Provide a snippet of code with the fix, if possible.
+
+# Test info
+
+- Name: tests/search-unified.spec.ts >> Unified Search Tests >> Bottom bar search works identically
+- Location: tests/search-unified.spec.ts:114:3
+
+# Error details
+
+```
+Test timeout of 60000ms exceeded.
+```
+
+# Page snapshot
+
+```yaml
+- generic [active] [ref=e1]:
+  - generic [ref=e2]:
+    - banner [ref=e3]:
+      - generic [ref=e4]:
+        - link [ref=e5] [cursor=pointer]:
+          - /url: /
+          - img "eProd" [ref=e7]
+          - heading "eProd" [level=1] [ref=e8]
+        - navigation [ref=e9]:
+          - link "Home" [ref=e10] [cursor=pointer]:
+            - /url: /
+          - link "Tools" [ref=e11] [cursor=pointer]:
+            - /url: /#categories
+          - link "Blog" [ref=e12] [cursor=pointer]:
+            - /url: /blog
+        - button "Search tools and blog... ⌘K" [ref=e14]:
+          - generic [ref=e17]: Search tools and blog...
+          - generic [ref=e18]: ⌘K
+        - button "Toggle Dark Mode" [ref=e20]
+    - main [ref=e23]:
+      - generic [ref=e24]:
+        - generic [ref=e27]:
+          - heading "Free Productivity Tools" [level=1] [ref=e28]
+          - paragraph [ref=e29]: 67+ free online tools for PDF, calculators, generators, and more
+          - button "Search tools and blog posts" [ref=e30]: Search tools and blog posts...
+        - generic [ref=e34]:
+          - 'heading "⭐ Featured: Chrome Extension" [level=2] [ref=e35]'
+          - link [ref=e36] [cursor=pointer]:
+            - /url: /contextly
+            - generic [ref=e37]:
+              - img "Contextly" [ref=e39]
+              - generic [ref=e40]:
+                - heading "Contextly" [level=3] [ref=e41]
+                - paragraph [ref=e42]: Chrome extension to improve writing anywhere — select text, choose a prompt, preview, then apply or copy.
+        - generic [ref=e44]:
+          - heading "All Tools" [level=2] [ref=e45]
+          - generic [ref=e46]:
+            - generic [ref=e47]:
+              - heading "PDF Tools(11)" [level=3] [ref=e48]:
+                - text: PDF Tools
+                - generic [ref=e49]: (11)
+              - generic [ref=e50]:
+                - link [ref=e51] [cursor=pointer]:
+                  - /url: /sign-pdf
+                  - heading "Sign PDF" [level=4] [ref=e52]
+                - link [ref=e53] [cursor=pointer]:
+                  - /url: /merge-pdf
+                  - heading "Merge PDF" [level=4] [ref=e54]
+                - link [ref=e55] [cursor=pointer]:
+                  - /url: /pdf-to-word
+                  - heading "PDF to Word" [level=4] [ref=e56]
+                - link [ref=e57] [cursor=pointer]:
+                  - /url: /compress-pdf
+                  - heading "Compress PDF" [level=4] [ref=e58]
+                - link [ref=e59] [cursor=pointer]:
+                  - /url: /split-pdf
+                  - heading "Split PDF" [level=4] [ref=e60]
+                - link [ref=e61] [cursor=pointer]:
+                  - /url: /rotate-pdf
+                  - heading "Rotate PDF" [level=4] [ref=e62]
+                - link [ref=e63] [cursor=pointer]:
+                  - /url: /pdf-to-image
+                  - heading "PDF to Image" [level=4] [ref=e64]
+                - link [ref=e65] [cursor=pointer]:
+                  - /url: /image-to-pdf
+                  - heading "Image to PDF" [level=4] [ref=e66]
+                - link [ref=e67] [cursor=pointer]:
+                  - /url: /pdf-to-text
+                  - heading "PDF to Text" [level=4] [ref=e68]
+                - link [ref=e69] [cursor=pointer]:
+                  - /url: /pdf-metadata
+                  - heading "PDF Metadata" [level=4] [ref=e70]
+                - link [ref=e71] [cursor=pointer]:
+                  - /url: /summarize-pdf
+                  - heading "AI Summarize PDF" [level=4] [ref=e72]
+            - generic [ref=e73]:
+              - heading "Calculators(10)" [level=3] [ref=e74]:
+                - text: Calculators
+                - generic [ref=e75]: (10)
+              - generic [ref=e76]:
+                - link [ref=e77] [cursor=pointer]:
+                  - /url: /age-calculator
+                  - heading "Age Calculator" [level=4] [ref=e78]
+                - link [ref=e79] [cursor=pointer]:
+                  - /url: /bmi-calculator
+                  - heading "BMI Calculator" [level=4] [ref=e80]
+                - link [ref=e81] [cursor=pointer]:
+                  - /url: /compound-interest-calculator
+                  - heading "Compound Interest" [level=4] [ref=e82]
+                - link [ref=e83] [cursor=pointer]:
+                  - /url: /loan-payment-calculator
+                  - heading "Loan Payment" [level=4] [ref=e84]
+                - link [ref=e85] [cursor=pointer]:
+                  - /url: /roi-calculator
+                  - heading "ROI Calculator" [level=4] [ref=e86]
+                - link [ref=e87] [cursor=pointer]:
+                  - /url: /discount-calculator
+                  - heading "Discount Calculator" [level=4] [ref=e88]
+                - link [ref=e89] [cursor=pointer]:
+                  - /url: /tip-split-calculator
+                  - heading "Tip Split Calculator" [level=4] [ref=e90]
+                - link [ref=e91] [cursor=pointer]:
+                  - /url: /time-calculator
+                  - heading "Time Calculator" [level=4] [ref=e92]
+                - link [ref=e93] [cursor=pointer]:
+                  - /url: /calorie-calculator
+                  - heading "Calorie Calculator" [level=4] [ref=e94]
+                - link [ref=e95] [cursor=pointer]:
+                  - /url: /probability-calculator
+                  - heading "Probability" [level=4] [ref=e96]
+            - generic [ref=e97]:
+              - heading "Generators(7)" [level=3] [ref=e98]:
+                - text: Generators
+                - generic [ref=e99]: (7)
+              - generic [ref=e100]:
+                - link [ref=e101] [cursor=pointer]:
+                  - /url: /password-generator
+                  - heading "Password Generator" [level=4] [ref=e102]
+                - link [ref=e103] [cursor=pointer]:
+                  - /url: /qr-generate
+                  - heading "QR Code Generator" [level=4] [ref=e104]
+                - link [ref=e105] [cursor=pointer]:
+                  - /url: /hashtag-generator
+                  - heading "Hashtag Generator" [level=4] [ref=e106]
+                - link [ref=e107] [cursor=pointer]:
+                  - /url: /youtube-title-generator
+                  - heading "YouTube Title" [level=4] [ref=e108]
+                - link [ref=e109] [cursor=pointer]:
+                  - /url: /uuid-generator
+                  - heading "UUID Generator" [level=4] [ref=e110]
+                - link [ref=e111] [cursor=pointer]:
+                  - /url: /barcode-generator
+                  - heading "Barcode Generator" [level=4] [ref=e112]
+                - link [ref=e113] [cursor=pointer]:
+                  - /url: /slug-generator
+                  - heading "Slug Generator" [level=4] [ref=e114]
+            - generic [ref=e115]:
+              - heading "AI Tools(6)" [level=3] [ref=e116]:
+                - text: AI Tools
+                - generic [ref=e117]: (6)
+              - generic [ref=e118]:
+                - link [ref=e119] [cursor=pointer]:
+                  - /url: /ai-email-subject-line
+                  - heading "AI Email Subject Line" [level=4] [ref=e120]
+                - link [ref=e121] [cursor=pointer]:
+                  - /url: /ai-resume-bullet
+                  - heading "AI Resume Bullet" [level=4] [ref=e122]
+                - link [ref=e123] [cursor=pointer]:
+                  - /url: /ai-product-description
+                  - heading "AI Product Description" [level=4] [ref=e124]
+                - link [ref=e125] [cursor=pointer]:
+                  - /url: /ai-meeting-notes-summarizer
+                  - heading "AI Meeting Notes" [level=4] [ref=e126]
+                - link [ref=e127] [cursor=pointer]:
+                  - /url: /text-summarizer
+                  - heading "Text Summarizer" [level=4] [ref=e128]
+                - link [ref=e129] [cursor=pointer]:
+                  - /url: /image-to-prompt
+                  - heading "Image to Prompt" [level=4] [ref=e130]
+            - generic [ref=e131]:
+              - heading "Converters(7)" [level=3] [ref=e132]:
+                - text: Converters
+                - generic [ref=e133]: (7)
+              - generic [ref=e134]:
+                - link [ref=e135] [cursor=pointer]:
+                  - /url: /json-to-csv
+                  - heading "JSON to CSV" [level=4] [ref=e136]
+                - link [ref=e137] [cursor=pointer]:
+                  - /url: /csv-to-json
+                  - heading "CSV to JSON" [level=4] [ref=e138]
+                - link [ref=e139] [cursor=pointer]:
+                  - /url: /image-convert
+                  - heading "Image Converter" [level=4] [ref=e140]
+                - link [ref=e141] [cursor=pointer]:
+                  - /url: /base64-encoder-decoder
+                  - heading "Base64 Encoder/Decoder" [level=4] [ref=e142]
+                - link [ref=e143] [cursor=pointer]:
+                  - /url: /url-encoder-decoder
+                  - heading "URL Encoder/Decoder" [level=4] [ref=e144]
+                - link [ref=e145] [cursor=pointer]:
+                  - /url: /timestamp-converter
+                  - heading "Timestamp Converter" [level=4] [ref=e146]
+                - link [ref=e147] [cursor=pointer]:
+                  - /url: /color-converter
+                  - heading "Color Converter" [level=4] [ref=e148]
+            - generic [ref=e149]:
+              - heading "Content & Writing(6)" [level=3] [ref=e150]:
+                - text: Content & Writing
+                - generic [ref=e151]: (6)
+              - generic [ref=e152]:
+                - link [ref=e153] [cursor=pointer]:
+                  - /url: /word-counter
+                  - heading "Word Counter" [level=4] [ref=e154]
+                - link [ref=e155] [cursor=pointer]:
+                  - /url: /text-case-converter
+                  - heading "Text Case Converter" [level=4] [ref=e156]
+                - link [ref=e157] [cursor=pointer]:
+                  - /url: /text-diff-checker
+                  - heading "Text Diff Checker" [level=4] [ref=e158]
+                - link [ref=e159] [cursor=pointer]:
+                  - /url: /reading-time-estimator
+                  - heading "Reading Time" [level=4] [ref=e160]
+                - link [ref=e161] [cursor=pointer]:
+                  - /url: /youtube-title-length-checker
+                  - heading "YouTube Title Length" [level=4] [ref=e162]
+                - link [ref=e163] [cursor=pointer]:
+                  - /url: /keyword-density-checker
+                  - heading "Keyword Density" [level=4] [ref=e164]
+            - generic [ref=e165]:
+              - heading "Developer Tools(7)" [level=3] [ref=e166]:
+                - text: Developer Tools
+                - generic [ref=e167]: (7)
+              - generic [ref=e168]:
+                - link [ref=e169] [cursor=pointer]:
+                  - /url: /regex-tester
+                  - heading "Regex Tester" [level=4] [ref=e170]
+                - link [ref=e171] [cursor=pointer]:
+                  - /url: /jwt-decoder
+                  - heading "JWT Decoder" [level=4] [ref=e172]
+                - link [ref=e173] [cursor=pointer]:
+                  - /url: /api-response-formatter
+                  - heading "API Response Formatter" [level=4] [ref=e174]
+                - link [ref=e175] [cursor=pointer]:
+                  - /url: /sql-formatter
+                  - heading "SQL Formatter" [level=4] [ref=e176]
+                - link [ref=e177] [cursor=pointer]:
+                  - /url: /json-minify-beautify
+                  - heading "JSON Minify/Beautify" [level=4] [ref=e178]
+                - link [ref=e179] [cursor=pointer]:
+                  - /url: /xml-formatter
+                  - heading "XML Formatter" [level=4] [ref=e180]
+                - link [ref=e181] [cursor=pointer]:
+                  - /url: /gitignore-suggester
+                  - heading "Gitignore Suggester" [level=4] [ref=e182]
+            - generic [ref=e183]:
+              - heading "Productivity(7)" [level=3] [ref=e184]:
+                - text: Productivity
+                - generic [ref=e185]: (7)
+              - generic [ref=e186]:
+                - link [ref=e187] [cursor=pointer]:
+                  - /url: /pomodoro-timer
+                  - heading "Pomodoro Timer" [level=4] [ref=e188]
+                - link [ref=e189] [cursor=pointer]:
+                  - /url: /task-prioritizer
+                  - heading "Task Prioritizer" [level=4] [ref=e190]
+                - link [ref=e191] [cursor=pointer]:
+                  - /url: /time-blocking-builder
+                  - heading "Time Blocking" [level=4] [ref=e192]
+                - link [ref=e193] [cursor=pointer]:
+                  - /url: /habit-streak-tracker
+                  - heading "Habit Streak Tracker" [level=4] [ref=e194]
+                - link [ref=e195] [cursor=pointer]:
+                  - /url: /goal-progress-tracker
+                  - heading "Goal Progress" [level=4] [ref=e196]
+                - link [ref=e197] [cursor=pointer]:
+                  - /url: /meeting-agenda-builder
+                  - heading "Meeting Agenda" [level=4] [ref=e198]
+                - link [ref=e199] [cursor=pointer]:
+                  - /url: /daily-planner
+                  - heading "Daily Planner" [level=4] [ref=e200]
+            - generic [ref=e201]:
+              - heading "Business(6)" [level=3] [ref=e202]:
+                - text: Business
+                - generic [ref=e203]: (6)
+              - generic [ref=e204]:
+                - link [ref=e205] [cursor=pointer]:
+                  - /url: /cac-calculator
+                  - heading "CAC Calculator" [level=4] [ref=e206]
+                - link [ref=e207] [cursor=pointer]:
+                  - /url: /ltv-calculator
+                  - heading "LTV Calculator" [level=4] [ref=e208]
+                - link [ref=e209] [cursor=pointer]:
+                  - /url: /roas-calculator
+                  - heading "ROAS Calculator" [level=4] [ref=e210]
+                - link [ref=e211] [cursor=pointer]:
+                  - /url: /churn-rate-calculator
+                  - heading "Churn Rate" [level=4] [ref=e212]
+                - link [ref=e213] [cursor=pointer]:
+                  - /url: /profit-margin-calculator
+                  - heading "Profit Margin" [level=4] [ref=e214]
+                - link [ref=e215] [cursor=pointer]:
+                  - /url: /burn-rate-runway
+                  - heading "Burn Rate & Runway" [level=4] [ref=e216]
+  - alert [ref=e217]
+```

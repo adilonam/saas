@@ -195,7 +195,6 @@ export default function ImprovedHomeDashboard({ onSearchClick }: ImprovedHomeDas
                 </div>
               ))}
             </div>
-          )}
         </div>
       </section>
     </div>

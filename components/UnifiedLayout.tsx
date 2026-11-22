@@ -11,11 +11,22 @@ import SearchOverlay from "./SearchOverlay";
 
 interface UnifiedLayoutProps {
   children: React.ReactNode;
+  searchOpen?: boolean;
+  setSearchOpen?: (open: boolean) => void;
 }
 
-export default function UnifiedLayout({ children }: UnifiedLayoutProps) {
+export default function UnifiedLayout({ 
+  children, 
+  searchOpen: externalSearchOpen, 
+  setSearchOpen: externalSetSearchOpen 
+}: UnifiedLayoutProps) {
   const pathname = usePathname();
-  const [searchOpen, setSearchOpen] = useState(false);
+  const [internalSearchOpen, setInternalSearchOpen] = useState(false);
+  
+  // Use external state if provided, otherwise use internal
+  const searchOpen = externalSearchOpen !== undefined ? externalSearchOpen : internalSearchOpen;
+  const setSearchOpen = externalSetSearchOpen || setInternalSearchOpen;
+  
   const isHome = pathname === '/';
   const isBlog = pathname?.startsWith('/blog');
 

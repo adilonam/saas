@@ -1,13 +1,10 @@
 import { Suspense } from "react";
-import ImprovedHomeDashboard from "components/ImprovedHomeDashboard";
-import UnifiedLayout from "components/UnifiedLayout";
+import HomePage from "components/HomePage";
 
 export default function Page() {
   return (
     <Suspense fallback={null}>
-      <UnifiedLayout>
-        <ImprovedHomeDashboard />
-      </UnifiedLayout>
+      <HomePage />
     </Suspense>
   );
 }

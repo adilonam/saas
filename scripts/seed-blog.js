@@ -1,19 +1,17 @@
 const fs = require('fs');
 const path = require('path');
 
-// Use dynamic import for ESM-only prisma client
-let prisma;
-
-async function getPrismaClient() {
-  if (!prisma) {
-    const { default: prismaModule } = await import('../lib/prisma.js');
-    prisma = prismaModule;
-  }
-  return prisma;
-}
-
+// Use tsx to run this as TypeScript would be better, but for now use require with the generated client
 async function seedBlogPosts() {
-  const prismaClient = await getPrismaClient();
+  // Dynamic import for ESM modules
+  const { PrismaClient } = await import('../prisma/generated/client.ts');
+  const { PrismaPg } = await import('@prisma/adapter-pg');
+  
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL,
+  });
+  
+  const prisma = new PrismaClient({ adapter });
   
   try {
     console.log('Starting blog post seeding...');
@@ -27,13 +25,13 @@ async function seedBlogPosts() {
     
     for (const post of seedData.posts) {
       try {
-        const existing = await prismaClient.blogPost.findUnique({
+        const existing = await prisma.blogPost.findUnique({
           where: { slug: post.slug },
         });
         
         if (existing) {
           // Update existing post
-          await prismaClient.blogPost.update({
+          await prisma.blogPost.update({
             where: { slug: post.slug },
             data: {
               title: post.title,
@@ -51,7 +49,7 @@ async function seedBlogPosts() {
           console.log(`✓ Updated: ${post.slug}`);
         } else {
           // Create new post
-          await prismaClient.blogPost.create({
+          await prisma.blogPost.create({
             data: {
               slug: post.slug,
               title: post.title,
@@ -80,12 +78,11 @@ async function seedBlogPosts() {
     console.log(`  Skipped: ${skipped}`);
     console.log(`  Total: ${seedData.posts.length}`);
     
+    await prisma.$disconnect();
   } catch (error) {
     console.error('❌ FATAL: Error seeding blog posts:', error);
-    await prismaClient.$disconnect();
+    await prisma.$disconnect();
     process.exit(1); // Fail loudly so build catches it
-  } finally {
-    await prismaClient.$disconnect();
   }
 }
 

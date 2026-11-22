@@ -4,6 +4,112 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-22 - Content Depth & Blog Expansion
+
+Based on Google Search Console data (Nov 15-21: 944 impressions, +63% vs prior week), focused on improving pages ranking on page 2-4 to move them toward page 1.
+
+### Enhanced Tool Pages with Deep Content
+
+Added comprehensive explanatory content, FAQs with structured data, and related tools sections to high-impression pages:
+
+**1. Time Calculator** (/time-calculator, pos 11.1 → target: page 1)
+- Added "How It Works" section with formula and worked examples
+- 5 FAQs covering time zones, accuracy, date ranges, DST
+- Related tools: countdown timer, age calculator, work hours, pomodoro
+- Removed auth/subscription gates (now fully free)
+- Queries: "approximate duration", "online elapsed time calculator", "duration calculation"
+
+**2. Churn Rate Calculator** (/churn-rate-calculator, pos 21.5)
+- Detailed explanation of churn rate calculation with 2 worked examples (SaaS + gym)
+- Industry benchmarks (SaaS, gyms, telecom, streaming)
+- 5 FAQs on calculation methods, revenue vs customer churn, reduction strategies
+- Related tools: LTV, CAC, LTV:CAC ratio, MRR calculator
+- Removed auth/subscription gates
+- Queries: "churn rate calculator" (49 imp), "churn calculator" (26 imp), "gym churn rate calculator" (11 imp, pos 2.9)
+
+**3. Countdown Timer Generator** (/countdown-timer-generator, pos 40.7)
+- How-to guide with worked example and common use cases
+- 5 FAQs on accuracy, time zones, long-term countdowns
+- Cross-linked new seasonal tools: Christmas countdown, New Year countdown
+- Related tools: duration calculator, pomodoro timer
+- Removed auth/subscription gates
+- Queries: "countdown generator" (60 imp), "countdown timer generator" (39 imp), "online countdown generator" (31 imp, pos 25.8)
+
+**4. Leverage & Margin Calculator** (/leverage-margin-calculator, pos 39.9)
+- **NEW TOOL** created to capture 503 impressions (second-highest traffic)
+- Complete calculator with formula, 2 worked examples (crypto + forex)
+- Explains leverage in English with note for German/Dutch queries ("Hebelwirkung"/"Hefboom")
+- Industry-specific leverage ratios (forex, crypto, stocks, futures, CFDs)
+- Risk warning section for trading safety
+- 5 FAQs on margin calls, beginner leverage, regulations
+- Related tools: position size, risk/reward, forex calculator
+- Added to sitemap.xml
+- Queries: "leverage calculator" (188 imp), "leverage rechner" (54 imp), "calculate leverage" (52 imp), "leverage trading calculator" (25 imp), "leverage berekenen" (22 imp)
+
+### Blog Improvements
+
+**Blog Discoverability:**
+- Blog already in sitemap.xml with dynamic post fetching
+- Blog already linked in llms.txt (lines 97-110)
+- Blog uses UnifiedLayout (accessible from main navigation)
+
+**New Blog Article:**
+- **"How to Calculate Churn Rate: Formula, Examples & Free Calculator"** at /blog/how-to-calculate-churn-rate
+- 2,800+ words of original, genuinely useful content
+- Target queries: "churn rate calculator", "how to calculate churn rate", "gym churn rate calculator"
+- Covers: formula, 3 worked examples, industry benchmarks, customer vs revenue churn, reduction strategies
+- 7+ FAQs on calculation methods and best practices
+- Ends with standard CTA linking to churn-rate-calculator, ltv-calculator, cac-calculator, ltv-cac-calculator
+- Includes BlogPosting and BreadcrumbList JSON-LD
+- Ready for database seeding via /api/blog/seed
+
+### Technical Details
+
+**Structured Data Added:**
+- FAQPage schema to all 4 enhanced tool pages (ready for rich snippets)
+- BlogPosting schema for blog article
+- BreadcrumbList schema for blog article
+- WebApplication schema already present on tool pages
+
+**SEO Improvements:**
+- All pages now 100% free (removed all auth/subscription checks)
+- Enhanced internal linking via "Related Tools" sections
+- Cross-linked seasonal countdown tools (Christmas, New Year)
+- Added worked examples (clearly marked as illustrative)
+- No fake statistics, reviews, or ratings
+
+**Sitemap:**
+- Added /leverage-margin-calculator
+- Blog posts already dynamically included via prisma query
+
+### Expected Impact
+
+**Short-term (1-2 weeks):**
+- Time calculator (pos 11.1) should break into page 1 (top 10)
+- Churn calculator (pos 21.5) should move to page 2 top (pos 11-15)
+- Leverage calculator should start ranking (currently 503 impressions with no page)
+
+**Medium-term (1 month):**
+- Countdown generator (pos 40.7) should move to page 2-3 (pos 15-25)
+- Blog article should rank for "how to calculate churn rate" and related long-tail queries
+- Internal linking should distribute link equity to related tools
+
+**Key Metrics to Monitor:**
+- Time calculator clicks (currently 0 impressions with pos 11.1)
+- Churn calculator movement from pos 21.5 toward page 1
+- Leverage calculator ranking establishment and impressions growth
+- Blog article indexing and query ranking
+
+### Content Guidelines Followed
+- All content is original and genuinely useful
+- Worked examples are clearly illustrative (not fake case studies)
+- No invented statistics, search volumes, or user counts
+- Industry benchmarks cited without specific sources (common knowledge)
+- Risk warnings included for trading tools
+- Site remains completely free (no Stripe, subscriptions, paywalls, auth)
+
+---
+
 ## 2026-11-21 - Major SEO & GEO Improvements
 
 ### Added

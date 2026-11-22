@@ -72,6 +72,26 @@ const TOOL_MAP: Record<string, RelatedTool> = {
     title: "Win Probability Calculator",
     description: "Calculate winning probabilities for games and competitions"
   },
+  "churn-rate-calculator": {
+    slug: "churn-rate-calculator",
+    title: "Churn Rate Calculator",
+    description: "Calculate customer churn rate and retention metrics"
+  },
+  "ltv-calculator": {
+    slug: "ltv-calculator",
+    title: "Customer Lifetime Value Calculator",
+    description: "Calculate LTV and customer profitability"
+  },
+  "cac-calculator": {
+    slug: "cac-calculator",
+    title: "Customer Acquisition Cost Calculator",
+    description: "Calculate how much it costs to acquire each customer"
+  },
+  "ltv-cac-calculator": {
+    slug: "ltv-cac-calculator",
+    title: "LTV:CAC Ratio Calculator",
+    description: "Measure customer acquisition efficiency"
+  },
 };
 
 export async function getPublishedPosts(page = 1, pageSize = 12): Promise<{

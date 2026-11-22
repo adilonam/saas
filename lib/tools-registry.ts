@@ -66,7 +66,7 @@ export const TOOLS_REGISTRY: Tool[] = [
   { slug: "tip-split-calculator", title: "Tip Split Calculator", description: "Calculate tip and split bills", category: "Calculator", keywords: ["tip", "split", "calculator", "bill", "restaurant", "calculate"] },
   { slug: "loan-payment-calculator", title: "Loan Payment Calculator", description: "Calculate loan payments", category: "Calculator", keywords: ["loan", "payment", "calculator", "mortgage", "finance", "calculate"] },
   { slug: "roi-calculator", title: "ROI Calculator", description: "Calculate return on investment", category: "Calculator", keywords: ["roi", "calculator", "return", "investment", "calculate"] },
-  { slug: "break-even-calculator", title: "Break Even Calculator", description: "Calculate break-even point", category: "Calculator", keywords: ["break even", "calculator", "business", "calculate"] },
+  { slug: "breakeven-calculator", title: "Break Even Calculator", description: "Calculate break-even point", category: "Calculator", keywords: ["break even", "breakeven", "calculator", "business", "calculate"] },
 
   // Share & Communication Tools
   { slug: "share", title: "Share Files Securely", description: "Send files with end-to-end encryption", category: "File", keywords: ["share", "file", "send", "transfer", "encrypt", "qr", "secure"] },

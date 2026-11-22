@@ -1,23 +1,32 @@
-const fs = require('fs');
-const path = require('path');
+import { PrismaClient } from '../prisma/generated/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import * as fs from 'fs';
+import * as path from 'path';
 
-// Use tsx to run this as TypeScript would be better, but for now use require with the generated client
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+
+const prisma = new PrismaClient({ adapter });
+
+interface BlogPostData {
+  slug: string;
+  title: string;
+  metaDescription: string;
+  keywords: string;
+  content: string;
+  coverImage?: string;
+  relatedTools?: string;
+  category?: string;
+  publishedAt?: string;
+}
+
 async function seedBlogPosts() {
-  // Dynamic import for ESM modules
-  const { PrismaClient } = await import('../prisma/generated/client.ts');
-  const { PrismaPg } = await import('@prisma/adapter-pg');
-  
-  const adapter = new PrismaPg({
-    connectionString: process.env.DATABASE_URL,
-  });
-  
-  const prisma = new PrismaClient({ adapter });
-  
   try {
     console.log('Starting blog post seeding...');
     
     const seedDataPath = path.join(__dirname, 'seed-blog-posts.json');
-    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'));
+    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8')) as { posts: BlogPostData[] };
     
     let created = 0;
     let updated = 0;
@@ -67,7 +76,7 @@ async function seedBlogPosts() {
           console.log(`✓ Created: ${post.slug}`);
         }
       } catch (error) {
-        console.error(`✗ Error processing ${post.slug}:`, error.message);
+        console.error(`✗ Error processing ${post.slug}:`, error instanceof Error ? error.message : error);
         skipped++;
       }
     }
@@ -87,11 +96,7 @@ async function seedBlogPosts() {
 }
 
 // Run if called directly
-if (require.main === module) {
-  seedBlogPosts().catch(err => {
-    console.error('❌ Fatal error:', err);
-    process.exit(1);
-  });
-}
-
-module.exports = { seedBlogPosts };
+seedBlogPosts().catch(err => {
+  console.error('❌ Fatal error:', err);
+  process.exit(1);
+});

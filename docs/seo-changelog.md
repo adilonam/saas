@@ -4,6 +4,41 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-22 (Follow-up) - Removed Unsourced Statistics
+
+Removed all specific numeric benchmarks and statistics that lacked cited sources, per site policy.
+
+### Changes
+
+**1. Churn Rate Calculator Page** (`/churn-rate-calculator`)
+- Removed specific industry benchmark percentages (SaaS 5-7% annual, B2C 5-10% monthly, gyms 3-5% monthly, etc.)
+- Removed "5-25× more expensive" claim about customer acquisition
+- Replaced with qualitative guidance: "acceptable churn varies by industry, contract length, customer type"
+- Kept clearly illustrative worked examples (marked as examples)
+
+**2. Blog Article** (`/blog/how-to-calculate-churn-rate`)
+- Removed all specific benchmark numbers from "What's a Good Churn Rate?" section
+- Removed stage-specific percentages (seed stage 10-15% monthly, growth 3-5%, mature <2%)
+- Removed industry-specific ranges (gyms 30-50% annual, telecom 1-2% monthly, etc.)
+- Removed "5-25×" customer acquisition cost claim
+- Removed "40-60% never return" and "20-30% can be won back" statistics
+- Updated meta description from "includes industry benchmarks" to "includes worked examples"
+- Replaced with guidance to consult published research specific to user's industry
+
+**3. Leverage & Margin Calculator Page** (`/leverage-margin-calculator`)
+- Removed specific leverage ratio ranges by market (Forex 30:1-500:1, Crypto 2:1-125:1, etc.)
+- Removed specific regulatory limits (EU 30:1, US 50:1, Asia 500:1)
+- Replaced with qualitative descriptions ("varies by jurisdiction", "check local regulations")
+- Kept risk warnings and worked calculation examples
+
+### Content Guidelines Reinforced
+- All worked examples remain (clearly marked as illustrative)
+- Qualitative comparisons acceptable (B2B typically lower than B2C)
+- Advice to consult published sources and historical data acceptable
+- No specific percentages, ratios, or statistics without citation
+
+---
+
 ## 2026-11-22 - Content Depth & Blog Expansion
 
 Based on Google Search Console data (Nov 15-21: 944 impressions, +63% vs prior week), focused on improving pages ranking on page 2-4 to move them toward page 1.

@@ -184,14 +184,20 @@ export default function LeverageMarginCalculatorPage() {
             Leverage (German: Hebelwirkung, Dutch: Hefboom) amplifies both gains and losses. For international traders: the calculation works the same in all markets and currencies—simply convert your position value to your account currency and divide by leverage to find required margin.
           </p>
 
-          <h3 className="text-xl font-semibold mt-6 mb-3">Common Leverage Ratios by Market</h3>
+          <h3 className="text-xl font-semibold mt-6 mb-3">Leverage Varies by Market and Jurisdiction</h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-4">
+            Available leverage depends on your market, jurisdiction, broker, and account type. Different markets and regulatory regimes impose different limits:
+          </p>
           <ul className="space-y-2 text-slate-600 dark:text-slate-300">
-            <li><strong>Forex:</strong> 30:1 to 100:1 (retail), up to 500:1 (professional)</li>
-            <li><strong>Crypto:</strong> 2:1 to 125:1 depending on exchange and regulation</li>
-            <li><strong>Stocks (Margin):</strong> 2:1 (Reg T) in the US</li>
-            <li><strong>Futures:</strong> 10:1 to 20:1 for index futures</li>
-            <li><strong>CFDs:</strong> 5:1 to 30:1 depending on asset class and broker</li>
+            <li><strong>Forex:</strong> Varies widely by jurisdiction; retail often lower than professional accounts</li>
+            <li><strong>Crypto:</strong> Ranges from conservative to very high depending on exchange and local regulations</li>
+            <li><strong>Stocks (Margin):</strong> Typically lower leverage with specific regulatory requirements</li>
+            <li><strong>Futures:</strong> Moderate leverage levels depending on contract type</li>
+            <li><strong>CFDs:</strong> Varies by asset class, broker, and regulatory framework</li>
           </ul>
+          <p className="text-slate-600 dark:text-slate-300 mt-4">
+            Always check your broker's specific offerings and your local regulations before trading.
+          </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">Risk Warning</h3>
           <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-300 dark:border-amber-700 rounded-lg p-4 my-4">
@@ -243,7 +249,7 @@ export default function LeverageMarginCalculatorPage() {
                 Is leverage trading legal everywhere?
               </summary>
               <p className="mt-3 text-slate-600 dark:text-slate-300">
-                Leverage limits vary by jurisdiction. The EU caps retail forex at 30:1, the US limits it to 50:1, while some Asian markets allow 500:1. Crypto leverage is also increasingly regulated. Check your local regulations.
+                Leverage limits vary significantly by jurisdiction. Different regions have different retail and professional leverage caps for forex, crypto, and other markets. Regulations are also evolving, particularly for crypto leverage. Always check your local regulations and your broker's compliance requirements before trading.
               </p>
             </details>
 

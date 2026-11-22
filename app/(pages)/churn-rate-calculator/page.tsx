@@ -155,24 +155,27 @@ export default function ChurnRateCalculatorPage() {
               <p>Churned = (1,200 + 200) - 1,350 = 50 members lost</p>
               <p>Churn Rate = (50 / 1,200) × 100 = <strong>4.17% quarterly churn</strong></p>
             </div>
-            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
-              A 4.17% quarterly churn rate is typical for fitness facilities. Annual churn would be approximately 15-17%.
-            </p>
           </div>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">What's a Good Churn Rate?</h3>
+          <p className="text-slate-600 dark:text-slate-300 mb-4">
+            Acceptable churn varies significantly by industry, contract length, and customer type. Rather than comparing to generic benchmarks, track your churn against your own historical cohorts and consult published research specific to your industry and business model.
+          </p>
+          <p className="text-slate-600 dark:text-slate-300">
+            <strong>Key factors that affect churn:</strong>
+          </p>
           <ul className="space-y-2 text-slate-600 dark:text-slate-300">
-            <li><strong>SaaS (B2B):</strong> 5-7% annual churn is considered excellent, 10-15% is average</li>
-            <li><strong>SaaS (B2C):</strong> 5-10% monthly churn is typical</li>
-            <li><strong>Gyms:</strong> 3-5% monthly churn (30-50% annual) is industry standard</li>
-            <li><strong>Telecom:</strong> 1-2% monthly churn is competitive</li>
-            <li><strong>Media/Streaming:</strong> 5-10% monthly churn depending on content quality</li>
+            <li><strong>Contract length:</strong> Annual contracts typically have lower churn than monthly</li>
+            <li><strong>Customer type:</strong> Enterprise/B2B generally has lower churn than consumer/B2C</li>
+            <li><strong>Market maturity:</strong> Early-stage products typically have higher churn while finding product-market fit</li>
+            <li><strong>Price point:</strong> Higher-priced products often have different churn patterns</li>
+            <li><strong>Switching costs:</strong> Deeper integration = harder to leave = lower churn</li>
           </ul>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">Why Churn Rate Matters</h3>
           <ul className="space-y-2 text-slate-600 dark:text-slate-300">
             <li><strong>Revenue Impact:</strong> High churn directly reduces recurring revenue and growth</li>
-            <li><strong>Customer Acquisition Cost:</strong> Acquiring new customers is 5-25× more expensive than retaining existing ones</li>
+            <li><strong>Customer Acquisition Cost:</strong> Acquiring new customers is significantly more expensive than retaining existing ones</li>
             <li><strong>Growth Sustainability:</strong> You must acquire enough new customers to offset churn and achieve net growth</li>
             <li><strong>Product Quality Signal:</strong> Rising churn indicates product-market fit issues or service problems</li>
           </ul>

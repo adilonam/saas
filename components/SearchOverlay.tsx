@@ -3,38 +3,116 @@
 import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { MagnifyingGlassIcon, XMarkIcon } from "@heroicons/react/24/outline";
+import { TOOLS_REGISTRY, type Tool } from "lib/tools-registry";
 
 interface SearchResult {
   type: "tool" | "blog";
   slug: string;
   title: string;
   description?: string;
+  score: number; // For ranking
 }
-
-// All tools from the site
-const ALL_TOOLS: SearchResult[] = [
-  { type: "tool", slug: "share", title: "Share Files Securely", description: "Send files and text with end-to-end encryption, room codes, and QR codes" },
-  { type: "tool", slug: "christmas-countdown", title: "Christmas Countdown", description: "Count down days to Christmas" },
-  { type: "tool", slug: "new-year-countdown", title: "New Year Countdown", description: "Count down to New Year" },
-  { type: "tool", slug: "secret-santa-generator", title: "Secret Santa Generator", description: "Generate Secret Santa assignments with exclusions" },
-  { type: "tool", slug: "black-friday-discount-calculator", title: "Black Friday Calculator", description: "Calculate Black Friday discounts and savings" },
-  { type: "tool", slug: "2027-calendar", title: "2027 Calendar", description: "View full 2027 calendar" },
-  { type: "tool", slug: "youtube-title-length-checker", title: "YouTube Title Length Checker", description: "Check YouTube title character limits" },
-  { type: "tool", slug: "sign-pdf", title: "Sign PDF", description: "Add digital signatures to PDFs" },
-  { type: "tool", slug: "merge-pdf", title: "Merge PDF", description: "Combine multiple PDF files" },
-  { type: "tool", slug: "age-calculator", title: "Age Calculator", description: "Calculate exact age in years, months, days" },
-  { type: "tool", slug: "acceptance-criteria-generator", title: "Acceptance Criteria Generator", description: "Generate acceptance criteria for user stories" },
-  { type: "tool", slug: "ai-email-subject-line", title: "AI Email Subject Line", description: "Generate compelling email subject lines" },
-  { type: "tool", slug: "ai-resume-bullet", title: "AI Resume Bullet", description: "Create impactful resume bullet points" },
-  { type: "tool", slug: "time-calculator", title: "Time Calculator", description: "Add and subtract time durations" },
-  { type: "tool", slug: "bmi-calculator", title: "BMI Calculator", description: "Calculate body mass index" },
-  { type: "tool", slug: "password-generator", title: "Password Generator", description: "Generate secure random passwords" },
-  { type: "tool", slug: "qr-generate", title: "QR Code Generator", description: "Create QR codes for any text or URL" },
-];
 
 interface SearchOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+}
+
+// Enhanced search matching with token-based scoring
+function matchTool(tool: Tool, query: string): { matches: boolean; score: number } {
+  const q = query.toLowerCase().trim();
+  if (!q) return { matches: false, score: 0 };
+
+  // Split query into tokens for multi-word matching
+  const queryTokens = q.split(/\s+/);
+  
+  const title = tool.title.toLowerCase();
+  const slug = tool.slug.toLowerCase();
+  const description = tool.description.toLowerCase();
+  const keywords = tool.keywords.map(k => k.toLowerCase());
+  const category = tool.category.toLowerCase();
+
+  let score = 0;
+  let matchFound = false;
+
+  // Check each query token
+  for (const token of queryTokens) {
+    let tokenMatched = false;
+
+    // Exact title match (highest priority)
+    if (title === token) {
+      score += 100;
+      tokenMatched = true;
+    }
+    // Title starts with token (high priority)
+    else if (title.startsWith(token)) {
+      score += 80;
+      tokenMatched = true;
+    }
+    // Title contains token as word
+    else if (title.includes(` ${token} `) || title.includes(` ${token}`) || title.includes(`${token} `)) {
+      score += 60;
+      tokenMatched = true;
+    }
+    // Title contains token anywhere
+    else if (title.includes(token)) {
+      score += 50;
+      tokenMatched = true;
+    }
+
+    // Exact slug match (very high priority for things like "pdf")
+    if (slug === token || slug.startsWith(`${token}-`) || slug.endsWith(`-${token}`) || slug.includes(`-${token}-`)) {
+      score += 90;
+      tokenMatched = true;
+    }
+    // Slug contains token
+    else if (slug.includes(token)) {
+      score += 70;
+      tokenMatched = true;
+    }
+
+    // Exact keyword match
+    if (keywords.some(k => k === token)) {
+      score += 85;
+      tokenMatched = true;
+    }
+    // Keyword starts with token
+    else if (keywords.some(k => k.startsWith(token))) {
+      score += 75;
+      tokenMatched = true;
+    }
+    // Keyword contains token
+    else if (keywords.some(k => k.includes(token))) {
+      score += 65;
+      tokenMatched = true;
+    }
+
+    // Category match
+    if (category === token || category.includes(token)) {
+      score += 40;
+      tokenMatched = true;
+    }
+
+    // Description match (lower priority)
+    if (description.includes(token)) {
+      score += 30;
+      tokenMatched = true;
+    }
+
+    if (tokenMatched) {
+      matchFound = true;
+    } else {
+      // If any token doesn't match, reduce overall score
+      score -= 20;
+    }
+  }
+
+  // Bonus for matching all tokens
+  if (matchFound && queryTokens.length > 1) {
+    score += 20;
+  }
+
+  return { matches: matchFound && score > 0, score };
 }
 
 export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
@@ -53,6 +131,7 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           slug: post.slug,
           title: post.title,
           description: post.metaDescription || undefined,
+          score: 0,
         }));
         setBlogPosts(posts);
       })
@@ -62,14 +141,24 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
       });
   }, []);
 
-  // Filter results
-  const toolResults = query.trim()
-    ? ALL_TOOLS.filter((tool) =>
-        tool.title.toLowerCase().includes(query.toLowerCase()) ||
-        tool.description?.toLowerCase().includes(query.toLowerCase())
-      )
+  // Enhanced tool filtering with ranking
+  const toolResults: SearchResult[] = query.trim()
+    ? TOOLS_REGISTRY
+        .map(tool => {
+          const { matches, score } = matchTool(tool, query);
+          return matches ? {
+            type: "tool" as const,
+            slug: tool.slug,
+            title: tool.title,
+            description: tool.description,
+            score
+          } : null;
+        })
+        .filter((r): r is NonNullable<typeof r> => r !== null)
+        .sort((a, b) => b.score - a.score) // Sort by score descending
     : [];
 
+  // Blog post filtering (keep existing simple matching)
   const blogResults = query.trim()
     ? blogPosts.filter((post) =>
         post.title.toLowerCase().includes(query.toLowerCase()) ||
@@ -156,8 +245,8 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
           </button>
         </div>
 
-        {/* Results */}
-        <div className="max-h-96 overflow-y-auto">
+        {/* Results - Increased max height and made scrollable */}
+        <div className="max-h-[70vh] overflow-y-auto">
           {!query.trim() ? (
             <div className="p-8 text-center text-gray-500 dark:text-gray-400">
               <MagnifyingGlassIcon className="w-12 h-12 mx-auto mb-3 opacity-50" />

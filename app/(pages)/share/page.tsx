@@ -534,14 +534,20 @@ function SharePageContent() {
   };
 
   const handleBinaryChunk = async (data: ArrayBuffer) => {
-    if (!fileTransferRef.current || !sharedKeyRef.current) return;
+    if (!fileTransferRef.current || !sharedKeyRef.current) {
+      console.log('Received binary chunk but no file transfer in progress or no key');
+      return;
+    }
 
     try {
+      console.log(`Received chunk: ${data.byteLength} bytes encrypted`);
       const decrypted = await decryptData(data, sharedKeyRef.current);
+      console.log(`Decrypted to: ${decrypted.byteLength} bytes`);
       fileTransferRef.current.chunks.push(decrypted);
       fileTransferRef.current.received += decrypted.byteLength;
 
       const progress = Math.round((fileTransferRef.current.received / fileTransferRef.current.total) * 100);
+      console.log(`File progress: ${progress}% (${fileTransferRef.current.received}/${fileTransferRef.current.total})`);
       setReceiveProgress({ 
         fileName: fileTransferRef.current.fileName, 
         progress 
@@ -556,8 +562,13 @@ function SharePageContent() {
   };
 
   const completeFileTransfer = async () => {
-    if (!fileTransferRef.current) return;
+    if (!fileTransferRef.current) {
+      console.error('completeFileTransfer called but no transfer in progress!');
+      return;
+    }
 
+    console.log(`Completing file transfer: ${fileTransferRef.current.fileName}`);
+    console.log(`Total chunks received: ${fileTransferRef.current.chunks.length}`);
     const blob = new Blob(fileTransferRef.current.chunks, { type: fileTransferRef.current.fileType });
     
     setReceivedFiles(prev => [...prev, {
@@ -709,8 +720,10 @@ function SharePageContent() {
 
       if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
         dataChannelRef.current.send(encrypted);
+        console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via DataChannel`);
       } else if (wsRef.current) {
         wsRef.current.send(encrypted);
+        console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via WebSocket`);
       }
 
       offset += CHUNK_SIZE;

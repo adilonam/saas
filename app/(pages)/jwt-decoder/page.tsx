@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -78,9 +76,6 @@ function decodeJwt(token: string): Decoded {
 }
 
 export default function JWTDecoderPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [token, setToken] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
   const [copied, setCopied] = useState<"header" | "payload" | null>(null);
@@ -89,19 +84,6 @@ export default function JWTDecoderPage() {
   const hasResult = decoded.header !== null || decoded.payload !== null;
 
   const handleDecode = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/jwt-decoder")}`
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!token.trim()) return;
     setResultUnlocked(true);
   };

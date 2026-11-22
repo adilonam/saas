@@ -1,16 +1,11 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function BatchRenamePage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<File[]>([]);
@@ -27,14 +22,7 @@ export default function BatchRenamePage() {
     });
   }, [files, prefix, startAt]);
 
-  const handleGenerate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setGenerated(true);
+  const handleGenerate = () => {    setGenerated(true);
   };
 
   const downloadCsv = () => {

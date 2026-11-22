@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { SparklesIcon } from "@heroicons/react/24/outline";
@@ -32,29 +30,12 @@ export default function AiTextToolPage({
   children,
   buildBody,
 }: AiTextToolPageProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     const trimmed = text.trim();
     if (!trimmed) {
@@ -76,13 +57,6 @@ export default function AiTextToolPage({
       const data = await res.json();
 
       if (!res.ok) {
-        if (
-          data.code === "subscription_required" ||
-          data.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Something went wrong.");
         return;
       }

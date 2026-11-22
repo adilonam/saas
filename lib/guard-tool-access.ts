@@ -1,17 +1,10 @@
-import type { Session } from "next-auth";
-
-type RouterLike = { push: (href: string) => void };
-
-/**
- * All tools are now free - always returns true.
- * @returns true (all users may proceed).
- */
+/** Tools are free and anonymous — access is always allowed. */
 export function guardToolAccess(
-  status: string,
-  session: Session | null,
-  pathname: string | null,
-  pagePath: string,
-  router: RouterLike,
+  _status?: unknown,
+  _session?: unknown,
+  _pathname?: string | null,
+  _fallbackPath?: string,
+  _router?: { push: (url: string) => void } | null,
 ): boolean {
   return true;
 }

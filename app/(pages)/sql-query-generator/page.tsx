@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { SparklesIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function SqlQueryGeneratorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [schema, setSchema] = useState("");
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState("");
@@ -20,19 +15,6 @@ export default function SqlQueryGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/sql-query-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!question.trim()) {
       setError("Please describe the query you need.");
       return;
@@ -53,13 +35,6 @@ export default function SqlQueryGeneratorPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (
-          data.code === "subscription_required" ||
-          data.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Something went wrong.");
         return;
       }

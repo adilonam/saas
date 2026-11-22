@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { SparklesIcon } from "@heroicons/react/24/outline";
@@ -18,9 +16,6 @@ const TONES = [
 ];
 
 export default function SentenceRewriterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [tone, setTone] = useState("");
   const [result, setResult] = useState("");
@@ -28,19 +23,6 @@ export default function SentenceRewriterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/sentence-rewriter")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!text.trim()) {
       setError("Please enter text to rewrite.");
       return;
@@ -58,13 +40,6 @@ export default function SentenceRewriterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (
-          data.code === "subscription_required" ||
-          data.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Something went wrong.");
         return;
       }

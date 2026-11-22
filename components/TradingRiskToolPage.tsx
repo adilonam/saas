@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import { CalculatorIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -42,9 +40,6 @@ export default function TradingRiskToolPage({
   fields,
   compute,
 }: TradingRiskToolPageProps) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const initialState = useMemo(() => {
     const map: Record<string, string> = {};
     for (const field of fields) map[field.key] = field.defaultValue ?? "";
@@ -54,19 +49,6 @@ export default function TradingRiskToolPage({
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     setResultUnlocked(true);
   };

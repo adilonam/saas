@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +12,6 @@ import {
 import { Loader2 } from "lucide-react";
 
 export default function PDFToWordPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [isConverting, setIsConverting] = useState(false);
@@ -59,21 +54,6 @@ export default function PDFToWordPage() {
   };
 
   const handleConvert = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-word")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!selectedFile) {
       setError("Please select a PDF file to convert.");
       return;
@@ -94,15 +74,6 @@ export default function PDFToWordPage() {
       if (!response.ok) {
         try {
           const errorData = await response.json();
-          if (
-            (response.status === 403 || response.status === 400) &&
-            (errorData.error === "Active subscription required" ||
-              errorData.error === "Insufficient tokens")
-          ) {
-            router.push("/pricing");
-            setIsConverting(false);
-            return;
-          }
           setError(
             errorData.error ||
               errorData.detail ||
@@ -114,8 +85,6 @@ export default function PDFToWordPage() {
         setIsConverting(false);
         return;
       }
-
-      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -30,26 +28,10 @@ function getPercentile(netWorth: number): { label: string; p: number } {
 }
 
 export default function WealthComparisonCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [netWorth, setNetWorth] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/wealth-comparison-calculator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

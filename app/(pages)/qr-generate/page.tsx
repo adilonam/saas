@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -10,10 +8,6 @@ import { Loader2 } from "lucide-react";
 import { ArrowDownTrayIcon, QrCodeIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 
 export default function QrGeneratePage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [text, setText] = useState("https://example.com");
   const [boxSize, setBoxSize] = useState(8);
   const [border, setBorder] = useState(2);
@@ -30,20 +24,6 @@ export default function QrGeneratePage() {
   }, [resultUrl]);
 
   const handleGenerate = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/qr-generate")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     const trimmed = text.trim();
     if (!trimmed) {

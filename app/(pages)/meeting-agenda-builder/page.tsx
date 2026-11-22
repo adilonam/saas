@@ -1,17 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function MeetingAgendaBuilderPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [title, setTitle] = useState("Weekly Product Sync");
   const [duration, setDuration] = useState("45");
   const [topics, setTopics] = useState("Metrics review\nBlockers\nRoadmap updates\nAction items");
@@ -23,14 +17,7 @@ export default function MeetingAgendaBuilderPage() {
     return topicList.map((topic, i) => ({ topic, minutes: i === topicList.length - 1 ? "Remaining" : String(perTopic) }));
   }, [topics, duration]);
 
-  const handleBuild = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setBuilt(true);
+  const handleBuild = () => {    setBuilt(true);
   };
 
   return (

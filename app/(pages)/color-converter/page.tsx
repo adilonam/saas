@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,6 @@ import {
   SwatchIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 type Source = "hex" | "rgb" | "hsl";
 
 function parseHex(s: string): { r: number; g: number; b: number } | null {
@@ -120,8 +117,7 @@ function hslToRgb(
 export default function ColorConverterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [source, setSource] = useState<Source>("hex");
+const [source, setSource] = useState<Source>("hex");
   const [hex, setHex] = useState("#3b82f6");
   const [r, setR] = useState("59");
   const [g, setG] = useState("130");
@@ -134,10 +130,7 @@ export default function ColorConverterPage() {
   const [previewHex, setPreviewHex] = useState("#3b82f6");
 
   const handleConvert = () => {
-    if (!guardToolAccess(status, session, pathname, "/color-converter", router)) {
-      return;
-    }
-    setError(null);
+setError(null);
     let rgb: { r: number; g: number; b: number } | null = null;
 
     if (source === "hex") {

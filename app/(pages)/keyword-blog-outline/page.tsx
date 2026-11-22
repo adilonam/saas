@@ -45,8 +45,7 @@ export default function KeywordBlogOutlinePage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setError(data.error || "Outline failed.");
+setError(data.error || "Outline failed.");
         return;
       }
       setAiOutline(data.text ?? "");

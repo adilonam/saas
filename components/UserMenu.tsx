@@ -16,23 +16,12 @@ interface UserMenuProps {
   user: {
     name?: string | null;
     email?: string | null;
-    subscriptionExpiresAt?: Date | null;
   };
 }
 
 export default function UserMenu({ user }: UserMenuProps) {
   const handleLogout = async () => {
-    await signOut({ callbackUrl: "/signin" });
-  };
-
-  const hasActiveSubscription =
-    user.subscriptionExpiresAt && new Date(user.subscriptionExpiresAt) > new Date();
-
-  const renderSubtitle = () => {
-    if (hasActiveSubscription) {
-      return `Expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`;
-    }
-    return "No subscription";
+    await signOut({ callbackUrl: "/" });
   };
 
   return (
@@ -46,9 +35,6 @@ export default function UserMenu({ user }: UserMenuProps) {
           <span className="hidden sm:inline text-left min-w-0">
             <span className="block truncate font-medium">
               {user.name || user.email || "User"}
-            </span>
-            <span className="block text-[10px] sm:text-xs uppercase tracking-tighter text-muted-foreground">
-              {renderSubtitle()}
             </span>
           </span>
         </Button>
@@ -64,11 +50,6 @@ export default function UserMenu({ user }: UserMenuProps) {
                 {user.email}
               </p>
             )}
-            <p className="text-xs leading-none text-muted-foreground mt-1">
-              {hasActiveSubscription
-                ? `Subscription expires ${new Date(user.subscriptionExpiresAt!).toLocaleDateString()}`
-                : "No active subscription"}
-            </p>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />

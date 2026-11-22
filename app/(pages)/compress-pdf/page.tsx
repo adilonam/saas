@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +14,6 @@ import { Loader2 } from "lucide-react";
 type PdfSetting = "screen" | "ebook" | "printer" | "prepress" | "default";
 
 export default function CompressPDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [pdfSettings, setPdfSettings] = useState<PdfSetting>("ebook");
@@ -54,21 +48,6 @@ export default function CompressPDFPage() {
   };
 
   const handleCompress = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/compress-pdf")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!file) {
       setError("Please select a PDF first.");
       return;

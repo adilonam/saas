@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -10,23 +9,18 @@ import {
   CodeBracketSquareIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
 import { formatXmlString } from "@/lib/format-xml";
 
 export default function XmlFormatterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [text, setText] = useState("");
+const [text, setText] = useState("");
   const [output, setOutput] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFormat = () => {
-    if (!guardToolAccess(status, session, pathname, "/xml-formatter", router)) {
-      return;
-    }
-    const res = formatXmlString(text);
+const res = formatXmlString(text);
     if (res.ok === false) {
       setError(res.error);
       setOutput("");

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { ChartBarIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 
 export default function AdROICalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [adSpend, setAdSpend] = useState("");
   const [revenue, setRevenue] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
@@ -28,19 +23,6 @@ export default function AdROICalculatorPage() {
   }, [adSpend, revenue]);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/ad-roi-calculator")}`
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

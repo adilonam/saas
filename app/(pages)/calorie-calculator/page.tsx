@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -41,9 +39,6 @@ function bmrMifflin(weightKg: number, heightCm: number, age: number, sex: Sex): 
 }
 
 export default function CalorieCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [unit, setUnit] = useState<Unit>("metric");
   const [sex, setSex] = useState<Sex>("male");
   const [activity, setActivity] = useState<Activity>("moderate");
@@ -55,14 +50,7 @@ export default function CalorieCalculatorPage() {
   const [heightIn, setHeightIn] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setResultUnlocked(true);
+  const handleCalculate = () => {    setResultUnlocked(true);
   };
 
   const { bmr, tdee } = useMemo(() => {

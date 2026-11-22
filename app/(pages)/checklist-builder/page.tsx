@@ -1,31 +1,18 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function ChecklistBuilderPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [title, setTitle] = useState("SOP: Launch New Campaign");
   const [steps, setSteps] = useState("Define objective\nPrepare assets\nQA tracking links\nLaunch and monitor");
   const [created, setCreated] = useState(false);
 
   const items = useMemo(() => steps.split("\n").map((s) => s.trim()).filter(Boolean), [steps]);
 
-  const handleCreate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setCreated(true);
+  const handleCreate = () => {    setCreated(true);
   };
 
   return (

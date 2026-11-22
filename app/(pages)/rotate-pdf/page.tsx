@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -16,10 +14,6 @@ import { Loader2 } from "lucide-react";
 const ROTATION_OPTIONS = [90, 180, -90, -180];
 
 export default function RotatePDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [rotation, setRotation] = useState<number>(90);
@@ -49,21 +43,6 @@ export default function RotatePDFPage() {
   };
 
   const handleRotate = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/rotate-pdf")}`
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!file) {
       setError("Please select a PDF first.");
       return;
@@ -99,20 +78,9 @@ export default function RotatePDFPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        if (
-          (response.status === 400 || response.status === 403) &&
-          errorData?.error &&
-          (errorData.error === "Insufficient tokens" ||
-            errorData.error === "Active subscription required")
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(errorData?.error || errorData?.detail || "Failed to rotate PDF");
         return;
       }
-
-      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

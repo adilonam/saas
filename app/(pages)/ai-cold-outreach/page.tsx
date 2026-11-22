@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { SparklesIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function AIColdOutreachPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [prompt, setPrompt] = useState(
     "I run a B2B SaaS for HR onboarding. I'm reaching out to HR directors at mid-size companies to offer a free trial. Keep it under 120 words."
   );
@@ -21,19 +16,6 @@ export default function AIColdOutreachPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/ai-cold-outreach")}`
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     const trimmed = prompt.trim();
     if (!trimmed) {

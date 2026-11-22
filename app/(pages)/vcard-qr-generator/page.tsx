@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -34,8 +33,7 @@ function buildVCard(input: {
 export default function VcardQrGeneratorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [fullName, setFullName] = useState("");
+const [fullName, setFullName] = useState("");
   const [org, setOrg] = useState("");
   const [title, setTitle] = useState("");
   const [phone, setPhone] = useState("");
@@ -45,20 +43,6 @@ export default function VcardQrGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/vcard-qr-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!fullName.trim() && !email.trim() && !phone.trim()) {
       setError("Enter at least a name, phone, or email.");
       setQrDataUrl(null);
@@ -80,10 +64,6 @@ export default function VcardQrGeneratorPage() {
       setQrDataUrl(null);
     }
   }, [
-    session,
-    status,
-    router,
-    pathname,
     fullName,
     org,
     title,

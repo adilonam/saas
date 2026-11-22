@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import Image from "next/image";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -20,8 +18,6 @@ const PROMPT_TYPES = [
 ] as const;
 
 export default function ImageToPromptPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -29,10 +25,6 @@ export default function ImageToPromptPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const hasActiveSubscription =
-    session?.user?.subscriptionExpiresAt &&
-    new Date(session.user.subscriptionExpiresAt) > new Date();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -57,16 +49,6 @@ export default function ImageToPromptPage() {
   };
 
   const handleGenerate = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push("/signup?callbackUrl=" + encodeURIComponent("/image-to-prompt"));
-      return;
-    }
-
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!selectedImage) {
       setError("Please select an image first.");
       return;
@@ -89,10 +71,6 @@ export default function ImageToPromptPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
-          return;
-        }
         throw new Error(data.error || "Failed to generate prompt");
       }
 

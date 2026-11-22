@@ -2,13 +2,10 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 function toMarkdown(text: string): string {
   const lines = text
     .split("\n")
@@ -30,8 +27,7 @@ function toMarkdown(text: string): string {
 export default function PdfToMarkdownPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [result, setResult] = useState("");
@@ -39,8 +35,7 @@ export default function PdfToMarkdownPage() {
   const [isLoading, setIsLoading] = useState(false);
 
   const handleConvert = async () => {
-    if (!guardToolAccess(status, session, pathname, "/pdf-to-markdown", router)) return;
-    if (!file) return;
+if (!file) return;
 
     setIsLoading(true);
     setError(null);

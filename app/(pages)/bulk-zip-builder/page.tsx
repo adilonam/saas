@@ -1,17 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function BulkZipBuilderPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<File[]>([]);
@@ -19,14 +14,7 @@ export default function BulkZipBuilderPage() {
   const [isBuilding, setIsBuilding] = useState(false);
 
   const handleBuild = async () => {
-    setError(null);    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    if (!files.length) {
+    setError(null);    if (!files.length) {
       setError("Please choose at least one file.");
       return;
     }

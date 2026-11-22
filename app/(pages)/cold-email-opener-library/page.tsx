@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -37,35 +35,14 @@ const TEMPLATES: { label: string; body: string }[] = [
 ];
 
 export default function ColdEmailOpenerLibraryPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [unlocked, setUnlocked] = useState(false);
   const [context, setContext] = useState("");
   const [aiOut, setAiOut] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/cold-email-opener-library")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
   const handleOpen = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   const handleAi = async () => {

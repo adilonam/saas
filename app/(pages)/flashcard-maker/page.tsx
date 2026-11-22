@@ -58,8 +58,7 @@ export default function FlashcardMakerPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setError(data.error || "Failed");
+setError(data.error || "Failed");
         return;
       }
       const text = (data.text as string) || "";

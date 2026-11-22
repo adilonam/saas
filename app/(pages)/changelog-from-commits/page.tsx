@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -14,9 +12,6 @@ import {
 } from "@/lib/conventional-commits";
 
 export default function ChangelogFromCommitsPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [input, setInput] = useState(
     "feat(auth): add OAuth login\nfix: handle null profile\nfeat(dashboard): export CSV\ndocs: update README",
   );
@@ -27,17 +22,6 @@ export default function ChangelogFromCommitsPage() {
   const [parsedCount, setParsedCount] = useState<number | null>(null);
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/changelog-from-commits")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

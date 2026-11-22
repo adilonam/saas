@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,22 +8,12 @@ import { Button } from "@/components/ui/button";
 import { CalculatorIcon } from "@heroicons/react/24/outline";
 
 export default function BreakevenCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [fixedCosts, setFixedCosts] = useState("");
   const [variableCostPerUnit, setVariableCostPerUnit] = useState("");
   const [pricePerUnit, setPricePerUnit] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setResultUnlocked(true);
+  const handleCalculate = () => {    setResultUnlocked(true);
   };
 
   const result = useMemo(() => {

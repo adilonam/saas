@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams } from "next/navigation";
+
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useParams, usePathname, useRouter } from "next/navigation";
 import { CalculatorIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
@@ -52,11 +52,8 @@ type TradingRiskAnalyticsToolPageProps = {
 };
 
 export default function TradingRiskAnalyticsToolPage({ slug: slugProp }: TradingRiskAnalyticsToolPageProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const params = useParams<{ tool?: string }>();
-  const { data: session, status } = useSession();
-  const [resultUnlocked, setResultUnlocked] = useState(false);
+const [resultUnlocked, setResultUnlocked] = useState(false);
   const segment = slugProp ?? (typeof params?.tool === "string" ? params.tool : "");
   const tool = TRADING_RISK_TOOLS.find((item) => item.slug === segment);
 
@@ -236,16 +233,6 @@ export default function TradingRiskAnalyticsToolPage({ slug: slugProp }: Trading
   }, [form, tool]);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt && new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

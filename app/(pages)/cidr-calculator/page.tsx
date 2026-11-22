@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { MapPinIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
 import { analyzeCidr } from "@/lib/cidr";
 
 const PAGE = "/cidr-calculator";
@@ -16,8 +14,7 @@ const PAGE = "/cidr-calculator";
 export default function CidrCalculatorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [input, setInput] = useState("192.168.1.0/24");
+const [input, setInput] = useState("192.168.1.0/24");
   const [unlocked, setUnlocked] = useState(false);
 
   const parsed = analyzeCidr(input);
@@ -25,8 +22,7 @@ export default function CidrCalculatorPage() {
   const info = parsed.ok === true ? parsed.info : null;
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    if (!parsed.ok) {
+if (!parsed.ok) {
       setUnlocked(false);
       return;
     }

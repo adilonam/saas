@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback, useRef } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -41,27 +40,13 @@ function validateValue(format: Format, value: string): string | null {
 export default function BarcodeGeneratorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+const canvasRef = useRef<HTMLCanvasElement>(null);
   const [value, setValue] = useState("");
   const [format, setFormat] = useState<Format>("CODE128");
   const [generated, setGenerated] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/barcode-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     const v = format === "CODE128" || format === "CODE39" ? value.trim() : value.replace(/\s/g, "");
     const validationError = validateValue(format, v);
@@ -94,7 +79,7 @@ export default function BarcodeGeneratorPage() {
       setError("Could not generate barcode. Check the value and format.");
       setGenerated(false);
     }
-  }, [session, status, router, pathname, value, format]);
+  }, [value, format]);
 
   return (
     <DashboardLayout>

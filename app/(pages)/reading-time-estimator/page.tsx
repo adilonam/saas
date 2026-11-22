@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,28 +9,12 @@ import { BookOpenIcon } from "@heroicons/react/24/outline";
 import { estimateReadingTime } from "@/lib/text-productivity";
 
 export default function ReadingTimeEstimatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [wpm, setWpm] = useState("200");
   const [unlocked, setUnlocked] = useState(false);
   const [result, setResult] = useState<ReturnType<typeof estimateReadingTime> | null>(null);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/reading-time-estimator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     const n = Number.parseInt(wpm, 10);
     setResult(estimateReadingTime(text, Number.isFinite(n) ? n : 200));
     setUnlocked(true);

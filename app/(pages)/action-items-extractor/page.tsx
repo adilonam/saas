@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -11,9 +9,6 @@ import { extractActionItemsHeuristic } from "@/lib/study-meeting-utils";
 import { Loader2 } from "lucide-react";
 
 export default function ActionItemsExtractorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [notes, setNotes] = useState(
     "Standup\n- [ ] Send deck to Alex\nTODO: book room for Q2\n* Action: review budget by Friday",
   );
@@ -23,24 +18,8 @@ export default function ActionItemsExtractorPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/action-items-extractor")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
   const handleExtract = async () => {
-    if (!gate()) return;
-    setError(null);
+setError(null);
     setUnlocked(true);
 
     if (!useAi) {

@@ -48,8 +48,7 @@ export default function InclusiveLanguageLinterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setAiError(data.error || "AI pass failed.");
+setAiError(data.error || "AI pass failed.");
         return;
       }
       setAiNotes(data.text ?? "");

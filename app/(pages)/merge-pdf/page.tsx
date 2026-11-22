@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -20,9 +18,6 @@ interface SelectedFile {
 }
 
 export default function MergePDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isMerging, setIsMerging] = useState(false);
@@ -55,21 +50,6 @@ export default function MergePDFPage() {
   };
 
   const handleMerge = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/merge-pdf")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (selectedFiles.length < 2) {
       setError("Please select at least 2 PDF files to merge");
       return;
@@ -92,15 +72,6 @@ export default function MergePDFPage() {
       if (!response.ok) {
         try {
           const errorData = await response.json();
-          if (
-            (response.status === 400 || response.status === 403) &&
-            (errorData.error === "Insufficient tokens" ||
-              errorData.error === "Active subscription required")
-          ) {
-            router.push("/pricing");
-            setIsMerging(false);
-            return;
-          }
           setError(errorData.error || "Failed to merge PDFs");
         } catch {
           setError("Failed to merge PDFs");
@@ -108,8 +79,6 @@ export default function MergePDFPage() {
         setIsMerging(false);
         return;
       }
-
-      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

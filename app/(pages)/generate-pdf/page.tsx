@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,9 +12,6 @@ import {
 import { Loader2 } from "lucide-react";
 
 export default function GeneratePDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [prompt, setPrompt] = useState(
     "Generate me a LaTeX report for solving 2nd degree equations.",
   );
@@ -26,20 +21,6 @@ export default function GeneratePDFPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerateLatex = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/generate-pdf")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     const trimmed = prompt.trim();
     if (!trimmed) {
@@ -78,21 +59,6 @@ export default function GeneratePDFPage() {
   };
 
   const handleGetPdf = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/generate-pdf")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!latex.trim()) {
       setError("Generate LaTeX first, or paste LaTeX code.");
       return;

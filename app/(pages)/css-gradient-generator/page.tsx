@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -14,8 +13,6 @@ import {
   ExclamationTriangleIcon,
   ArrowPathIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 function normalizeHex(s: string): string | null {
   let h = s.trim().replace(/^#/, "");
   if (h.length === 3) {
@@ -31,8 +28,7 @@ function normalizeHex(s: string): string | null {
 export default function CssGradientGeneratorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [angle, setAngle] = useState("135");
+const [angle, setAngle] = useState("135");
   const [c1, setC1] = useState("#6366f1");
   const [c2, setC2] = useState("#ec4899");
   const [stop1, setStop1] = useState("0");
@@ -61,10 +57,7 @@ export default function CssGradientGeneratorPage() {
   };
 
   const handleGenerate = () => {
-    if (!guardToolAccess(status, session, pathname, "/css-gradient-generator", router)) {
-      return;
-    }
-    setError(null);
+setError(null);
     const a = Number(angle);
     const p1 = Number(stop1);
     const p2 = Number(stop2);

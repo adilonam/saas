@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import { format } from "sql-formatter";
 import DashboardLayout from "components/DashboardLayout";
@@ -11,8 +10,6 @@ import {
   CircleStackIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 const DIALECTS = [
   { value: "sql", label: "ANSI SQL" },
   { value: "mysql", label: "MySQL" },
@@ -26,18 +23,14 @@ const DIALECTS = [
 export default function SqlFormatterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [text, setText] = useState("");
+const [text, setText] = useState("");
   const [dialect, setDialect] = useState<(typeof DIALECTS)[number]["value"]>("sql");
   const [output, setOutput] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleFormat = () => {
-    if (!guardToolAccess(status, session, pathname, "/sql-formatter", router)) {
-      return;
-    }
-    setError(null);
+setError(null);
     try {
       const formatted = format(text.trim(), { language: dialect });
       setOutput(formatted);

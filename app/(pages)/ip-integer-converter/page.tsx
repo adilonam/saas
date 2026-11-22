@@ -1,14 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CalculatorIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
 import { intToIpv4 } from "@/lib/cidr";
 
 const PAGE = "/ip-integer-converter";
@@ -23,16 +21,14 @@ function ipv4ToInt(s: string): number | null {
 export default function IpIntegerConverterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [value, setValue] = useState("");
+const [value, setValue] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dotted, setDotted] = useState<string | null>(null);
   const [integer, setInteger] = useState<string | null>(null);
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    const v = value.trim();
+const v = value.trim();
     setError(null);
     if (!v) {
       setError("Enter an IPv4 address or a 32-bit unsigned integer.");

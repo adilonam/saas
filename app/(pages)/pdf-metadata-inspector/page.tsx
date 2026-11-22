@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon, DocumentMagnifyingGlassIcon } from "@heroicons/react/24/outline";
@@ -14,9 +12,6 @@ type MetadataResponse = {
 };
 
 export default function PdfMetadataInspectorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -26,14 +21,7 @@ export default function PdfMetadataInspectorPage() {
 
   const handleInspect = async () => {
     setError(null);
-    setResult(null);    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    if (!file) {
+    setResult(null);    if (!file) {
       setError("Please select a PDF file.");
       return;
     }

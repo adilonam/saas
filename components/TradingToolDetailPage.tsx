@@ -1,8 +1,8 @@
 "use client";
 
+import { useParams } from "next/navigation";
+
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useParams, usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,14 +16,10 @@ type TradingToolDetailPageProps = {
 };
 
 export default function TradingToolDetailPage({ pathSegment: pathSegmentProp }: TradingToolDetailPageProps) {
-  const router = useRouter();
-  const pathname = usePathname();
   const params = useParams<{ tool?: string }>();
   const pathSegment =
     pathSegmentProp ?? (typeof params?.tool === "string" ? params.tool : "");
-  const { data: session, status } = useSession();
-
-  const [symbol, setSymbol] = useState("");
+const [symbol, setSymbol] = useState("");
   const [timeframe, setTimeframe] = useState("");
   const [notes, setNotes] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
@@ -31,18 +27,6 @@ export default function TradingToolDetailPage({ pathSegment: pathSegmentProp }: 
   const tool = getTradingToolByPath(pathSegment);
 
   const handleRun = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/trading-tools")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     setResultUnlocked(true);
   };

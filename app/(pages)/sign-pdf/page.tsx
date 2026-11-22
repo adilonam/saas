@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import TopBar from "components/sign-pdf/TopBar";
 import PDFViewer from "components/sign-pdf/PDFViewer";
@@ -14,9 +12,6 @@ import { signPDF } from "components/sign-pdf/utils/pdfSigning";
 import { SignaturePosition } from "components/sign-pdf/types";
 
 export default function SignPDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
   const [signatureType, setSignatureType] = useState<"simple" | "digital">(
     "simple",
   );
@@ -64,19 +59,6 @@ export default function SignPDFPage() {
 
   const downloadSignedPDF = async () => {
     // Check authentication — send to signup with callback so they can sign up or sign in and return here
-    if (status === "unauthenticated" || !session) {
-      const callbackUrl = pathname || "/sign-pdf";
-      router.push(`/signup?callbackUrl=${encodeURIComponent(callbackUrl)}`);
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
 
     if (!pdfFile || !signatureImage || signaturePositions.length === 0) {
       alert("Please upload a PDF, create a signature, and place it on the PDF");
@@ -93,14 +75,6 @@ export default function SignPDFPage() {
 
       if (!signCheckResponse.ok) {
         const errData = await signCheckResponse.json().catch(() => ({}));
-        if (
-          signCheckResponse.status === 403 &&
-          errData.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          setIsLoading(false);
-          return;
-        }
         throw new Error(errData.error || "Subscription check failed");
       }
 

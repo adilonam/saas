@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon, PhotoIcon, XMarkIcon } from "@heroicons/react/24/outline";
@@ -11,10 +9,6 @@ import { Loader2 } from "lucide-react";
 const DEFAULT_QUALITY = 85;
 
 export default function ImageToPDFPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
 
@@ -47,21 +41,6 @@ export default function ImageToPDFPage() {
   };
 
   const handleConvert = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/image-to-pdf")}`
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!file) {
       setError("Please select an image first.");
       return;
@@ -88,20 +67,9 @@ export default function ImageToPDFPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        if (
-          (response.status === 400 || response.status === 403) &&
-          errorData?.error &&
-          (errorData.error === "Insufficient tokens" ||
-            errorData.error === "Active subscription required")
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(errorData?.error || errorData?.detail || "Failed to convert image to PDF");
         return;
       }
-
-      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

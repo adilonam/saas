@@ -69,8 +69,7 @@ export default function ReadingLevelEstimatorPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setErr(data.error || "Coach request failed.");
+setErr(data.error || "Coach request failed.");
         return;
       }
       setCoach(data.text ?? "");

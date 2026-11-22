@@ -80,34 +80,16 @@ function parseResult(body: unknown): EqTestResult | null {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
 
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: {
-        name: true,
-        email: true,
-        subscriptionExpiresAt: true,
-      },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const hasActiveSubscription =
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      return NextResponse.json(
-        {
-          error: "Active subscription required",
-          code: "subscription_required",
-        },
-        { status: 403 },
-      );
-    }
+    const user = session?.user?.id
+      ? await prisma.user.findUnique({
+          where: { id: session.user.id },
+          select: {
+            name: true,
+            email: true,
+          },
+        })
+      : null;
 
     const fastApiUrl = process.env.FAST_API_URL;
     if (!fastApiUrl) {
@@ -130,8 +112,8 @@ export async function POST(request: Request) {
     }
 
     const latex = buildEqReportLatex(result, {
-      name: user.name ?? session.user.name,
-      email: user.email ?? session.user.email,
+      name: user?.name ?? session?.user?.name ?? "Guest",
+      email: user?.email ?? session?.user?.email ?? "",
     });
 
     const upstreamResponse = await fetch(

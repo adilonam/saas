@@ -1,28 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { CodeBracketSquareIcon } from "@heroicons/react/24/outline";
 
 export default function ApiResponseFormatterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [rawInput, setRawInput] = useState('{"name":"API","version":1}');
   const [formatted, setFormatted] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleFormat = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setError(null);
+  const handleFormat = () => {    setError(null);
     try {
       const parsed = JSON.parse(rawInput);
       setFormatted(JSON.stringify(parsed, null, 2));
@@ -31,14 +19,7 @@ export default function ApiResponseFormatterPage() {
     }
   };
 
-  const handleMinify = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setError(null);
+  const handleMinify = () => {    setError(null);
     try {
       const parsed = JSON.parse(rawInput);
       setFormatted(JSON.stringify(parsed));

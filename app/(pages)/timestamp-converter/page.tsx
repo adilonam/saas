@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -11,8 +10,6 @@ import {
   ClockIcon,
   ExclamationTriangleIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 type InputMode = "auto" | "unix_s" | "unix_ms" | "iso";
 
 function parseTimestamp(raw: string, mode: InputMode): Date | null {
@@ -45,18 +42,14 @@ function parseTimestamp(raw: string, mode: InputMode): Date | null {
 export default function TimestampConverterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [input, setInput] = useState("");
+const [input, setInput] = useState("");
   const [mode, setMode] = useState<InputMode>("auto");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [date, setDate] = useState<Date | null>(null);
 
   const handleConvert = () => {
-    if (!guardToolAccess(status, session, pathname, "/timestamp-converter", router)) {
-      return;
-    }
-    setError(null);
+setError(null);
     const d = parseTimestamp(input, mode);
     if (!d) {
       setError("Could not parse that value. Try another format or switch input type.");

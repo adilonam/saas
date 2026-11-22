@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -11,21 +10,15 @@ import {
   DocumentDuplicateIcon,
   CheckIcon,
 } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function UuidGeneratorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [uuids, setUuids] = useState<string[]>([]);
+const [uuids, setUuids] = useState<string[]>([]);
   const [unlocked, setUnlocked] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
 
   const handleGenerate = () => {
-    if (!guardToolAccess(status, session, pathname, "/uuid-generator", router)) {
-      return;
-    }
-    const id = crypto.randomUUID();
+const id = crypto.randomUUID();
     setUuids((prev) => [id, ...prev].slice(0, 20));
     setUnlocked(true);
   };

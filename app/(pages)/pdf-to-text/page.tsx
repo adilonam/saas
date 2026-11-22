@@ -1,18 +1,12 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon, DocumentTextIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function PdfToTextPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -23,14 +17,7 @@ export default function PdfToTextPage() {
   const handleExtract = async () => {
     setError(null);
     setText("");
-    setTotalPages(null);    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
+    setTotalPages(null);
     if (!file) {
       setError("Please select a PDF file.");
       return;

@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ServerStackIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
 import { COMMON_PORTS } from "@/lib/common-ports-data";
 
 const PAGE = "/common-ports-reference";
@@ -16,8 +14,7 @@ const PAGE = "/common-ports-reference";
 export default function CommonPortsReferencePage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [query, setQuery] = useState("");
+const [query, setQuery] = useState("");
   const [unlocked, setUnlocked] = useState(false);
 
   const filtered = useMemo(() => {
@@ -33,8 +30,7 @@ export default function CommonPortsReferencePage() {
   }, [query]);
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   return (

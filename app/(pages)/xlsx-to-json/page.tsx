@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -15,10 +13,6 @@ import {
 } from "@heroicons/react/24/outline";
 
 export default function XlsxToJsonPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [maxRows, setMaxRows] = useState<number>(10000);
@@ -42,21 +36,6 @@ export default function XlsxToJsonPage() {
   };
 
   const handleConvert = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/xlsx-to-json")}`,
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!file) {
       setError("Please select an XLSX file first.");
       return;
@@ -84,9 +63,7 @@ export default function XlsxToJsonPage() {
         return;
       }
 
-      await update();
-
-      const data = (await res.json()) as { rows?: unknown };
+const data = (await res.json()) as { rows?: unknown };
       setRows((Array.isArray(data.rows) ? data.rows : []) as unknown[]);
     } catch {
       setError("Something went wrong while converting. Please try again.");

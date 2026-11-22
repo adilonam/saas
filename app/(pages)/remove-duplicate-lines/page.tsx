@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,9 +8,6 @@ import { QueueListIcon } from "@heroicons/react/24/outline";
 import { removeDuplicateLines } from "@/lib/text-productivity";
 
 export default function RemoveDuplicateLinesPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [trimEach, setTrimEach] = useState(true);
   const [ignoreCase, setIgnoreCase] = useState(false);
@@ -21,19 +16,6 @@ export default function RemoveDuplicateLinesPage() {
   const [removed, setRemoved] = useState(0);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/remove-duplicate-lines")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     const before = text.split(/\r\n|\r|\n/).length;
     const result = removeDuplicateLines(text, { trimEach, ignoreCase });
     const after = result.split(/\r\n|\r|\n/).length;

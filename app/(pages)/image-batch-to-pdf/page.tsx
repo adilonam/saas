@@ -2,26 +2,21 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function ImageBatchToPdfPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<File[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleRun = async () => {
-    if (!guardToolAccess(status, session, pathname, "/image-batch-to-pdf", router)) return;
-    if (files.length === 0) return;
+if (files.length === 0) return;
 
     setIsLoading(true);
     setError(null);

@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,10 +15,6 @@ import { Loader2 } from "lucide-react";
 type CsvToJsonResponse = { rows?: string[][] };
 
 export default function CsvToJsonPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [delimiter, setDelimiter] = useState<string>(",");
@@ -44,19 +38,6 @@ export default function CsvToJsonPage() {
   }, [response]);
 
   const validateBeforeConvert = (): boolean => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/csv-to-json")}`);
-      return false;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-
     if (!file) {
       setError("Please select a .csv file first.");
       return false;

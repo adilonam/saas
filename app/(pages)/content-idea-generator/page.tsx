@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -19,9 +17,6 @@ const FORMATS = [
 ];
 
 export default function ContentIdeaGeneratorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [topic, setTopic] = useState("");
   const [format, setFormat] = useState("any");
   const [ideas, setIdeas] = useState<string[]>([]);
@@ -29,19 +24,6 @@ export default function ContentIdeaGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/content-idea-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!topic.trim()) {
       setError("Enter a topic.");
       return;
@@ -60,10 +42,6 @@ export default function ContentIdeaGeneratorPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Failed to generate ideas");
         return;
       }

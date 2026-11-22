@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export default function RegexTesterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [pattern, setPattern] = useState("\\d+");
   const [flags, setFlags] = useState("g");
   const [testString, setTestString] = useState("Hello 123 world 456");
@@ -34,14 +29,7 @@ export default function RegexTesterPage() {
     }
   }, [pattern, flags, testString]);
 
-  const handleTest = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setResultUnlocked(true);
+  const handleTest = () => {    setResultUnlocked(true);
   };
 
   return (

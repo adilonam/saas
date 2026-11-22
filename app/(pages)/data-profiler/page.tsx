@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowUpTrayIcon, ChartBarIcon } from "@heroicons/react/24/outline";
@@ -11,9 +9,6 @@ import { Loader2 } from "lucide-react";
 type RowsResponse = { rows?: unknown[][]; error?: string; detail?: string };
 
 export default function DataProfilerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
@@ -34,14 +29,7 @@ export default function DataProfilerPage() {
 
   const handleProfile = async () => {
     setError(null);
-    setRows([]);    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    if (!file) {
+    setRows([]);    if (!file) {
       setError("Please select a CSV or XLSX file.");
       return;
     }

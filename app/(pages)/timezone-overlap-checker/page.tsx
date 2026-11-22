@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useMemo, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -47,8 +46,7 @@ function formatRange(start: Date, end: Date, zone: string): string {
 export default function TimezoneOverlapCheckerPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [dateYmd, setDateYmd] = useState(() => {
+const [dateYmd, setDateYmd] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   });
@@ -68,21 +66,8 @@ export default function TimezoneOverlapCheckerPage() {
   }, [unlocked, dateYmd, participants]);
 
   const handleSubmit = useCallback(() => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/timezone-overlap-checker")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setUnlocked(true);
-  }, [session, status, router, pathname]);
+  }, []);
 
   const addRow = () =>
     setParticipants((rows) => [

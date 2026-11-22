@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { GlobeAltIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 const PAGE = "/timezone-now-grid";
 
 const PRESETS = [
@@ -58,8 +55,7 @@ function formatNow(zone: string, now: Date): { time: string; date: string; offse
 export default function TimezoneNowGridPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [rows, setRows] = useState<{ id: string; zone: string }[]>([
+const [rows, setRows] = useState<{ id: string; zone: string }[]>([
     { id: "a", zone: "America/New_York" },
     { id: "b", zone: "Europe/London" },
     { id: "c", zone: "Asia/Tokyo" },
@@ -75,8 +71,7 @@ export default function TimezoneNowGridPage() {
   }, [unlocked]);
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   const addPreset = (zone: string) => {

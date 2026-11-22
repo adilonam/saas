@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { BanknotesIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 
 export default function StartupValuationCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [revenue, setRevenue] = useState("");
   const [growthRate, setGrowthRate] = useState("");
   const [margin, setMargin] = useState("");
@@ -37,19 +32,6 @@ export default function StartupValuationCalculatorPage() {
   }, [revenue, growthRate, margin, multiple]);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/startup-valuation-calculator")}`
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

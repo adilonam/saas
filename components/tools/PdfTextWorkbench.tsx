@@ -2,13 +2,10 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowUpTrayIcon, SparklesIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 type PdfTextWorkbenchProps = {
   pagePath: string;
   title: string;
@@ -30,9 +27,7 @@ export default function PdfTextWorkbench({
 }: PdfTextWorkbenchProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-
-  const fileInputRef = useRef<HTMLInputElement>(null);
+const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [prompt, setPrompt] = useState("");
   const [result, setResult] = useState("");
@@ -41,16 +36,7 @@ export default function PdfTextWorkbench({
   const [error, setError] = useState<string | null>(null);
 
   const handleRun = async () => {
-    const canProceed = guardToolAccess(
-      status,
-      session,
-      pathname,
-      pagePath,
-      router,
-    );
-    if (!canProceed) return;
-
-    if (!file) {
+if (!file) {
       setError("Please upload a PDF file.");
       return;
     }

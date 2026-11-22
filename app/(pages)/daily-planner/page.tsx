@@ -1,17 +1,11 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function DailyPlannerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [wake, setWake] = useState("07:00");
   const [sleep, setSleep] = useState("23:00");
   const [tasks, setTasks] = useState("Deep work\nMeetings\nExercise\nReview & planning");
@@ -22,14 +16,7 @@ export default function DailyPlannerPage() {
     return taskList.map((task, i) => ({ time: i < 3 ? `${8 + i * 2}:00` : `${14 + i}:00`, task }));
   }, [tasks]);
 
-  const handleGenerate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setGenerated(true);
+  const handleGenerate = () => {    setGenerated(true);
   };
 
   return (

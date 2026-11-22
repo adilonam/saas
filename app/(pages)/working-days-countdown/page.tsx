@@ -1,15 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CalendarIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 const PAGE = "/working-days-countdown";
 
 function truncateLocal(d: Date): Date {
@@ -58,8 +55,7 @@ function workingDaysInclusive(a: Date, b: Date, holidays: Set<string>): number {
 export default function WorkingDaysCountdownPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [deadline, setDeadline] = useState("");
+const [deadline, setDeadline] = useState("");
   const [holidayText, setHolidayText] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -82,8 +78,7 @@ export default function WorkingDaysCountdownPage() {
   }, [unlocked, deadline, holidayText]);
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    setError(null);
+setError(null);
     const end = parseYmd(deadline);
     if (!end) {
       setError("Use deadline YYYY-MM-DD.");

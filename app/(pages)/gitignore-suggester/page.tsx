@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,9 +13,6 @@ import {
 } from "@/lib/gitignore-by-stack";
 
 export default function GitignoreSuggesterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [selected, setSelected] = useState<Set<GitignoreStackId>>(new Set(["node", "nextjs"]));
   const [output, setOutput] = useState("");
   const [stackHint, setStackHint] = useState("");
@@ -35,17 +30,6 @@ export default function GitignoreSuggesterPage() {
   };
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/gitignore-suggester")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

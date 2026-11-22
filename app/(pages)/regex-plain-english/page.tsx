@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,9 +10,6 @@ import { Loader2 } from "lucide-react";
 const FLAVORS = ["JavaScript", "PCRE", "Python", "Go", ".NET"];
 
 export default function RegexPlainEnglishPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [pattern, setPattern] = useState("^https?://[^\\s]+$");
   const [flavor, setFlavor] = useState("JavaScript");
   const [explanation, setExplanation] = useState("");
@@ -22,17 +17,6 @@ export default function RegexPlainEnglishPage() {
   const [error, setError] = useState<string | null>(null);
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/regex-plain-english")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

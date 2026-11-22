@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,9 +40,6 @@ function writeStore(s: Stored) {
 }
 
 export default function DeepWorkQuotaTrackerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [unlocked, setUnlocked] = useState(false);
   const [target, setTarget] = useState("20");
   const [logged, setLogged] = useState("0");
@@ -52,23 +47,6 @@ export default function DeepWorkQuotaTrackerPage() {
   const [hydrated, setHydrated] = useState(false);
 
   const weekKey = useMemo(() => isoWeekKey(new Date()), []);
-
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/deep-work-quota-tracker")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -99,8 +77,7 @@ export default function DeepWorkQuotaTrackerPage() {
   const pct = targetNum > 0 ? Math.min(100, (loggedNum / targetNum) * 100) : 0;
 
   const handleSaveTarget = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
     const t = Math.max(parseFloat(target) || 0, 0);
     const l = Math.max(parseFloat(logged) || 0, 0);
     persist(t, l);

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef, useCallback } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { FilmIcon, ArrowUpTrayIcon, CheckIcon } from "@heroicons/react/24/outline";
@@ -88,8 +86,6 @@ function extractFramesFromVideo(videoUrl: string): Promise<Blob[]> {
 }
 
 export default function VideoToPromptPage() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedVideo, setSelectedVideo] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -97,10 +93,6 @@ export default function VideoToPromptPage() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-
-  const hasActiveSubscription =
-    session?.user?.subscriptionExpiresAt &&
-    new Date(session.user.subscriptionExpiresAt) > new Date();
 
   const handleFileSelect = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -125,16 +117,6 @@ export default function VideoToPromptPage() {
   }, [previewUrl]);
 
   const handleGenerate = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push("/signup?callbackUrl=" + encodeURIComponent("/video-to-prompt"));
-      return;
-    }
-
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!selectedVideo || !previewUrl) {
       setError("Please select a video first.");
       return;
@@ -164,10 +146,6 @@ export default function VideoToPromptPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
-          return;
-        }
         throw new Error(data.error || "Failed to generate prompt");
       }
 

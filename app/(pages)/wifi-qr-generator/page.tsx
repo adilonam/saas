@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -29,8 +28,7 @@ function buildWifiString(
 export default function WifiQrGeneratorPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [ssid, setSsid] = useState("");
+const [ssid, setSsid] = useState("");
   const [password, setPassword] = useState("");
   const [security, setSecurity] = useState<Security>("WPA2");
   const [hidden, setHidden] = useState(false);
@@ -38,20 +36,6 @@ export default function WifiQrGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = useCallback(async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/wifi-qr-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!ssid.trim()) {
       setError("Please enter the network name (SSID).");
       setQrDataUrl(null);
@@ -77,7 +61,7 @@ export default function WifiQrGeneratorPage() {
       setError("Could not generate QR code. Please try again.");
       setQrDataUrl(null);
     }
-  }, [session, status, router, pathname, ssid, password, security, hidden]);
+  }, [ssid, password, security, hidden]);
 
   return (
     <DashboardLayout>

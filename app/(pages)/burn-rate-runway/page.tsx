@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,28 +8,10 @@ import { Button } from "@/components/ui/button";
 import { PresentationChartLineIcon } from "@heroicons/react/24/outline";
 
 export default function BurnRateRunwayPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [cash, setCash] = useState("");
   const [monthlyExpenses, setMonthlyExpenses] = useState("");
   const [monthlyIncome, setMonthlyIncome] = useState("");
   const [unlocked, setUnlocked] = useState(false);
-
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/burn-rate-runway")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
 
   const result = useMemo(() => {
     const balance = parseFloat(cash) || 0;
@@ -108,8 +88,7 @@ export default function BurnRateRunwayPage() {
 
           <Button
             onClick={() => {
-              if (!gate()) return;
-              setUnlocked(true);
+setUnlocked(true);
             }}
             className="gap-2"
           >

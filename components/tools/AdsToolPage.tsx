@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import { CalculatorIcon, ChartBarIcon } from "@heroicons/react/24/outline";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -17,10 +15,7 @@ type Props = {
 
 export default function AdsToolPage({ slug }: Props) {
   const config = ADS_TOOLS_BY_SLUG[slug];
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [resultUnlocked, setResultUnlocked] = useState(false);
+const [resultUnlocked, setResultUnlocked] = useState(false);
   const [values, setValues] = useState<Record<string, string>>(() =>
     config ? Object.fromEntries(config.inputs.map((field) => [field.key, ""])) : {},
   );
@@ -42,17 +37,6 @@ export default function AdsToolPage({ slug }: Props) {
     config?.inputs.every((input) => (parseFloat(values[input.key]) || 0) > 0) ?? false;
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || `/${slug}`)}`);
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

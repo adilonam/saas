@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +8,6 @@ import { SparklesIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function ReleaseNotesPolisherPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [draft, setDraft] = useState("");
   const [tone, setTone] = useState("professional and friendly");
   const [polished, setPolished] = useState("");
@@ -20,17 +15,6 @@ export default function ReleaseNotesPolisherPage() {
   const [error, setError] = useState<string | null>(null);
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/release-notes-polisher")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

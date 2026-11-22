@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,29 +8,9 @@ import { Button } from "@/components/ui/button";
 import { ChartPieIcon } from "@heroicons/react/24/outline";
 
 export default function UtilizationCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [billable, setBillable] = useState("");
   const [available, setAvailable] = useState("");
   const [unlocked, setUnlocked] = useState(false);
-
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/utilization-calculator")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
 
   const result = useMemo(() => {
     const b = parseFloat(billable) || 0;
@@ -87,8 +65,7 @@ export default function UtilizationCalculatorPage() {
 
           <Button
             onClick={() => {
-              if (!gate()) return;
-              setUnlocked(true);
+setUnlocked(true);
             }}
             className="gap-2"
           >

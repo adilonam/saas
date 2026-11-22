@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -16,9 +14,6 @@ function newTopic(): Topic {
 }
 
 export default function MeetingAgendaTimerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [topics, setTopics] = useState<Topic[]>([
     { id: "1", title: "Kickoff & goals", minutes: "5" },
     { id: "2", title: "Design review", minutes: "10" },
@@ -28,21 +23,6 @@ export default function MeetingAgendaTimerPage() {
   const [activeIndex, setActiveIndex] = useState(0);
   const [running, setRunning] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(0);
-
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/meeting-agenda-timer")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
 
   const currentMinutesStr = topics[activeIndex]?.minutes ?? "1";
 
@@ -71,8 +51,7 @@ export default function MeetingAgendaTimerPage() {
   }, [running, secondsLeft]);
 
   const handleStartMeeting = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
     setActiveIndex(0);
     const m = Number.parseInt(topics[0]?.minutes ?? "5", 10) || 1;
     setSecondsLeft(Math.max(1, m * 60));

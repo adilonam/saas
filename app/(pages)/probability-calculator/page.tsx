@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -23,9 +21,6 @@ function nCr(n: number, r: number): number {
 }
 
 export default function ProbabilityCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [mode, setMode] = useState<"single" | "multiple" | "combinations">("single");
   const [singleP, setSingleP] = useState("");
   const [eventA, setEventA] = useState("");
@@ -34,14 +29,7 @@ export default function ProbabilityCalculatorPage() {
   const [kChoose, setKChoose] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setResultUnlocked(true);
+  const handleCalculate = () => {    setResultUnlocked(true);
   };
 
   const result = useMemo(() => {

@@ -1,8 +1,6 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -13,10 +11,6 @@ import {
 import { Loader2 } from "lucide-react";
 
 export default function PDFMetadataPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -41,21 +35,6 @@ export default function PDFMetadataPage() {
   };
 
   const handleExtract = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-metadata")}`
-      );
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (!file) {
       setError("Please select a PDF first.");
       return;
@@ -75,22 +54,11 @@ export default function PDFMetadataPage() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => null);
-        if (
-          (response.status === 400 || response.status === 403) &&
-          errorData?.error &&
-          (errorData.error === "Insufficient tokens" ||
-            errorData.error === "Active subscription required")
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(errorData?.error || errorData?.detail || "Failed to extract metadata");
         return;
       }
 
-      await update();
-
-      const data = (await response.json()) as {
+const data = (await response.json()) as {
         page_count: number;
         metadata: Record<string, string | null>;
       };

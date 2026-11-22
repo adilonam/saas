@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,9 +10,6 @@ import { ArrowsRightLeftIcon } from "@heroicons/react/24/outline";
 type Mode = "hourly-to-annual" | "annual-to-hourly";
 
 export default function FreelanceRateConverterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [mode, setMode] = useState<Mode>("hourly-to-annual");
   const [hourly, setHourly] = useState("");
   const [annual, setAnnual] = useState("");
@@ -23,26 +18,8 @@ export default function FreelanceRateConverterPage() {
   const [utilizationPct, setUtilizationPct] = useState("100");
   const [unlocked, setUnlocked] = useState(false);
 
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/freelance-rate-converter")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
   const handleConvert = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   const math = useMemo(() => {

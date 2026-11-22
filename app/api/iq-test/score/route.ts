@@ -59,29 +59,6 @@ function parseSelectedAnswers(body: unknown): SelectedAnswer[] | null {
 export async function POST(request: Request) {
   try {
     const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscriptionExpiresAt: true },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-    const hasActiveSubscription =
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      return NextResponse.json(
-        {
-          error: "Active subscription required",
-          code: "subscription_required",
-        },
-        { status: 403 },
-      );
-    }
 
     const body = await request.json();
     const attemptId =
@@ -103,10 +80,10 @@ export async function POST(request: Request) {
 
       const guestToken = await getGuestToken();
       const owns =
-        attempt.userId === session.user.id ||
+        attempt.userId === session?.user?.id ||
         (guestToken &&
           attempt.guestToken === guestToken &&
-          (!attempt.userId || attempt.userId === session.user.id));
+          (!attempt.userId || attempt.userId === session?.user?.id));
       if (!owns) {
         return NextResponse.json({ error: "Forbidden" }, { status: 403 });
       }
@@ -162,7 +139,7 @@ export async function POST(request: Request) {
           result: result as unknown as Prisma.InputJsonValue,
           status: "scored",
           elapsedSeconds: Math.round(elapsedSeconds),
-          userId: session.user.id,
+          userId: session?.user?.id ?? null,
         } satisfies Prisma.IqTestAttemptUncheckedUpdateInput,
       });
       attemptPayload = serializeAttempt(updated);

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,9 +8,6 @@ import { ChatBubbleBottomCenterTextIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function ToneCheckerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [channel, setChannel] = useState<"email" | "slack">("email");
   const [text, setText] = useState("");
   const [unlocked, setUnlocked] = useState(false);
@@ -36,31 +31,14 @@ export default function ToneCheckerPage() {
     };
   }, [text]);
 
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/tone-checker")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
-
   const handleHeuristics = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
     setAiResult(null);
     setError(null);
   };
 
   const handleAi = async () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
     const trimmed = text.trim();
     if (!trimmed) {
       setError("Paste a message first.");

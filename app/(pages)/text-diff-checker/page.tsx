@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,22 +8,12 @@ import { DocumentDuplicateIcon } from "@heroicons/react/24/outline";
 import { lineBasedDiff, type DiffLine } from "@/lib/text-productivity";
 
 export default function TextDiffCheckerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [left, setLeft] = useState("");
   const [right, setRight] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [diff, setDiff] = useState<DiffLine[]>([]);
 
-  const handleSubmit = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setDiff(lineBasedDiff(left, right));
+  const handleSubmit = () => {    setDiff(lineBasedDiff(left, right));
     setUnlocked(true);
   };
 

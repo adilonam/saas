@@ -60,8 +60,7 @@ export default function LinkedInHeadlineCombinerPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setError(data.error || "AI request failed");
+setError(data.error || "AI request failed");
         return;
       }
       setCombined(data.text ?? "");

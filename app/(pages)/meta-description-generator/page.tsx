@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,9 +9,6 @@ import { SparklesIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function MetaDescriptionGeneratorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [title, setTitle] = useState("");
   const [text, setText] = useState("");
   const [result, setResult] = useState("");
@@ -21,19 +16,6 @@ export default function MetaDescriptionGeneratorPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/meta-description-generator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!text.trim()) {
       setError("Please describe the page or paste key content.");
       return;
@@ -54,13 +36,6 @@ export default function MetaDescriptionGeneratorPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (
-          data.code === "subscription_required" ||
-          data.error === "Active subscription required"
-        ) {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Something went wrong.");
         return;
       }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,9 +32,6 @@ function formatInZone(zone: string, date: Date): string {
 }
 
 export default function TimezoneMeetingPlannerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [zones, setZones] = useState<string[]>(["America/New_York", "Europe/London"]);
   const [localTime, setLocalTime] = useState("09:00");
   const [localDate, setLocalDate] = useState(() => {
@@ -46,19 +41,6 @@ export default function TimezoneMeetingPlannerPage() {
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/timezone-meeting-planner")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

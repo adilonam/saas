@@ -2,19 +2,14 @@
 
 import { useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function HtmlInvoiceToPdfPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-
-  const [company, setCompany] = useState("Eprod LLC");
+const [company, setCompany] = useState("Eprod LLC");
   const [client, setClient] = useState("Client Inc.");
   const [item, setItem] = useState("Consulting Services");
   const [amount, setAmount] = useState("1200.00");
@@ -50,8 +45,7 @@ export default function HtmlInvoiceToPdfPage() {
   );
 
   const handleGenerate = async () => {
-    if (!guardToolAccess(status, session, pathname, "/html-invoice-to-pdf", router)) return;
-    setIsLoading(true);
+setIsLoading(true);
     setError(null);
     try {
       const res = await fetch("/api/html-to-pdf", {

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -10,21 +8,11 @@ import { Bars3BottomLeftIcon } from "@heroicons/react/24/outline";
 import { countTextStats } from "@/lib/text-productivity";
 
 export default function WordCounterPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [text, setText] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [stats, setStats] = useState<ReturnType<typeof countTextStats> | null>(null);
 
-  const handleSubmit = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setStats(countTextStats(text));
+  const handleSubmit = () => {    setStats(countTextStats(text));
     setUnlocked(true);
   };
 

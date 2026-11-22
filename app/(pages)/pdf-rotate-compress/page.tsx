@@ -2,18 +2,14 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function PdfRotateCompressPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [rotation, setRotation] = useState("90");
@@ -22,8 +18,7 @@ export default function PdfRotateCompressPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleProcess = async () => {
-    if (!guardToolAccess(status, session, pathname, "/pdf-rotate-compress", router)) return;
-    if (!file) return;
+if (!file) return;
 
     setIsLoading(true);
     setError(null);

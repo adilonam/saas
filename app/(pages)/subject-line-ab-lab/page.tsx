@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -23,9 +21,6 @@ function heuristics(text: string) {
 }
 
 export default function SubjectLineAbLabPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [unlocked, setUnlocked] = useState(false);
   const [a, setA] = useState("");
   const [b, setB] = useState("");
@@ -34,14 +29,7 @@ export default function SubjectLineAbLabPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleOpen = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setUnlocked(true);
+  const handleOpen = () => {    setUnlocked(true);
   };
 
   const tipsA = useMemo(() => heuristics(a), [a]);

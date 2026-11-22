@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,9 +8,6 @@ import { ClipboardDocumentIcon } from "@heroicons/react/24/outline";
 import { CONVENTIONAL_TYPES } from "@/lib/conventional-commits";
 
 export default function ConventionalCommitHelperPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [type, setType] = useState<string>("feat");
   const [scope, setScope] = useState("");
   const [breaking, setBreaking] = useState(false);
@@ -35,17 +30,6 @@ export default function ConventionalCommitHelperPage() {
   }, [type, scope, breaking, subject, body, footer]);
 
   const ensureAuth = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/conventional-commit-helper")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

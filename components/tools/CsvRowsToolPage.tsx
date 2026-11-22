@@ -1,8 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -109,9 +107,6 @@ const COPY_BY_MODE: Record<CsvMode, { title: string; subtitle: string; submitLab
 };
 
 export default function CsvRowsToolPage({ mode }: { mode: CsvMode }) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<File[]>([]);
@@ -134,17 +129,6 @@ export default function CsvRowsToolPage({ mode }: { mode: CsvMode }) {
   }, [rows]);
 
   const ensureAccess = (): boolean => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/")}`);
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
     return true;
   };
 

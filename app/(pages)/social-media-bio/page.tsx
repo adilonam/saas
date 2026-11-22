@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -23,9 +21,6 @@ const PLATFORMS = [
 ];
 
 export default function SocialMediaBioPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [name, setName] = useState("");
   const [niche, setNiche] = useState("");
   const [platform, setPlatform] = useState("any");
@@ -34,19 +29,6 @@ export default function SocialMediaBioPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/social-media-bio")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     if (!name.trim() && !niche.trim()) {
       setError("Enter your name or niche.");
       return;
@@ -65,10 +47,6 @@ export default function SocialMediaBioPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === "subscription_required" || data.error === "Active subscription required") {
-          router.push("/pricing");
-          return;
-        }
         setError(data.error || "Failed to generate bios");
         return;
       }

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -20,10 +18,6 @@ interface SelectedFile {
 }
 
 export default function ZipCreatePage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status, update } = useSession();
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isZipping, setIsZipping] = useState(false);
@@ -69,14 +63,7 @@ export default function ZipCreatePage() {
     setError(null);
   };
 
-  const handleZip = async () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
+  const handleZip = async () => {
     if (selectedFiles.length === 0) {
       setError("Please select at least one file.");
       return;
@@ -103,8 +90,6 @@ export default function ZipCreatePage() {
         );
         return;
       }
-
-      await update();
 
       const blob = await response.blob();
       const url = URL.createObjectURL(blob);

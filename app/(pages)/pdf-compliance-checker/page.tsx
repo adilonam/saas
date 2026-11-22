@@ -2,20 +2,16 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 type CheckItem = { rule: string; passed: boolean; details: string };
 
 export default function PdfComplianceCheckerPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [checks, setChecks] = useState<CheckItem[]>([]);
@@ -49,8 +45,7 @@ export default function PdfComplianceCheckerPage() {
   };
 
   const handleCheck = async () => {
-    if (!guardToolAccess(status, session, pathname, "/pdf-compliance-checker", router)) return;
-    if (!file) return;
+if (!file) return;
 
     setIsLoading(true);
     setError(null);

@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -12,28 +10,12 @@ import { BanknotesIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 type Period = "yearly" | "monthly";
 
 export default function SalaryAfterTaxCalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [grossInput, setGrossInput] = useState("");
   const [period, setPeriod] = useState<Period>("yearly");
   const [taxRatePct, setTaxRatePct] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/salary-after-tax-calculator")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

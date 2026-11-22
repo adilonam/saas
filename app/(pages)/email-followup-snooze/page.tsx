@@ -1,8 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -36,32 +34,12 @@ function saveItems(items: SnoozeItem[]) {
 }
 
 export default function EmailFollowupSnoozePage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [unlocked, setUnlocked] = useState(false);
   const [items, setItems] = useState<SnoozeItem[]>([]);
   const [who, setWho] = useState("");
   const [due, setDue] = useState("");
   const [note, setNote] = useState("");
   const [hydrated, setHydrated] = useState(false);
-
-  const gate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/email-followup-snooze")}`,
-      );
-      return false;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return false;
-    }
-    return true;
-  };
 
   useEffect(() => {
     queueMicrotask(() => {
@@ -76,8 +54,7 @@ export default function EmailFollowupSnoozePage() {
   }, []);
 
   const handleOpen = () => {
-    if (!gate()) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   const handleAdd = () => {

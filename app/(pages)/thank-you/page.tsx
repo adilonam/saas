@@ -1,8 +1,9 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { Suspense } from "react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { CheckCircleIcon, ClockIcon } from "@heroicons/react/24/solid";

@@ -2,27 +2,21 @@
 
 import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function MarkdownBrandPdfPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-
-  const [brandName, setBrandName] = useState("Eprod");
+const [brandName, setBrandName] = useState("Eprod");
   const [primaryColor, setPrimaryColor] = useState("#1d4ed8");
   const [markdown, setMarkdown] = useState("# Monthly Report\n\n- KPI 1\n- KPI 2\n");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleGenerate = async () => {
-    if (!guardToolAccess(status, session, pathname, "/markdown-brand-pdf", router)) return;
-    if (!markdown.trim()) return;
+if (!markdown.trim()) return;
 
     setIsLoading(true);
     setError(null);

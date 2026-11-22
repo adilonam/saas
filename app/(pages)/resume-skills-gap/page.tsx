@@ -73,8 +73,7 @@ export default function ResumeSkillsGapPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setError(data.error || "Request failed");
+setError(data.error || "Request failed");
         return;
       }
       setAiText(data.text ?? "");

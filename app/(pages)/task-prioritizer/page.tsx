@@ -1,18 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 
 type Item = { task: string; urgency: number; importance: number };
 
 export default function TaskPrioritizerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [rawTasks, setRawTasks] = useState("Plan launch,5,5\nReply inbox,5,2\nWorkout,2,4\nClean desk,1,1");
   const [ran, setRan] = useState(false);
 
@@ -36,14 +30,7 @@ export default function TaskPrioritizerPage() {
     };
   }, [parsed]);
 
-  const handlePrioritize = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setRan(true);
+  const handlePrioritize = () => {    setRan(true);
   };
 
   const renderList = (title: string, items: Item[]) => (

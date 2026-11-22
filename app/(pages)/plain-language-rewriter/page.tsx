@@ -34,8 +34,7 @@ export default function PlainLanguageRewriterPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") return;
-        setError(data.error || "Request failed.");
+setError(data.error || "Request failed.");
         return;
       }
       setResult(data.text ?? "");

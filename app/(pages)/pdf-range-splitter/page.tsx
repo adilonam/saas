@@ -2,18 +2,14 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowDownTrayIcon, ArrowUpTrayIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function PdfRangeSplitterPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [file, setFile] = useState<File | null>(null);
   const [range, setRange] = useState("1-3");
@@ -21,8 +17,7 @@ export default function PdfRangeSplitterPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleSplit = async () => {
-    if (!guardToolAccess(status, session, pathname, "/pdf-range-splitter", router)) return;
-    if (!file) return;
+if (!file) return;
 
     setIsLoading(true);
     setError(null);

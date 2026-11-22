@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import {
@@ -25,8 +23,6 @@ interface SummaryResult {
 }
 
 export default function SummarizePDFPage() {
-  const router = useRouter();
-  const { data: session, status, update } = useSession();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [selectedFiles, setSelectedFiles] = useState<SelectedFile[]>([]);
   const [isSummarizing, setIsSummarizing] = useState(false);
@@ -62,19 +58,6 @@ export default function SummarizePDFPage() {
   };
 
   const handleSummarize = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push("/signup?callbackUrl=" + encodeURIComponent("/summarize-pdf"));
-      return;
-    }
-
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-
     if (selectedFiles.length === 0) {
       setError("Please select at least one PDF file");
       return;
@@ -98,15 +81,6 @@ export default function SummarizePDFPage() {
       if (!response.ok) {
         try {
           const errorData = await response.json();
-          if (
-            (response.status === 400 || response.status === 403) &&
-            (errorData.error === "Insufficient tokens" ||
-              errorData.error === "Active subscription required")
-          ) {
-            router.push("/pricing");
-            setIsSummarizing(false);
-            return;
-          }
           setError(errorData.error || "Failed to summarize PDFs");
         } catch {
           setError("Failed to summarize PDFs");
@@ -115,9 +89,7 @@ export default function SummarizePDFPage() {
         return;
       }
 
-      await update();
-
-      const data = (await response.json()) as { summaries: SummaryResult[] };
+const data = (await response.json()) as { summaries: SummaryResult[] };
       setResults(data.summaries || []);
     } catch (err) {
       console.error("Error summarizing PDFs:", err);

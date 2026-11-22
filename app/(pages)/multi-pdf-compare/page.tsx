@@ -2,18 +2,14 @@
 
 import { useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { ArrowUpTrayIcon, XMarkIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
-import { guardToolAccess } from "@/lib/guard-tool-access";
-
 export default function MultiPdfComparePage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const inputRef = useRef<HTMLInputElement>(null);
+const inputRef = useRef<HTMLInputElement>(null);
 
   const [files, setFiles] = useState<File[]>([]);
   const [result, setResult] = useState("");
@@ -21,8 +17,7 @@ export default function MultiPdfComparePage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleCompare = async () => {
-    if (!guardToolAccess(status, session, pathname, "/multi-pdf-compare", router)) return;
-    if (files.length < 2) {
+if (files.length < 2) {
       setError("Please upload at least 2 PDFs.");
       return;
     }

@@ -1,14 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
 import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { UserGroupIcon, PlusIcon, TrashIcon } from "@heroicons/react/24/outline";
-import { guardToolAccess } from "@/lib/guard-tool-access";
 import { findSlotsAcrossDays, type SlotParticipant } from "@/lib/meeting-slot-finder";
 
 const PAGE = "/meeting-overlap-finder";
@@ -38,8 +36,7 @@ function fmtUtc(d: Date) {
 export default function MeetingOverlapFinderPage() {
   const router = useRouter();
   const pathname = usePathname();
-  const { data: session, status } = useSession();
-  const [startYmd, setStartYmd] = useState(() => {
+const [startYmd, setStartYmd] = useState(() => {
     const d = new Date();
     return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
   });
@@ -77,8 +74,7 @@ export default function MeetingOverlapFinderPage() {
   }, [unlocked, startYmd, endYmd, slotPayload, slotMinutes, stepMinutes, maxSlots, skipWeekend, weekendTZ]);
 
   const handleSubmit = () => {
-    if (!guardToolAccess(status, session, pathname, PAGE, router)) return;
-    setUnlocked(true);
+setUnlocked(true);
   };
 
   const addRow = () =>

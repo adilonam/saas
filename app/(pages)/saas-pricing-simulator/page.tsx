@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,9 +8,6 @@ import { Button } from "@/components/ui/button";
 import { CurrencyDollarIcon, CalculatorIcon } from "@heroicons/react/24/outline";
 
 export default function SaaSPricingSimulatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [mrr, setMrr] = useState("");
   const [customers, setCustomers] = useState("");
   const [churnPct, setChurnPct] = useState("");
@@ -39,19 +34,6 @@ export default function SaaSPricingSimulatorPage() {
   }, [mrr, customers, churnPct, arpu]);
 
   const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/saas-pricing-simulator")}`
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResultUnlocked(true);
   };
 

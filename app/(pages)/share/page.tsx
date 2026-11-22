@@ -1,5 +1,7 @@
 "use client";
 
+import { useSearchParams } from "next/navigation";
+
 import { useState, useEffect, useRef, Suspense } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
@@ -12,8 +14,6 @@ import {
   DocumentArrowDownIcon,
   XMarkIcon 
 } from "@heroicons/react/24/outline";
-import { useSearchParams } from "next/navigation";
-
 // Crypto utilities for E2E encryption (ECDH + AES-GCM)
 async function generateKeyPair() {
   const keyPair = await crypto.subtle.generateKey(

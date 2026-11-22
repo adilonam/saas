@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -30,7 +29,6 @@ function saveTodos(todos: Todo[]) {
 }
 
 export default function PersonalDashboardPage() {
-  const router = useRouter();
   const { ensureAccess } = useToolAccess();
   const [unlocked, setUnlocked] = useState(false);
   const [city, setCity] = useState("");
@@ -124,10 +122,6 @@ export default function PersonalDashboardPage() {
       });
       const data = await res.json();
       if (!res.ok) {
-        if (data.code === "subscription_required") {
-          router.push("/pricing");
-          return;
-        }
         return;
       }
       if (data.text) setQuote(data.text);

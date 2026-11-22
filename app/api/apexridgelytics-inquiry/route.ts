@@ -4,29 +4,6 @@ import prisma from "@/lib/prisma";
 
 export async function POST(request: Request) {
   try {
-    const session = await auth();
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
-    const user = await prisma.user.findUnique({
-      where: { id: session.user.id },
-      select: { subscriptionExpiresAt: true },
-    });
-    if (!user) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
-    }
-
-    const hasActiveSubscription =
-      user.subscriptionExpiresAt &&
-      new Date(user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      return NextResponse.json(
-        { error: "Active subscription required", code: "subscription_required" },
-        { status: 403 },
-      );
-    }
-
     const body = await request.json();
     const brief = typeof body.brief === "string" ? body.brief.trim() : "";
     if (!brief) {
@@ -36,9 +13,18 @@ export async function POST(request: Request) {
       );
     }
 
+    const session = await auth();
+    const userId = session?.user?.id;
+    if (!userId) {
+      // Accept anonymous briefs without persisting a user-bound inquiry
+      return NextResponse.json({
+        inquiry: { id: null, status: "received", createdAt: new Date().toISOString() },
+      });
+    }
+
     const inquiry = await prisma.agencyInquiry.create({
       data: {
-        userId: session.user.id,
+        userId,
         brief,
       },
       select: {

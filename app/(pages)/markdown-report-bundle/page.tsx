@@ -1,18 +1,12 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useSession } from "next-auth/react";
-import { usePathname, useRouter } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { DocumentArrowDownIcon } from "@heroicons/react/24/outline";
 import { Loader2 } from "lucide-react";
 
 export default function MarkdownReportBundlePage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
-
   const [markdownBlocks, setMarkdownBlocks] = useState<string>("# Report 1\n\nContent here.\n\n---\n\n# Report 2\n\nMore content.");
   const [isBuilding, setIsBuilding] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -23,14 +17,7 @@ export default function MarkdownReportBundlePage() {
   );
 
   const handleBuild = async () => {
-    setError(null);    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    if (!segments.length) {
+    setError(null);    if (!segments.length) {
       setError("Please add at least one markdown report.");
       return;
     }

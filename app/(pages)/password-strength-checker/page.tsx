@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -11,27 +9,11 @@ import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 import { analyzePasswordStrength } from "@/lib/text-productivity";
 
 export default function PasswordStrengthCheckerPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [password, setPassword] = useState("");
   const [unlocked, setUnlocked] = useState(false);
   const [result, setResult] = useState<ReturnType<typeof analyzePasswordStrength> | null>(null);
 
   const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(
-        `/signup?callbackUrl=${encodeURIComponent(pathname || "/password-strength-checker")}`,
-      );
-      return;
-    }
-    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
     setResult(analyzePasswordStrength(password));
     setUnlocked(true);
   };

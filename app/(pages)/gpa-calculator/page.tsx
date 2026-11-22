@@ -1,8 +1,6 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { useSession } from "next-auth/react";
-import { useRouter, usePathname } from "next/navigation";
 import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -31,20 +29,10 @@ function createRow(): CourseRow {
 }
 
 export default function GPACalculatorPage() {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { data: session, status } = useSession();
   const [rows, setRows] = useState<CourseRow[]>(() => [createRow(), createRow()]);
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {    const hasActiveSubscription =
-      session.user.subscriptionExpiresAt &&
-      new Date(session.user.subscriptionExpiresAt) > new Date();
-    if (!hasActiveSubscription) {
-      router.push("/pricing");
-      return;
-    }
-    setResultUnlocked(true);
+  const handleCalculate = () => {    setResultUnlocked(true);
   };
 
   const addCourse = () => setRows((prev) => [...prev, createRow()]);

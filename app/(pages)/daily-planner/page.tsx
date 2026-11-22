@@ -22,12 +22,7 @@ export default function DailyPlannerPage() {
     return taskList.map((task, i) => ({ time: i < 3 ? `${8 + i * 2}:00` : `${14 + i}:00`, task }));
   }, [tasks]);
 
-  const handleGenerate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/daily-planner")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleGenerate = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

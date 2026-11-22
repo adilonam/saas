@@ -24,12 +24,7 @@ export default function PasswordGeneratorPage() {
   const [genError, setGenError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
-  const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/password-generator")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleSubmit = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

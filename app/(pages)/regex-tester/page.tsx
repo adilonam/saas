@@ -34,12 +34,7 @@ export default function RegexTesterPage() {
     }
   }, [pattern, flags, testString]);
 
-  const handleTest = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/regex-tester")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleTest = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

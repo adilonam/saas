@@ -18,14 +18,7 @@ export default function HtmlToPdfPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleRender = async () => {
-    setError(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/html-to-pdf")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
+    setError(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

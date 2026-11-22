@@ -23,12 +23,7 @@ export default function MeetingAgendaBuilderPage() {
     return topicList.map((topic, i) => ({ topic, minutes: i === topicList.length - 1 ? "Remaining" : String(perTopic) }));
   }, [topics, duration]);
 
-  const handleBuild = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/meeting-agenda-builder")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleBuild = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

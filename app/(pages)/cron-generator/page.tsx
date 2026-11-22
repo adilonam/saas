@@ -34,12 +34,7 @@ export default function CronGeneratorPage() {
     [minute, hour, dayOfMonth, month, dayOfWeek]
   );
 
-  const handleGenerate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/cron-generator")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleGenerate = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

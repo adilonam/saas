@@ -56,12 +56,7 @@ export default function JsonToCsvPage() {
   const [csvOutput, setCsvOutput] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleConvert = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/json-to-csv")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleConvert = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

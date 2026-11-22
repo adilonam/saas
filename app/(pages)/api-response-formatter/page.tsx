@@ -15,12 +15,7 @@ export default function ApiResponseFormatterPage() {
   const [formatted, setFormatted] = useState("");
   const [error, setError] = useState<string | null>(null);
 
-  const handleFormat = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleFormat = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {
@@ -36,12 +31,7 @@ export default function ApiResponseFormatterPage() {
     }
   };
 
-  const handleMinify = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/api-response-formatter")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleMinify = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

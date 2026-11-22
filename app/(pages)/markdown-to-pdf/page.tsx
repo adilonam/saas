@@ -18,14 +18,7 @@ export default function MarkdownToPdfPage() {
   const [error, setError] = useState<string | null>(null);
 
   const handleRender = async () => {
-    setError(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/markdown-to-pdf")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
+    setError(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

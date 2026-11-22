@@ -36,12 +36,7 @@ export default function BMICalculatorPage() {
   const [heightIn, setHeightIn] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bmi-calculator")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleCalculate = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

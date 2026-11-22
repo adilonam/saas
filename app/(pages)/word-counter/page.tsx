@@ -17,12 +17,7 @@ export default function WordCounterPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [stats, setStats] = useState<ReturnType<typeof countTextStats> | null>(null);
 
-  const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/word-counter")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleSubmit = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

@@ -36,12 +36,7 @@ export default function TaskPrioritizerPage() {
     };
   }, [parsed]);
 
-  const handlePrioritize = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/task-prioritizer")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handlePrioritize = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

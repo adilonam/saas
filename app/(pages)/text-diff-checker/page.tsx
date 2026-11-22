@@ -18,12 +18,7 @@ export default function TextDiffCheckerPage() {
   const [unlocked, setUnlocked] = useState(false);
   const [diff, setDiff] = useState<DiffLine[]>([]);
 
-  const handleSubmit = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/text-diff-checker")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleSubmit = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

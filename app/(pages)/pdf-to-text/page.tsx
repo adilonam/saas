@@ -23,14 +23,7 @@ export default function PdfToTextPage() {
   const handleExtract = async () => {
     setError(null);
     setText("");
-    setTotalPages(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-to-text")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
+    setTotalPages(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

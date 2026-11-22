@@ -19,13 +19,7 @@ export default function BulkZipBuilderPage() {
   const [isBuilding, setIsBuilding] = useState(false);
 
   const handleBuild = async () => {
-    setError(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/bulk-zip-builder")}`);
-      return;
-    }
-    const hasActiveSubscription =
+    setError(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

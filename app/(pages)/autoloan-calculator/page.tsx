@@ -25,12 +25,7 @@ export default function AutoLoanCalculatorPage() {
   const [termYears, setTermYears] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/autoloan-calculator")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleCalculate = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

@@ -23,13 +23,7 @@ export default function MarkdownReportBundlePage() {
   );
 
   const handleBuild = async () => {
-    setError(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/markdown-report-bundle")}`);
-      return;
-    }
-    const hasActiveSubscription =
+    setError(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

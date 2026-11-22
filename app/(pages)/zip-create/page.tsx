@@ -69,13 +69,7 @@ export default function ZipCreatePage() {
     setError(null);
   };
 
-  const handleZip = async () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/zip-create")}`);
-      return;
-    }
-
-    const hasActiveSubscription =
+  const handleZip = async () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

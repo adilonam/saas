@@ -34,13 +34,7 @@ export default function DataProfilerPage() {
 
   const handleProfile = async () => {
     setError(null);
-    setRows([]);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/data-profiler")}`);
-      return;
-    }
-    const hasActiveSubscription =
+    setRows([]);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

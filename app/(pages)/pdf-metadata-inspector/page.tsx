@@ -26,13 +26,7 @@ export default function PdfMetadataInspectorPage() {
 
   const handleInspect = async () => {
     setError(null);
-    setResult(null);
-
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/pdf-metadata-inspector")}`);
-      return;
-    }
-    const hasActiveSubscription =
+    setResult(null);    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

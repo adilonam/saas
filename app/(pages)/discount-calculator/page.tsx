@@ -19,12 +19,7 @@ export default function DiscountCalculatorPage() {
   const [salePrice, setSalePrice] = useState("");
   const [resultUnlocked, setResultUnlocked] = useState(false);
 
-  const handleCalculate = () => {
-    if (status === "unauthenticated" || !session) {
-      router.push(`/signup?callbackUrl=${encodeURIComponent(pathname || "/discount-calculator")}`);
-      return;
-    }
-    const hasActiveSubscription =
+  const handleCalculate = () => {    const hasActiveSubscription =
       session.user.subscriptionExpiresAt &&
       new Date(session.user.subscriptionExpiresAt) > new Date();
     if (!hasActiveSubscription) {

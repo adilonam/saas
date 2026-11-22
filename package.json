@@ -5,7 +5,7 @@
   "description": "Nextjs Saas Starter Template",
   "scripts": {
     "dev": "next dev",
-    "build": "prisma migrate deploy && prisma generate && (node scripts/seed-blog.js || echo 'Seeding failed, continuing...') && next build",
+    "build": "prisma migrate deploy && prisma generate && tsx scripts/seed-blog.ts && next build",
     "start": "next start",
     "lint": "eslint .",
     "indexnow:submit": "tsx scripts/submit-indexnow.ts",
@@ -42,7 +42,6 @@
     "nodemailer": "^7.0.7",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^5.5.207",
-    "peerjs": "^1.5.5",
     "qrcode": "^1.5.4",
     "react": "^19.2.1",
     "react-dom": "^19.2.1",
@@ -58,6 +57,7 @@
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.65.1",
     "@tailwindcss/postcss": "^4.1.17",
     "@types/jsbarcode": "^3.11.4",
     "@types/node": "^22.10.5",

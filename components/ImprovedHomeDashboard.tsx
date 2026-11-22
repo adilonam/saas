@@ -27,10 +27,14 @@ const TOOL_CATEGORIES = {
     { path: "loan-payment-calculator", title: "Loan Payment" },
     { path: "roi-calculator", title: "ROI Calculator" },
     { path: "discount-calculator", title: "Discount Calculator" },
+    { path: "black-friday-discount-calculator", title: "Black Friday Calculator" },
     { path: "tip-split-calculator", title: "Tip Split Calculator" },
     { path: "time-calculator", title: "Time Calculator" },
     { path: "calorie-calculator", title: "Calorie Calculator" },
     { path: "probability-calculator", title: "Probability" },
+    { path: "christmas-countdown", title: "Christmas Countdown" },
+    { path: "new-year-countdown", title: "New Year Countdown" },
+    { path: "2027-calendar", title: "2027 Calendar" },
   ],
   "Generators": [
     { path: "password-generator", title: "Password Generator" },
@@ -83,6 +87,8 @@ const TOOL_CATEGORIES = {
     { path: "goal-progress-tracker", title: "Goal Progress" },
     { path: "meeting-agenda-builder", title: "Meeting Agenda" },
     { path: "daily-planner", title: "Daily Planner" },
+    { path: "secret-santa-generator", title: "Secret Santa Generator" },
+    { path: "share", title: "Share Files Securely" },
   ],
   "Business": [
     { path: "cac-calculator", title: "CAC Calculator" },
@@ -94,41 +100,11 @@ const TOOL_CATEGORIES = {
   ],
 };
 
-export default function ImprovedHomeDashboard() {
-  const [searchQuery, setSearchQuery] = useState("");
+interface ImprovedHomeDashboardProps {
+  onSearchClick: () => void;
+}
 
-  // Flatten all tools for search
-  const allTools = useMemo(() => {
-    const tools: Array<{ path: string; title: string; category: string }> = [];
-    Object.entries(TOOL_CATEGORIES).forEach(([category, categoryTools]) => {
-      categoryTools.forEach((tool) => {
-        tools.push({ ...tool, category });
-      });
-    });
-    return tools;
-  }, []);
-
-  // Filter tools based on search
-  const filteredCategories = useMemo(() => {
-    if (!searchQuery.trim()) return TOOL_CATEGORIES;
-
-    const query = searchQuery.toLowerCase();
-    const filtered: Record<string, Array<{ path: string; title: string }>> = {};
-
-    Object.entries(TOOL_CATEGORIES).forEach(([category, tools]) => {
-      const matchingTools = tools.filter(
-        (tool) =>
-          tool.title.toLowerCase().includes(query) ||
-          tool.path.toLowerCase().includes(query)
-      );
-      if (matchingTools.length > 0) {
-        filtered[category] = matchingTools;
-      }
-    });
-
-    return filtered;
-  }, [searchQuery]);
-
+export default function ImprovedHomeDashboard({ onSearchClick }: ImprovedHomeDashboardProps) {
   const totalTools = Object.values(TOOL_CATEGORIES).reduce(
     (sum, tools) => sum + tools.length,
     0
@@ -147,20 +123,15 @@ export default function ImprovedHomeDashboard() {
               {totalTools}+ free online tools for PDF, calculators, generators, and more
             </p>
 
-            {/* Prominent Search */}
-            <div className="relative max-w-2xl mx-auto">
-              <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="search"
-                placeholder="Search tools..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 md:py-4 text-base md:text-lg border-2 border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                aria-label="Search tools"
-              />
-            </div>
+            {/* Prominent Search - Opens SearchOverlay */}
+            <button
+              onClick={onSearchClick}
+              className="relative max-w-2xl mx-auto w-full pl-11 pr-4 py-3 md:py-4 text-base md:text-lg border-2 border-gray-300 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-left transition-colors hover:border-blue-400 dark:hover:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              aria-label="Search tools and blog posts"
+            >
+              <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+              <span className="text-gray-500 dark:text-gray-400">Search tools and blog posts...</span>
+            </button>
           </div>
         </div>
       </section>
@@ -202,18 +173,11 @@ export default function ImprovedHomeDashboard() {
       <section id="all-tools" className="py-8 md:py-12">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-bold mb-6 md:mb-8 text-gray-900 dark:text-white">
-            {searchQuery ? `Search Results (${Object.values(filteredCategories).flat().length})` : 'All Tools'}
+            All Tools
           </h2>
 
-          {Object.keys(filteredCategories).length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-gray-600 dark:text-gray-400 text-lg">
-                No tools found matching "{searchQuery}"
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-10 md:space-y-12">
-              {Object.entries(filteredCategories).map(([category, tools]) => (
+          <div className="space-y-10 md:space-y-12">
+            {Object.entries(TOOL_CATEGORIES).map(([category, tools]) => (
                 <div key={category}>
                   <h3 className="text-lg md:text-xl font-bold mb-4 text-gray-800 dark:text-gray-200 border-b border-gray-200 dark:border-gray-800 pb-2">
                     {category}
@@ -237,7 +201,6 @@ export default function ImprovedHomeDashboard() {
                 </div>
               ))}
             </div>
-          )}
         </div>
       </section>
     </div>

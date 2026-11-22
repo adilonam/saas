@@ -13,6 +13,12 @@ interface SearchResult {
 
 // All tools from the site
 const ALL_TOOLS: SearchResult[] = [
+  { type: "tool", slug: "share", title: "Share Files Securely", description: "Send files and text with end-to-end encryption, room codes, and QR codes" },
+  { type: "tool", slug: "christmas-countdown", title: "Christmas Countdown", description: "Count down days to Christmas" },
+  { type: "tool", slug: "new-year-countdown", title: "New Year Countdown", description: "Count down to New Year" },
+  { type: "tool", slug: "secret-santa-generator", title: "Secret Santa Generator", description: "Generate Secret Santa assignments with exclusions" },
+  { type: "tool", slug: "black-friday-discount-calculator", title: "Black Friday Calculator", description: "Calculate Black Friday discounts and savings" },
+  { type: "tool", slug: "2027-calendar", title: "2027 Calendar", description: "View full 2027 calendar" },
   { type: "tool", slug: "youtube-title-length-checker", title: "YouTube Title Length Checker", description: "Check YouTube title character limits" },
   { type: "tool", slug: "sign-pdf", title: "Sign PDF", description: "Add digital signatures to PDFs" },
   { type: "tool", slug: "merge-pdf", title: "Merge PDF", description: "Combine multiple PDF files" },
@@ -20,17 +26,10 @@ const ALL_TOOLS: SearchResult[] = [
   { type: "tool", slug: "acceptance-criteria-generator", title: "Acceptance Criteria Generator", description: "Generate acceptance criteria for user stories" },
   { type: "tool", slug: "ai-email-subject-line", title: "AI Email Subject Line", description: "Generate compelling email subject lines" },
   { type: "tool", slug: "ai-resume-bullet", title: "AI Resume Bullet", description: "Create impactful resume bullet points" },
-  // Add more tools as needed
-];
-
-const BLOG_POSTS: SearchResult[] = [
-  { type: "blog", slug: "youtube-title-length-guide", title: "YouTube Title Length: Complete Guide" },
-  { type: "blog", slug: "how-to-sign-pdf-documents", title: "How to Sign PDF Documents Online" },
-  { type: "blog", slug: "calculate-age-accurately", title: "How to Calculate Age Accurately" },
-  { type: "blog", slug: "merge-pdf-files-guide", title: "How to Merge PDF Files" },
-  { type: "blog", slug: "ai-writing-tools-guide", title: "AI Writing Tools Guide" },
-  { type: "blog", slug: "productivity-tools-guide", title: "Free Online Productivity Tools Guide" },
-  { type: "blog", slug: "acceptance-criteria-guide", title: "Writing Effective Acceptance Criteria" },
+  { type: "tool", slug: "time-calculator", title: "Time Calculator", description: "Add and subtract time durations" },
+  { type: "tool", slug: "bmi-calculator", title: "BMI Calculator", description: "Calculate body mass index" },
+  { type: "tool", slug: "password-generator", title: "Password Generator", description: "Generate secure random passwords" },
+  { type: "tool", slug: "qr-generate", title: "QR Code Generator", description: "Create QR codes for any text or URL" },
 ];
 
 interface SearchOverlayProps {
@@ -41,7 +40,27 @@ interface SearchOverlayProps {
 export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
   const [query, setQuery] = useState("");
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [blogPosts, setBlogPosts] = useState<SearchResult[]>([]);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Fetch blog posts on mount
+  useEffect(() => {
+    fetch("/api/blog")
+      .then((res) => res.json())
+      .then((data) => {
+        const posts: SearchResult[] = data.posts.map((post: any) => ({
+          type: "blog" as const,
+          slug: post.slug,
+          title: post.title,
+          description: post.metaDescription || undefined,
+        }));
+        setBlogPosts(posts);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch blog posts:", err);
+        setBlogPosts([]);
+      });
+  }, []);
 
   // Filter results
   const toolResults = query.trim()
@@ -52,8 +71,9 @@ export default function SearchOverlay({ isOpen, onClose }: SearchOverlayProps) {
     : [];
 
   const blogResults = query.trim()
-    ? BLOG_POSTS.filter((post) =>
-        post.title.toLowerCase().includes(query.toLowerCase())
+    ? blogPosts.filter((post) =>
+        post.title.toLowerCase().includes(query.toLowerCase()) ||
+        post.description?.toLowerCase().includes(query.toLowerCase())
       )
     : [];
 

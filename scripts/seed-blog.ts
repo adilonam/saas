@@ -1,20 +1,32 @@
-const { PrismaClient } = require('@prisma/client');
-const { PrismaPg } = require('@prisma/adapter-pg');
-const fs = require('fs');
-const path = require('path');
+import { PrismaClient } from '../prisma/generated/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: process.env.DATABASE_URL!,
 });
 
 const prisma = new PrismaClient({ adapter });
+
+interface BlogPostData {
+  slug: string;
+  title: string;
+  metaDescription: string;
+  keywords: string;
+  content: string;
+  coverImage?: string;
+  relatedTools?: string;
+  category?: string;
+  publishedAt?: string;
+}
 
 async function seedBlogPosts() {
   try {
     console.log('Starting blog post seeding...');
     
     const seedDataPath = path.join(__dirname, 'seed-blog-posts.json');
-    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8'));
+    const seedData = JSON.parse(fs.readFileSync(seedDataPath, 'utf8')) as { posts: BlogPostData[] };
     
     let created = 0;
     let updated = 0;
@@ -64,7 +76,7 @@ async function seedBlogPosts() {
           console.log(`✓ Created: ${post.slug}`);
         }
       } catch (error) {
-        console.error(`✗ Error processing ${post.slug}:`, error.message);
+        console.error(`✗ Error processing ${post.slug}:`, error instanceof Error ? error.message : error);
         skipped++;
       }
     }
@@ -75,18 +87,16 @@ async function seedBlogPosts() {
     console.log(`  Skipped: ${skipped}`);
     console.log(`  Total: ${seedData.posts.length}`);
     
-  } catch (error) {
-    console.error('Error seeding blog posts:', error);
-    // Don't fail the build if seeding fails
-    console.log('Continuing despite seeding errors...');
-  } finally {
     await prisma.$disconnect();
+  } catch (error) {
+    console.error('❌ FATAL: Error seeding blog posts:', error);
+    await prisma.$disconnect();
+    process.exit(1); // Fail loudly so build catches it
   }
 }
 
 // Run if called directly
-if (require.main === module) {
-  seedBlogPosts();
-}
-
-module.exports = { seedBlogPosts };
+seedBlogPosts().catch(err => {
+  console.error('❌ Fatal error:', err);
+  process.exit(1);
+});

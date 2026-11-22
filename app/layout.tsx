@@ -19,7 +19,7 @@ export const metadata: Metadata = {
     template: "%s | eProd",
   },
   description:
-    "Free online productivity tools: PDF tools (sign, merge, convert), calculators, AI-powered generators, converters, and developer utilities. 500+ free tools for work and personal use.",
+    "Free online productivity tools: PDF tools (sign, merge, convert), calculators, AI-powered generators, converters, and developer utilities. Hundreds of free tools for work and personal use.",
   keywords: [
     "online tools",
     "free calculator",
@@ -42,13 +42,13 @@ export const metadata: Metadata = {
     siteName: "eProd",
     title: "eProd – Free Online Productivity Tools & Calculators",
     description:
-      "Free online productivity tools: PDF tools, calculators, AI-powered generators, converters, and developer utilities. 500+ free tools for work and personal use.",
+      "Free online productivity tools: PDF tools, calculators, AI-powered generators, converters, and developer utilities. Hundreds of free tools for work and personal use.",
   },
   twitter: {
     card: "summary",
     title: "eProd – Free Online Productivity Tools",
     description:
-      "Free online productivity tools: PDF tools, calculators, AI-powered generators, and more. 500+ free tools.",
+      "Free online productivity tools: PDF tools, calculators, AI-powered generators, and more. Hundreds of free tools.",
   },
   robots: {
     index: true,

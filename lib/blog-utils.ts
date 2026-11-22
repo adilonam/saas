@@ -165,7 +165,7 @@ export function parseRelatedTools(relatedToolsString: string | null): RelatedToo
 
 export function generateBlogPostMetadata(post: BlogPost): Metadata {
   const url = `${SITE_URL}/blog/${post.slug}`;
-  const title = `${post.title} – ${SITE_NAME}`;
+  const title = post.title; // Root layout adds "| eProd" suffix
   const description = post.metaDescription || post.title;
 
   return {

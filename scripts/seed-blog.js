@@ -1,15 +1,20 @@
-const { PrismaClient } = require('@prisma/client');
-const { PrismaPg } = require('@prisma/adapter-pg');
 const fs = require('fs');
 const path = require('path');
 
-const adapter = new PrismaPg({
-  connectionString: process.env.DATABASE_URL,
-});
+// Use dynamic import for ESM-only prisma client
+let prisma;
 
-const prisma = new PrismaClient({ adapter });
+async function getPrismaClient() {
+  if (!prisma) {
+    const { default: prismaModule } = await import('../lib/prisma.js');
+    prisma = prismaModule;
+  }
+  return prisma;
+}
 
 async function seedBlogPosts() {
+  const prismaClient = await getPrismaClient();
+  
   try {
     console.log('Starting blog post seeding...');
     
@@ -22,13 +27,13 @@ async function seedBlogPosts() {
     
     for (const post of seedData.posts) {
       try {
-        const existing = await prisma.blogPost.findUnique({
+        const existing = await prismaClient.blogPost.findUnique({
           where: { slug: post.slug },
         });
         
         if (existing) {
           // Update existing post
-          await prisma.blogPost.update({
+          await prismaClient.blogPost.update({
             where: { slug: post.slug },
             data: {
               title: post.title,
@@ -46,7 +51,7 @@ async function seedBlogPosts() {
           console.log(`✓ Updated: ${post.slug}`);
         } else {
           // Create new post
-          await prisma.blogPost.create({
+          await prismaClient.blogPost.create({
             data: {
               slug: post.slug,
               title: post.title,
@@ -76,17 +81,20 @@ async function seedBlogPosts() {
     console.log(`  Total: ${seedData.posts.length}`);
     
   } catch (error) {
-    console.error('Error seeding blog posts:', error);
-    // Don't fail the build if seeding fails
-    console.log('Continuing despite seeding errors...');
+    console.error('❌ FATAL: Error seeding blog posts:', error);
+    await prismaClient.$disconnect();
+    process.exit(1); // Fail loudly so build catches it
   } finally {
-    await prisma.$disconnect();
+    await prismaClient.$disconnect();
   }
 }
 
 // Run if called directly
 if (require.main === module) {
-  seedBlogPosts();
+  seedBlogPosts().catch(err => {
+    console.error('❌ Fatal error:', err);
+    process.exit(1);
+  });
 }
 
 module.exports = { seedBlogPosts };

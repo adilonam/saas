@@ -658,27 +658,29 @@ function SharePageContent() {
       return;
     }
 
-    console.log(`Completing file transfer: ${fileTransferRef.current.fileName}`);
-    console.log(`Total chunks received: ${fileTransferRef.current.chunks.length}`);
-    const blob = new Blob(fileTransferRef.current.chunks, { type: fileTransferRef.current.fileType });
-    
+    // Snapshot before clearing the ref — React state updaters may run later.
+    const transfer = fileTransferRef.current;
+    fileTransferRef.current = null;
+    setReceiveProgress(null);
+
+    console.log(`Completing file transfer: ${transfer.fileName}`);
+    console.log(`Total chunks received: ${transfer.chunks.length}`);
+    const blob = new Blob(transfer.chunks, { type: transfer.fileType || "application/octet-stream" });
+
     setReceivedFiles(prev => [...prev, {
-      fileName: fileTransferRef.current!.fileName,
-      fileSize: fileTransferRef.current!.fileSize,
-      fileType: fileTransferRef.current!.fileType,
-      blob: blob,
+      fileName: transfer.fileName,
+      fileSize: transfer.fileSize,
+      fileType: transfer.fileType,
+      blob,
       timestamp: Date.now()
     }]);
 
     setMessages(prev => [...prev, {
       type: "file-complete",
-      content: fileTransferRef.current!.fileName,
+      content: transfer.fileName,
       from: "peer",
       timestamp: Date.now()
     }]);
-
-    setReceiveProgress(null);
-    fileTransferRef.current = null;
   };
 
   const queueText = () => {

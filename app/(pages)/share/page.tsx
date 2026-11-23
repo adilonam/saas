@@ -12,12 +12,28 @@ import {
   DocumentArrowDownIcon,
 } from "@heroicons/react/24/outline";
 import {
+  base64ToBuffer,
+  bufferToBase64,
+  decryptData,
+  deriveSharedKey,
+  encryptData,
+  exportPublicKey,
+  generateKeyPair,
+  hashData,
+  importPublicKey,
+  normalizeBinaryFrame,
+} from "@/lib/share-crypto";
+import {
   type AppDataMessage,
   type SignalInbound,
-  CONNECT_TIMEOUT_MS,
+  type TransportMode,
   FILE_CHUNK_SIZE,
+  P2P_FALLBACK_MS,
+  RELAY_CONNECT_TIMEOUT_MS,
+  RELAY_FILE_CHUNK_SIZE,
   fetchIceServers,
   generateRoomCode,
+  getRelayUrl,
   getSignalUrl,
   waitForBufferedAmountLow,
 } from "@/lib/share-webrtc";
@@ -53,12 +69,16 @@ function newId() {
 function SharePageContent() {
   const searchParams = useSearchParams();
   const autoJoinRoom = searchParams?.get("room") || null;
+  const forceRelayFallback =
+    searchParams?.get("forceRelayFallback") === "1" ||
+    searchParams?.get("relay") === "1";
 
   const [mode, setMode] = useState<"send" | "receive" | null>(null);
   const [roomCode, setRoomCode] = useState("");
   const [inputCode, setInputCode] = useState("");
   const [status, setStatus] = useState("Disconnected");
   const [connected, setConnected] = useState(false);
+  const [transportMode, setTransportMode] = useState<TransportMode>(null);
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [textInput, setTextInput] = useState("");
@@ -73,7 +93,8 @@ function SharePageContent() {
     progress: number;
   } | null>(null);
 
-  const wsRef = useRef<WebSocket | null>(null);
+  const signalWsRef = useRef<WebSocket | null>(null);
+  const relayWsRef = useRef<WebSocket | null>(null);
   const pcRef = useRef<RTCPeerConnection | null>(null);
   const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitiatorRef = useRef(false);
@@ -81,23 +102,56 @@ function SharePageContent() {
   const remoteSetRef = useRef(false);
   const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
   const incomingFileRef = useRef<IncomingFile | null>(null);
-  const connectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const p2pTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const relayTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const makingOfferRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const startedAutoJoinRef = useRef(false);
   const connectedRef = useRef(false);
+  const transportModeRef = useRef<TransportMode>(null);
+  const fallingBackRef = useRef(false);
+  const roomCodeRef = useRef("");
+  const keyPairRef = useRef<CryptoKeyPair | null>(null);
+  const sharedKeyRef = useRef<CryptoKey | null>(null);
+  const sentKeyExchangeRef = useRef(false);
   const handleSignalRef = useRef<(raw: string) => Promise<void>>(async () => {});
   const handleDataRef = useRef<(event: MessageEvent) => Promise<void>>(async () => {});
+  const handleRelayMessageRef = useRef<(event: MessageEvent) => Promise<void>>(
+    async () => {},
+  );
+  const fallbackToRelayRef = useRef<(reason: string) => void>(() => {});
 
-  const clearConnectTimer = () => {
-    if (connectTimerRef.current) {
-      clearTimeout(connectTimerRef.current);
-      connectTimerRef.current = null;
+  const clearP2pTimer = () => {
+    if (p2pTimerRef.current) {
+      clearTimeout(p2pTimerRef.current);
+      p2pTimerRef.current = null;
     }
   };
 
-  const cleanupPeer = (opts?: { keepSocket?: boolean; statusMsg?: string }) => {
-    clearConnectTimer();
+  const clearRelayTimer = () => {
+    if (relayTimerRef.current) {
+      clearTimeout(relayTimerRef.current);
+      relayTimerRef.current = null;
+    }
+  };
+
+  const markTransport = (t: TransportMode) => {
+    transportModeRef.current = t;
+    setTransportMode(t);
+  };
+
+  const markConnected = (t: "p2p" | "relay") => {
+    clearP2pTimer();
+    clearRelayTimer();
+    fallingBackRef.current = false;
+    connectedRef.current = true;
+    setConnected(true);
+    setError(null);
+    markTransport(t);
+    setStatus(t === "p2p" ? "Connected (P2P)" : "Connected (relay)");
+  };
+
+  const closePeerConnection = () => {
     if (dcRef.current) {
       try {
         dcRef.current.close();
@@ -117,25 +171,54 @@ function SharePageContent() {
     remoteSetRef.current = false;
     pendingIceRef.current = [];
     makingOfferRef.current = false;
-    incomingFileRef.current = null;
-    connectedRef.current = false;
-    setConnected(false);
-    setSendProgress(null);
-    setReceiveProgress(null);
-    if (!opts?.keepSocket && wsRef.current) {
+  };
+
+  const closeSignal = () => {
+    if (signalWsRef.current) {
       try {
-        wsRef.current.close();
+        signalWsRef.current.onclose = null;
+        signalWsRef.current.close();
       } catch {
         /* ignore */
       }
-      wsRef.current = null;
+      signalWsRef.current = null;
     }
+  };
+
+  const closeRelay = () => {
+    if (relayWsRef.current) {
+      try {
+        relayWsRef.current.onclose = null;
+        relayWsRef.current.close();
+      } catch {
+        /* ignore */
+      }
+      relayWsRef.current = null;
+    }
+  };
+
+  const cleanupAll = (opts?: { statusMsg?: string }) => {
+    clearP2pTimer();
+    clearRelayTimer();
+    closePeerConnection();
+    closeSignal();
+    closeRelay();
+    connectedRef.current = false;
+    fallingBackRef.current = false;
+    sharedKeyRef.current = null;
+    sentKeyExchangeRef.current = false;
+    keyPairRef.current = null;
+    incomingFileRef.current = null;
+    markTransport(null);
+    setConnected(false);
+    setSendProgress(null);
+    setReceiveProgress(null);
     if (opts?.statusMsg) setStatus(opts.statusMsg);
   };
 
   useEffect(() => {
     return () => {
-      cleanupPeer();
+      cleanupAll();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -151,54 +234,44 @@ function SharePageContent() {
   }, [autoJoinRoom, mode]);
 
   const sendSignal = (payload: Record<string, unknown>) => {
-    const ws = wsRef.current;
+    const ws = signalWsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify(payload));
   };
 
-  const markConnected = () => {
-    clearConnectTimer();
-    connectedRef.current = true;
-    setConnected(true);
-    setError(null);
-    setStatus("Connected (P2P)");
+  const startP2pTimer = () => {
+    clearP2pTimer();
+    p2pTimerRef.current = setTimeout(() => {
+      if (dcRef.current?.readyState === "open" || transportModeRef.current === "relay") {
+        return;
+      }
+      console.log("P2P timeout — falling back to relay");
+      fallbackToRelayRef.current("timeout");
+    }, P2P_FALLBACK_MS);
   };
 
-  const startConnectTimer = () => {
-    clearConnectTimer();
-    connectTimerRef.current = setTimeout(() => {
-      if (dcRef.current?.readyState === "open") return;
+  const startRelayTimer = () => {
+    clearRelayTimer();
+    relayTimerRef.current = setTimeout(() => {
+      if (transportModeRef.current === "relay" && connectedRef.current) return;
       setError(
-        "Could not establish a direct peer connection. This often happens behind a strict firewall or symmetric NAT (no TURN server configured yet). Try another network, or ask the other person to join again.",
+        "Could not connect via peer-to-peer or server relay. Check your network and try again.",
       );
       setStatus("Connection failed");
-      cleanupPeer({ keepSocket: true, statusMsg: "Connection failed" });
-    }, CONNECT_TIMEOUT_MS);
+      cleanupAll({ statusMsg: "Connection failed" });
+    }, RELAY_CONNECT_TIMEOUT_MS);
   };
 
-  const flushPendingIce = async () => {
-    const pc = pcRef.current;
-    if (!pc || !remoteSetRef.current) return;
-    const queued = pendingIceRef.current.splice(0);
-    for (const c of queued) {
-      try {
-        await pc.addIceCandidate(c);
-      } catch (e) {
-        console.warn("addIceCandidate failed", e);
-      }
-    }
-  };
+  // ---- P2P DataChannel (plaintext; DTLS encrypts in transit) ----
 
-  const handleDataMessage = async (event: MessageEvent) => {
+  const handleP2pDataMessage = async (event: MessageEvent) => {
     if (typeof event.data === "string") {
       let msg: AppDataMessage;
       try {
         msg = JSON.parse(event.data) as AppDataMessage;
       } catch {
-        console.warn("Invalid data-channel JSON");
         return;
       }
-
       if (msg.type === "text" && typeof msg.data === "string") {
         setMessages((prev) => [
           ...prev,
@@ -212,7 +285,6 @@ function SharePageContent() {
         ]);
         return;
       }
-
       if (msg.type === "file-meta") {
         incomingFileRef.current = {
           fileName: msg.fileName,
@@ -224,7 +296,6 @@ function SharePageContent() {
         setReceiveProgress({ fileName: msg.fileName, progress: 0 });
         return;
       }
-
       if (msg.type === "file-complete") {
         const transfer = incomingFileRef.current;
         incomingFileRef.current = null;
@@ -257,21 +328,10 @@ function SharePageContent() {
       return;
     }
 
-    // Binary file chunk
-    let buffer: ArrayBuffer;
-    if (event.data instanceof ArrayBuffer) {
-      buffer = event.data;
-    } else if (ArrayBuffer.isView(event.data)) {
-      buffer = event.data.buffer.slice(
-        event.data.byteOffset,
-        event.data.byteOffset + event.data.byteLength,
-      ) as ArrayBuffer;
-    } else if (typeof Blob !== "undefined" && event.data instanceof Blob) {
-      buffer = await event.data.arrayBuffer();
-    } else {
-      return;
-    }
-
+    const buffer = await normalizeBinaryFrame(
+      event.data as Blob | ArrayBuffer | ArrayBufferView,
+    );
+    if (!buffer) return;
     const transfer = incomingFileRef.current;
     if (!transfer) return;
     transfer.chunks.push(buffer);
@@ -290,13 +350,15 @@ function SharePageContent() {
 
     channel.onopen = () => {
       console.log("DataChannel open");
-      markConnected();
+      markConnected("p2p");
     };
     channel.onclose = () => {
       console.log("DataChannel closed");
-      connectedRef.current = false;
-      setConnected(false);
-      setStatus("Peer left");
+      if (transportModeRef.current === "p2p") {
+        connectedRef.current = false;
+        setConnected(false);
+        setStatus("Peer left");
+      }
     };
     channel.onerror = (e) => {
       console.error("DataChannel error", e);
@@ -308,8 +370,13 @@ function SharePageContent() {
 
   const createPeerConnection = async () => {
     if (pcRef.current) return pcRef.current;
-    const iceServers = await fetchIceServers();
-    const pc = new RTCPeerConnection({ iceServers });
+
+    let iceServers = await fetchIceServers();
+    const config: RTCConfiguration = forceRelayFallback
+      ? { iceServers: [], iceTransportPolicy: "relay" }
+      : { iceServers };
+
+    const pc = new RTCPeerConnection(config);
     pcRef.current = pc;
 
     pc.onicecandidate = (event) => {
@@ -326,16 +393,21 @@ function SharePageContent() {
       const state = pc.connectionState;
       console.log("pc connectionState", state);
       if (state === "failed") {
-        setError(
-          "Peer connection failed. A direct path could not be found (strict NAT / no TURN). Try again on another network.",
-        );
-        setStatus("Connection failed");
-        cleanupPeer({ keepSocket: true, statusMsg: "Connection failed" });
-      } else if (state === "disconnected") {
+        fallbackToRelayRef.current("pc-failed");
+      } else if (state === "disconnected" && transportModeRef.current === "p2p") {
+        connectedRef.current = false;
         setConnected(false);
         setStatus("Peer left");
       } else if (state === "connecting") {
         setStatus("Connecting");
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      const state = pc.iceConnectionState;
+      console.log("pc iceConnectionState", state);
+      if (state === "failed") {
+        fallbackToRelayRef.current("ice-failed");
       }
     };
 
@@ -351,7 +423,7 @@ function SharePageContent() {
     makingOfferRef.current = true;
     try {
       setStatus("Connecting");
-      startConnectTimer();
+      startP2pTimer();
       const pc = await createPeerConnection();
       const channel = pc.createDataChannel("share", { ordered: true });
       setupDataChannel(channel);
@@ -360,17 +432,29 @@ function SharePageContent() {
       sendSignal({ type: "offer", sdp: offer.sdp });
     } catch (e) {
       console.error("createOffer failed", e);
-      setError("Failed to start peer connection.");
-      setStatus("Connection failed");
+      fallbackToRelayRef.current("offer-failed");
     } finally {
       makingOfferRef.current = false;
+    }
+  };
+
+  const flushPendingIce = async () => {
+    const pc = pcRef.current;
+    if (!pc || !remoteSetRef.current) return;
+    const queued = pendingIceRef.current.splice(0);
+    for (const c of queued) {
+      try {
+        await pc.addIceCandidate(c);
+      } catch (e) {
+        console.warn("addIceCandidate failed", e);
+      }
     }
   };
 
   const handleOffer = async (sdp: string) => {
     try {
       setStatus("Connecting");
-      startConnectTimer();
+      startP2pTimer();
       const pc = await createPeerConnection();
       await pc.setRemoteDescription({ type: "offer", sdp });
       remoteSetRef.current = true;
@@ -380,8 +464,7 @@ function SharePageContent() {
       sendSignal({ type: "answer", sdp: answer.sdp });
     } catch (e) {
       console.error("handleOffer failed", e);
-      setError("Failed to accept peer offer.");
-      setStatus("Connection failed");
+      fallbackToRelayRef.current("answer-failed");
     }
   };
 
@@ -397,7 +480,9 @@ function SharePageContent() {
     }
   };
 
-  const handleRemoteIce = async (msg: Extract<SignalInbound, { type: "ice-candidate" }>) => {
+  const handleRemoteIce = async (
+    msg: Extract<SignalInbound, { type: "ice-candidate" }>,
+  ) => {
     const init: RTCIceCandidateInit = {
       candidate: msg.candidate ?? undefined,
       sdpMid: msg.sdpMid ?? undefined,
@@ -428,32 +513,33 @@ function SharePageContent() {
         isInitiatorRef.current = !!msg.initiator;
         setStatus(msg.initiator ? "Waiting for peer" : "Connecting");
         if (!msg.initiator) {
-          // Second peer waits for offer from initiator
           setStatus("Connecting");
-          startConnectTimer();
+          startP2pTimer();
         }
         break;
       case "peer-joined":
         setStatus("Connecting");
+        startP2pTimer();
         if (isInitiatorRef.current) {
           await createAndSendOffer();
         }
         break;
       case "peer-left":
-        cleanupPeer({
-          keepSocket: true,
-          statusMsg: "Peer left",
-        });
-        setError(null);
+        // Other peer may have closed signaling to switch to relay — follow them.
+        if (!connectedRef.current && transportModeRef.current !== "relay") {
+          fallbackToRelayRef.current("peer-left");
+        } else if (transportModeRef.current === "p2p") {
+          connectedRef.current = false;
+          setConnected(false);
+          setStatus("Peer left");
+          closePeerConnection();
+        }
         break;
       case "error":
         setError(msg.message || "Signaling error");
-        setStatus(
-          /full/i.test(msg.message || "") ? "Room full" : "Error",
-        );
+        setStatus(/full/i.test(msg.message || "") ? "Room full" : "Error");
         break;
       case "ping":
-        // Keepalive — ignore (or could echo; not required)
         break;
       case "offer":
         if (msg.sdp) await handleOffer(msg.sdp);
@@ -469,54 +555,219 @@ function SharePageContent() {
     }
   };
 
-  handleSignalRef.current = handleSignalMessage;
-  handleDataRef.current = handleDataMessage;
+  // ---- Relay mode (legacy WS + ECDH) ----
 
-  // Expose connection diagnostics for Playwright / manual debug
-  if (typeof window !== "undefined") {
-    (
-      window as unknown as {
-        __shareDebug?: () => {
-          connected: boolean;
-          status: string;
-          dcState: string | undefined;
-          pcState: RTCPeerConnectionState | undefined;
-        };
+  const exchangeKeys = async () => {
+    if (!keyPairRef.current || sentKeyExchangeRef.current) return;
+    const publicKey = await exportPublicKey(keyPairRef.current.publicKey);
+    const payload = JSON.stringify({ type: "key-exchange", publicKey });
+    sentKeyExchangeRef.current = true;
+    const ws = relayWsRef.current;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      ws.send(payload);
+    } else {
+      sentKeyExchangeRef.current = false;
+    }
+  };
+
+  const handleKeyExchange = async (publicKeyString: string) => {
+    if (!keyPairRef.current) return;
+    try {
+      const peerPublicKey = await importPublicKey(publicKeyString);
+      const sharedKey = await deriveSharedKey(
+        keyPairRef.current.privateKey,
+        peerPublicKey,
+      );
+      sharedKeyRef.current = sharedKey;
+      console.log("Relay shared key established");
+
+      if (!sentKeyExchangeRef.current) {
+        await exchangeKeys();
       }
-    ).__shareDebug = () => ({
-      connected: connectedRef.current,
-      status,
-      dcState: dcRef.current?.readyState,
-      pcState: pcRef.current?.connectionState,
+
+      if (!connectedRef.current || transportModeRef.current !== "relay") {
+        markConnected("relay");
+      }
+    } catch (e) {
+      console.error("Key exchange failed", e);
+    }
+  };
+
+  const handleRelayEncryptedText = async (encryptedData: string) => {
+    if (!sharedKeyRef.current) return;
+    try {
+      const decrypted = await decryptData(
+        base64ToBuffer(encryptedData),
+        sharedKeyRef.current,
+      );
+      const text = new TextDecoder().decode(decrypted);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: newId(),
+          type: "text",
+          content: text,
+          from: "peer",
+          timestamp: Date.now(),
+        },
+      ]);
+    } catch (e) {
+      console.error("Relay text decrypt failed", e);
+    }
+  };
+
+  const handleRelayEncryptedChunk = async (data: ArrayBuffer) => {
+    if (!incomingFileRef.current || !sharedKeyRef.current) return;
+    try {
+      const decrypted = await decryptData(data, sharedKeyRef.current);
+      const transfer = incomingFileRef.current;
+      transfer.chunks.push(decrypted);
+      transfer.received += decrypted.byteLength;
+      const progress = Math.min(
+        100,
+        Math.round((transfer.received / Math.max(transfer.fileSize, 1)) * 100),
+      );
+      setReceiveProgress({ fileName: transfer.fileName, progress });
+    } catch (e) {
+      console.error("Relay chunk decrypt failed", e);
+    }
+  };
+
+  const completeRelayFile = () => {
+    const transfer = incomingFileRef.current;
+    incomingFileRef.current = null;
+    setReceiveProgress(null);
+    if (!transfer) return;
+    const blob = new Blob(transfer.chunks, {
+      type: transfer.fileType || "application/octet-stream",
     });
-  }
+    setReceivedFiles((prev) => [
+      ...prev,
+      {
+        fileName: transfer.fileName,
+        fileSize: transfer.fileSize,
+        fileType: transfer.fileType,
+        blob,
+        timestamp: Date.now(),
+      },
+    ]);
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: newId(),
+        type: "file",
+        content: transfer.fileName,
+        from: "peer",
+        timestamp: Date.now(),
+      },
+    ]);
+  };
 
-  const connectSignal = (room: string) => {
-    cleanupPeer();
-    setError(null);
-    setConnected(false);
-    setStatus("Connecting");
-
-    const url = getSignalUrl(room);
-    const ws = new WebSocket(url);
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log("Signaling connected", url);
-    };
-    ws.onmessage = (event) => {
-      if (typeof event.data !== "string") {
-        // Protocol: binary frames rejected by server; ignore if any
+  const handleRelayMessage = async (event: MessageEvent) => {
+    if (typeof event.data === "string") {
+      let msg: Record<string, unknown>;
+      try {
+        msg = JSON.parse(event.data) as Record<string, unknown>;
+      } catch {
         return;
       }
-      void handleSignalRef.current(event.data);
+
+      const type = msg.type as string | undefined;
+      if (type === "connected") {
+        peerIdRef.current = String(msg.peer_id || "");
+        const peers = typeof msg.peers_in_room === "number" ? msg.peers_in_room : 0;
+        if (peers >= 2) {
+          setStatus("Connecting");
+          await exchangeKeys();
+        } else {
+          setStatus("Waiting for peer");
+        }
+        return;
+      }
+      if (type === "peer_joined") {
+        setStatus("Connecting");
+        await exchangeKeys();
+        return;
+      }
+      if (type === "peer_left") {
+        connectedRef.current = false;
+        setConnected(false);
+        setStatus("Peer left");
+        return;
+      }
+      if (type === "error") {
+        const errMsg = String(msg.error || msg.message || "Relay error");
+        setError(errMsg);
+        setStatus(/full/i.test(errMsg) ? "Room full" : "Error");
+        return;
+      }
+      if (type === "ping") return;
+      if (type === "key-exchange" && typeof msg.publicKey === "string") {
+        await handleKeyExchange(msg.publicKey);
+        return;
+      }
+      if (type === "text" && typeof msg.data === "string") {
+        await handleRelayEncryptedText(msg.data);
+        return;
+      }
+      if (type === "file-meta" && typeof msg.fileName === "string") {
+        incomingFileRef.current = {
+          fileName: msg.fileName,
+          fileSize: Number(msg.fileSize) || 0,
+          fileType: String(msg.fileType || "application/octet-stream"),
+          chunks: [],
+          received: 0,
+        };
+        setReceiveProgress({ fileName: msg.fileName, progress: 0 });
+        return;
+      }
+      if (type === "file-complete") {
+        completeRelayFile();
+        return;
+      }
+      return;
+    }
+
+    const buffer = await normalizeBinaryFrame(
+      event.data as Blob | ArrayBuffer | ArrayBufferView,
+    );
+    if (buffer) await handleRelayEncryptedChunk(buffer);
+  };
+
+  const connectRelay = async (room: string) => {
+    closeRelay();
+    clearP2pTimer();
+    startRelayTimer();
+    setStatus("Connecting");
+    setError(null);
+    markTransport(null);
+    connectedRef.current = false;
+    setConnected(false);
+    sentKeyExchangeRef.current = false;
+    sharedKeyRef.current = null;
+
+    if (!keyPairRef.current) {
+      keyPairRef.current = await generateKeyPair();
+    }
+
+    const url = getRelayUrl(room);
+    console.log("Connecting relay", url);
+    const ws = new WebSocket(url);
+    ws.binaryType = "arraybuffer";
+    relayWsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Relay WS open");
+    };
+    ws.onmessage = (event) => {
+      void handleRelayMessageRef.current(event);
     };
     ws.onerror = () => {
-      setError("Signaling connection error. Please try again.");
-      setStatus("Error");
+      console.error("Relay WS error");
     };
     ws.onclose = () => {
-      if (connectedRef.current) {
+      console.log("Relay WS closed");
+      if (transportModeRef.current === "relay" && connectedRef.current) {
         connectedRef.current = false;
         setConnected(false);
         setStatus("Peer left");
@@ -524,13 +775,95 @@ function SharePageContent() {
     };
   };
 
+  const fallbackToRelay = (reason: string) => {
+    if (fallingBackRef.current || transportModeRef.current === "relay") return;
+    if (dcRef.current?.readyState === "open") return;
+    fallingBackRef.current = true;
+    console.log("Falling back to relay:", reason);
+    clearP2pTimer();
+    closePeerConnection();
+    closeSignal();
+    setError(null);
+    setStatus("Connecting");
+    const room = roomCodeRef.current;
+    if (!room) {
+      setError("Missing room code for relay fallback.");
+      setStatus("Connection failed");
+      return;
+    }
+    void connectRelay(room);
+  };
+
+  fallbackToRelayRef.current = fallbackToRelay;
+  handleSignalRef.current = handleSignalMessage;
+  handleDataRef.current = handleP2pDataMessage;
+  handleRelayMessageRef.current = handleRelayMessage;
+
+  const connectSignal = (room: string) => {
+    cleanupAll();
+    roomCodeRef.current = room;
+    setError(null);
+    setConnected(false);
+    setStatus("Connecting");
+    fallingBackRef.current = false;
+
+    const url = getSignalUrl(room);
+    const ws = new WebSocket(url);
+    signalWsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Signaling connected", url);
+    };
+    ws.onmessage = (event) => {
+      if (typeof event.data !== "string") return;
+      void handleSignalRef.current(event.data);
+    };
+    ws.onerror = () => {
+      // Signal failure → try relay directly
+      fallbackToRelayRef.current("signal-error");
+    };
+    ws.onclose = () => {
+      // P2P already up — signaling can drop without ending the session
+      if (transportModeRef.current === "p2p" && connectedRef.current) return;
+      if (fallingBackRef.current || transportModeRef.current === "relay") return;
+      if (!connectedRef.current) {
+        fallbackToRelayRef.current("signal-closed");
+      }
+    };
+  };
+
+  // Expose diagnostics for Playwright
+  if (typeof window !== "undefined") {
+    (
+      window as unknown as {
+        __shareDebug?: () => {
+          connected: boolean;
+          status: string;
+          mode: TransportMode;
+          dcState: string | undefined;
+          pcState: RTCPeerConnectionState | undefined;
+          iceState: RTCIceConnectionState | undefined;
+        };
+      }
+    ).__shareDebug = () => ({
+      connected: connectedRef.current,
+      status,
+      mode: transportModeRef.current,
+      dcState: dcRef.current?.readyState,
+      pcState: pcRef.current?.connectionState,
+      iceState: pcRef.current?.iceConnectionState,
+    });
+  }
+
   const startSending = async () => {
     const code = generateRoomCode();
+    roomCodeRef.current = code;
     setRoomCode(code);
     setMode("send");
     setMessages([]);
     setReceivedFiles([]);
-    setQrUrl(`${window.location.origin}/share?room=${code}`);
+    const qs = forceRelayFallback ? "&forceRelayFallback=1" : "";
+    setQrUrl(`${window.location.origin}/share?room=${code}${qs}`);
     setStatus("Waiting for peer");
     connectSignal(code);
   };
@@ -546,6 +879,7 @@ function SharePageContent() {
       setStatus("Invalid code");
       return;
     }
+    roomCodeRef.current = joinCode;
     setRoomCode(joinCode);
     setMode("receive");
     setMessages([]);
@@ -554,12 +888,13 @@ function SharePageContent() {
     connectSignal(joinCode);
   };
 
-  const sendText = () => {
+  // ---- Send (routes to P2P or relay) ----
+
+  const sendText = async () => {
     const text = textInput.trim();
     if (!text) return;
     setTextInput("");
 
-    // Optimistic local append — peer will render on receive; no server echo.
     setMessages((prev) => [
       ...prev,
       {
@@ -571,14 +906,32 @@ function SharePageContent() {
       },
     ]);
 
-    const dc = dcRef.current;
-    if (!dc || dc.readyState !== "open") {
-      setError("Not connected to a peer yet.");
-      return;
-    }
     try {
-      const payload: AppDataMessage = { type: "text", data: text };
-      dc.send(JSON.stringify(payload));
+      if (dcRef.current?.readyState === "open") {
+        const payload: AppDataMessage = { type: "text", data: text };
+        dcRef.current.send(JSON.stringify(payload));
+        return;
+      }
+
+      if (
+        relayWsRef.current?.readyState === WebSocket.OPEN &&
+        sharedKeyRef.current
+      ) {
+        const encoded = new TextEncoder().encode(text);
+        const encrypted = await encryptData(
+          encoded.buffer.slice(
+            encoded.byteOffset,
+            encoded.byteOffset + encoded.byteLength,
+          ) as ArrayBuffer,
+          sharedKeyRef.current,
+        );
+        relayWsRef.current.send(
+          JSON.stringify({ type: "text", data: bufferToBase64(encrypted) }),
+        );
+        return;
+      }
+
+      setError("Not connected to a peer yet.");
     } catch (e) {
       console.error("send text failed", e);
       setError("Failed to send text.");
@@ -586,38 +939,66 @@ function SharePageContent() {
   };
 
   const sendFile = async (file: File) => {
-    const dc = dcRef.current;
-    if (!dc || dc.readyState !== "open") {
-      setError("Not connected to a peer yet.");
-      return;
-    }
-
     setSendProgress({ fileName: file.name, progress: 0 });
     try {
-      const meta: AppDataMessage = {
-        type: "file-meta",
-        fileName: file.name,
-        fileSize: file.size,
-        fileType: file.type || "application/octet-stream",
-      };
-      dc.send(JSON.stringify(meta));
-
-      let offset = 0;
-      while (offset < file.size) {
-        await waitForBufferedAmountLow(dc);
-        const slice = file.slice(offset, offset + FILE_CHUNK_SIZE);
-        const buf = await slice.arrayBuffer();
-        dc.send(buf);
-        offset += buf.byteLength;
-        setSendProgress({
+      if (dcRef.current?.readyState === "open") {
+        const meta: AppDataMessage = {
+          type: "file-meta",
           fileName: file.name,
-          progress: Math.min(100, Math.round((offset / file.size) * 100)),
-        });
-      }
+          fileSize: file.size,
+          fileType: file.type || "application/octet-stream",
+        };
+        dcRef.current.send(JSON.stringify(meta));
 
-      await waitForBufferedAmountLow(dc);
-      const done: AppDataMessage = { type: "file-complete" };
-      dc.send(JSON.stringify(done));
+        let offset = 0;
+        while (offset < file.size) {
+          await waitForBufferedAmountLow(dcRef.current);
+          const slice = file.slice(offset, offset + FILE_CHUNK_SIZE);
+          const buf = await slice.arrayBuffer();
+          dcRef.current.send(buf);
+          offset += buf.byteLength;
+          setSendProgress({
+            fileName: file.name,
+            progress: Math.min(100, Math.round((offset / file.size) * 100)),
+          });
+        }
+        await waitForBufferedAmountLow(dcRef.current);
+        dcRef.current.send(JSON.stringify({ type: "file-complete" } satisfies AppDataMessage));
+      } else if (
+        relayWsRef.current?.readyState === WebSocket.OPEN &&
+        sharedKeyRef.current
+      ) {
+        const fileData = await file.arrayBuffer();
+        const fileHash = await hashData(fileData);
+        relayWsRef.current.send(
+          JSON.stringify({
+            type: "file-meta",
+            fileName: file.name,
+            fileSize: file.size,
+            fileType: file.type || "application/octet-stream",
+            hash: fileHash,
+          }),
+        );
+
+        let offset = 0;
+        while (offset < file.size) {
+          const slice = file.slice(offset, offset + RELAY_FILE_CHUNK_SIZE);
+          const buf = await slice.arrayBuffer();
+          const encrypted = await encryptData(buf, sharedKeyRef.current);
+          relayWsRef.current.send(encrypted);
+          offset += buf.byteLength;
+          setSendProgress({
+            fileName: file.name,
+            progress: Math.min(100, Math.round((offset / file.size) * 100)),
+          });
+          // Small delay to avoid flooding the relay
+          await new Promise((r) => setTimeout(r, 40));
+        }
+        relayWsRef.current.send(JSON.stringify({ type: "file-complete" }));
+      } else {
+        setError("Not connected to a peer yet.");
+        return;
+      }
 
       setMessages((prev) => [
         ...prev,
@@ -659,15 +1040,15 @@ function SharePageContent() {
   };
 
   const resetHome = () => {
-    cleanupPeer();
+    cleanupAll({ statusMsg: "Disconnected" });
     setMode(null);
     setRoomCode("");
+    roomCodeRef.current = "";
     setInputCode("");
     setQrUrl("");
     setMessages([]);
     setReceivedFiles([]);
     setError(null);
-    setStatus("Disconnected");
   };
 
   if (!mode) {
@@ -677,7 +1058,8 @@ function SharePageContent() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Secure File & Text Share</h1>
             <p className="text-slate-600 dark:text-slate-400">
-              Peer-to-peer WebRTC • Encrypted in transit (DTLS) • No server storage
+              Peer-to-peer WebRTC with automatic relay fallback • Encrypted in
+              transit
             </p>
           </div>
 
@@ -776,6 +1158,7 @@ function SharePageContent() {
             <div
               data-testid="share-status"
               data-connected={connected ? "true" : "false"}
+              data-mode={transportMode || ""}
               className={`px-4 py-2 rounded-full text-sm font-medium ${
                 connected
                   ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
@@ -832,12 +1215,12 @@ function SharePageContent() {
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    sendText();
+                    void sendText();
                   }
                 }}
               />
               <Button
-                onClick={sendText}
+                onClick={() => void sendText()}
                 disabled={!connected || !textInput.trim()}
                 className="w-full"
               >
@@ -862,7 +1245,9 @@ function SharePageContent() {
               <DocumentArrowDownIcon className="h-12 w-12 mx-auto text-slate-400 mb-2" />
               <p className="text-sm font-medium">Click or drag file here</p>
               <p className="text-xs text-slate-500 mt-1">
-                Sent peer-to-peer over WebRTC
+                {transportMode === "relay"
+                  ? "Sent via encrypted server relay"
+                  : "Sent peer-to-peer over WebRTC"}
               </p>
               <input
                 ref={fileInputRef}

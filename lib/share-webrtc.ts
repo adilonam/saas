@@ -1,7 +1,10 @@
-/** WebRTC Share — signaling helpers (browser ↔ FastAPI signal socket only). */
+/** WebRTC Share — signaling + relay URL helpers. */
 
 export const DEFAULT_SIGNAL_BASE =
   "wss://saas-backend-326a81a69453.herokuapp.com/ws/share/signal";
+
+export const DEFAULT_RELAY_BASE =
+  "wss://saas-backend-326a81a69453.herokuapp.com/ws/share/ws";
 
 export const DEFAULT_ICE_URL =
   "https://saas-backend-326a81a69453.herokuapp.com/api/share/ice-servers";
@@ -12,9 +15,12 @@ export const FALLBACK_ICE_SERVERS: RTCIceServer[] = [
 ];
 
 export const FILE_CHUNK_SIZE = 64 * 1024;
+export const RELAY_FILE_CHUNK_SIZE = 64 * 1024;
 export const DC_HIGH_WATER = 512 * 1024;
 export const DC_LOW_WATER = 128 * 1024;
-export const CONNECT_TIMEOUT_MS = 25000;
+/** Fail P2P and fall back to relay if DataChannel is not open by then. */
+export const P2P_FALLBACK_MS = 8000;
+export const RELAY_CONNECT_TIMEOUT_MS = 20000;
 
 export type SignalInbound =
   | { type: "joined"; peer_id: string; initiator: boolean }
@@ -31,6 +37,7 @@ export type SignalInbound =
       sdpMLineIndex?: number | null;
     };
 
+/** Plaintext app messages over DataChannel (DTLS). */
 export type AppDataMessage =
   | { type: "text"; data: string }
   | {
@@ -41,18 +48,29 @@ export type AppDataMessage =
     }
   | { type: "file-complete" };
 
+export type TransportMode = "p2p" | "relay" | null;
+
+function hostFromWsEnv(raw: string): string {
+  let base = raw.replace(/\/$/, "");
+  if (base.endsWith("/ws/share/signal")) {
+    base = base.replace(/\/ws\/share\/signal$/, "");
+  }
+  if (base.endsWith("/ws/share/ws")) {
+    base = base.replace(/\/ws\/share\/ws$/, "");
+  }
+  return base;
+}
+
 export function getSignalUrl(roomId: string): string {
   const raw =
     process.env.NEXT_PUBLIC_SHARE_SIGNAL_URL ||
     process.env.NEXT_PUBLIC_SHARE_WS_URL ||
     DEFAULT_SIGNAL_BASE;
-  // Accept either .../signal or a full .../signal/ template; strip legacy /ws suffix.
   let base = raw.replace(/\/$/, "");
   if (base.endsWith("/ws/share/ws")) {
     base = base.replace(/\/ws\/share\/ws$/, "/ws/share/signal");
   }
   if (!base.includes("/ws/share/signal")) {
-    // If env points at host root, append path
     if (base.startsWith("ws")) {
       base = `${base}/ws/share/signal`;
     }
@@ -60,15 +78,42 @@ export function getSignalUrl(roomId: string): string {
   return `${base}/${encodeURIComponent(roomId)}`;
 }
 
+export function getRelayUrl(roomId: string): string {
+  const raw =
+    process.env.NEXT_PUBLIC_SHARE_RELAY_URL ||
+    (() => {
+      const signal =
+        process.env.NEXT_PUBLIC_SHARE_SIGNAL_URL ||
+        process.env.NEXT_PUBLIC_SHARE_WS_URL ||
+        DEFAULT_SIGNAL_BASE;
+      try {
+        const host = hostFromWsEnv(signal);
+        if (host.startsWith("ws")) return `${host}/ws/share/ws`;
+      } catch {
+        /* fall through */
+      }
+      return DEFAULT_RELAY_BASE;
+    })();
+  let base = raw.replace(/\/$/, "");
+  if (base.endsWith("/ws/share/signal")) {
+    base = base.replace(/\/ws\/share\/signal$/, "/ws/share/ws");
+  }
+  if (!base.includes("/ws/share/ws")) {
+    if (base.startsWith("ws")) {
+      base = `${base}/ws/share/ws`;
+    }
+  }
+  return `${base}/${encodeURIComponent(roomId)}`;
+}
+
 export function getIceServersUrl(): string {
+  if (process.env.NEXT_PUBLIC_SHARE_ICE_URL) {
+    return process.env.NEXT_PUBLIC_SHARE_ICE_URL;
+  }
   const signal =
     process.env.NEXT_PUBLIC_SHARE_SIGNAL_URL ||
     process.env.NEXT_PUBLIC_SHARE_WS_URL ||
     DEFAULT_SIGNAL_BASE;
-  if (process.env.NEXT_PUBLIC_SHARE_ICE_URL) {
-    return process.env.NEXT_PUBLIC_SHARE_ICE_URL;
-  }
-  // Derive https API URL from wss signal base when possible
   try {
     const u = new URL(signal.replace(/^ws/, "http"));
     return `${u.origin}/api/share/ice-servers`;

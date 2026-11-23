@@ -5,7 +5,7 @@ import DashboardLayout from "components/DashboardLayout";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { ChartBarIcon, CalculatorIcon } from "@heroicons/react/24/outline";
+import { ChartBarIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 
 export default function LeverageMarginCalculatorPage() {
@@ -32,8 +32,45 @@ export default function LeverageMarginCalculatorPage() {
     };
   }, [positionSize, leverage, entryPrice]);
 
+  const FAQ_ITEMS = [
+    {
+      q: "What is the difference between leverage and margin?",
+      a: "Leverage is the ratio of your position size to your capital (e.g., 10:1). Margin is the actual amount of money you need to deposit. They're inversely related: higher leverage means lower margin requirement.",
+    },
+    {
+      q: "How do I calculate leveraged profit or loss?",
+      a: "Profit or loss on the full position equals price change × position size (or % price move × position value). Your return on margin is that P&L divided by the margin you posted. Leverage magnifies percentage returns on your capital—not the probability of being right.",
+    },
+    {
+      q: "Can I use this as a portfolio or CFD leverage calculator?",
+      a: "Yes for a first-pass estimate: sum exposure (or notional) as position value, then divide by equity or posted margin. CFD leverage ratios work the same way. Broker margin rules and haircuts can differ, so confirm with your platform.",
+    },
+    {
+      q: "Does this calculate options leverage?",
+      a: "Options leverage is different—delta, notional, and premium all matter. You can approximate notional exposure ÷ capital with this tool, but treat options risk with dedicated option metrics. This calculator is best for margin-style leverage (forex, CFDs, futures-style).",
+    },
+    {
+      q: "What leverage should beginners use?",
+      a: "Beginners should start with low leverage (2:1 to 5:1) or no leverage at all. This reduces risk while you learn market behavior and risk management. Avoid maximum leverage offerings from brokers.",
+    },
+  ];
+
   return (
     <DashboardLayout>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            mainEntity: FAQ_ITEMS.map((item) => ({
+              "@type": "Question",
+              name: item.q,
+              acceptedAnswer: { "@type": "Answer", text: item.a },
+            })),
+          }),
+        }}
+      />
       <div className="max-w-4xl mx-auto">
         <div className="flex items-center gap-3 mb-8">
           <div className="size-12 rounded-2xl bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600">
@@ -41,10 +78,10 @@ export default function LeverageMarginCalculatorPage() {
           </div>
           <div>
             <h1 className="text-2xl font-bold tracking-tight">
-              Leverage & Margin Calculator
+              Leverage Calculator (Margin & Trading)
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-              Calculate required margin for leveraged trading positions
+              Free leverage and margin calculator—required margin, ratios, and trading P&amp;L context. No signup.
             </p>
           </div>
         </div>
@@ -179,9 +216,37 @@ export default function LeverageMarginCalculatorPage() {
             </p>
           </div>
 
+          <h3 className="text-xl font-semibold mt-6 mb-3">Leverage Profit Calculator (Illustrative)</h3>
+          <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg font-mono text-sm my-4 space-y-2">
+            <div>P&amp;L = Position Value × Price Change %</div>
+            <div>Return on Margin = P&amp;L / Required Margin</div>
+          </div>
+          <div className="bg-violet-50 dark:bg-violet-900/20 border border-violet-200 dark:border-violet-800 rounded-lg p-4 my-4">
+            <p className="font-semibold mb-2">Example: 10:1 leverage, 2% favorable move</p>
+            <ul className="space-y-1 text-slate-700 dark:text-slate-300">
+              <li><strong>Position value:</strong> $10,000</li>
+              <li><strong>Margin at 10:1:</strong> $1,000</li>
+              <li><strong>Price move:</strong> +2%</li>
+            </ul>
+            <div className="mt-3 space-y-1 text-slate-700 dark:text-slate-300">
+              <p>P&amp;L = $10,000 × 2% = <strong>$200</strong></p>
+              <p>Return on margin = $200 / $1,000 = <strong>20%</strong></p>
+            </div>
+            <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">
+              Illustrative only. A 2% adverse move would lose $200 (−20% on margin). Leverage does not change the dollar P&amp;L on the position—it changes how large that P&amp;L is relative to your capital.
+            </p>
+          </div>
+
+          <h3 className="text-xl font-semibold mt-6 mb-3">Portfolio, CFD, and Options-Style Exposure</h3>
+          <ul className="space-y-2 text-slate-600 dark:text-slate-300">
+            <li><strong>Portfolio leverage:</strong> Total market exposure ÷ equity. Example: $40,000 exposure on $10,000 equity ≈ 4:1. Use the calculator with position value = exposure and leverage = exposure / equity (or enter leverage and read required margin as equity needed).</li>
+            <li><strong>CFD leverage ratio:</strong> Same margin formula—notional CFD position ÷ posted margin. Asset class and broker rules set the maximum ratio.</li>
+            <li><strong>Options leverage:</strong> Often thought of as notional controlled ÷ premium paid, but true risk depends on delta and time decay. This tool is a rough notional check, not a substitute for options Greeks.</li>
+          </ul>
+
           <h3 className="text-xl font-semibold mt-6 mb-3">Understanding Leverage (Hebelwirkung / Hefboom)</h3>
           <p className="text-slate-600 dark:text-slate-300">
-            Leverage (German: Hebelwirkung, Dutch: Hefboom) amplifies both gains and losses. For international traders: the calculation works the same in all markets and currencies—simply convert your position value to your account currency and divide by leverage to find required margin.
+            Leverage (German: Hebelwirkung / Hebel; Dutch: hefboom) amplifies both gains and losses. The math is the same in any currency: convert position value to your account currency, then divide by leverage for required margin. We keep explanations in English rather than machine-translated pages so the formulas stay clear.
           </p>
 
           <h3 className="text-xl font-semibold mt-6 mb-3">Leverage Varies by Market and Jurisdiction</h3>
@@ -215,52 +280,18 @@ export default function LeverageMarginCalculatorPage() {
         {/* FAQ Section */}
         <div className="mt-12 space-y-6">
           <h2 className="text-2xl font-bold">Frequently Asked Questions</h2>
-          
           <div className="space-y-4">
-            <details className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
-                What is the difference between leverage and margin?
-              </summary>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
-                Leverage is the ratio of your position size to your capital (e.g., 10:1). Margin is the actual amount of money you need to deposit. They're inversely related: higher leverage means lower margin requirement.
-              </p>
-            </details>
-
-            <details className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
-                What happens if my position goes against me?
-              </summary>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
-                If losses reduce your account below the maintenance margin level, you'll receive a margin call. If you don't add funds or close positions, your broker will liquidate your position to prevent further losses.
-              </p>
-            </details>
-
-            <details className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
-                What leverage should beginners use?
-              </summary>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
-                Beginners should start with low leverage (2:1 to 5:1) or no leverage at all. This reduces risk while you learn market behavior and risk management. Avoid maximum leverage offerings from brokers.
-              </p>
-            </details>
-
-            <details className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
-                Is leverage trading legal everywhere?
-              </summary>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
-                Leverage limits vary significantly by jurisdiction. Different regions have different retail and professional leverage caps for forex, crypto, and other markets. Regulations are also evolving, particularly for crypto leverage. Always check your local regulations and your broker's compliance requirements before trading.
-              </p>
-            </details>
-
-            <details className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
-              <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
-                How do I calculate leverage if I know my margin?
-              </summary>
-              <p className="mt-3 text-slate-600 dark:text-slate-300">
-                If you know your margin and position value, leverage = position value / margin. For example, a $10,000 position with $2,000 margin = 5:1 leverage.
-              </p>
-            </details>
+            {FAQ_ITEMS.map((item) => (
+              <details
+                key={item.q}
+                className="group bg-slate-50 dark:bg-slate-900/40 rounded-lg p-4 border border-slate-200 dark:border-slate-700"
+              >
+                <summary className="font-semibold cursor-pointer text-slate-900 dark:text-white">
+                  {item.q}
+                </summary>
+                <p className="mt-3 text-slate-600 dark:text-slate-300">{item.a}</p>
+              </details>
+            ))}
           </div>
         </div>
 
@@ -302,6 +333,15 @@ export default function LeverageMarginCalculatorPage() {
               <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Risk Per Trade Calculator</h3>
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 Calculate how much to risk per trade
+              </p>
+            </Link>
+            <Link
+              href="/blog/how-to-calculate-leverage-in-trading"
+              className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 transition-colors bg-white dark:bg-slate-800/50 sm:col-span-2"
+            >
+              <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Guide: How to Calculate Leverage</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Formulas, margin examples, CFD and portfolio leverage explained
               </p>
             </Link>
           </div>

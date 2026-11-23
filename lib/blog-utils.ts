@@ -92,6 +92,31 @@ const TOOL_MAP: Record<string, RelatedTool> = {
     title: "LTV:CAC Ratio Calculator",
     description: "Measure customer acquisition efficiency"
   },
+  "leverage-margin-calculator": {
+    slug: "leverage-margin-calculator",
+    title: "Leverage & Margin Calculator",
+    description: "Calculate required margin and leverage ratios for trading"
+  },
+  "position-size-calculator": {
+    slug: "position-size-calculator",
+    title: "Position Size Calculator",
+    description: "Calculate optimal position size based on risk tolerance"
+  },
+  "risk-reward-ratio-calculator": {
+    slug: "risk-reward-ratio-calculator",
+    title: "Risk/Reward Ratio Calculator",
+    description: "Calculate risk/reward ratio for trades"
+  },
+  "forex-position-size-calculator": {
+    slug: "forex-position-size-calculator",
+    title: "Forex Position Size Calculator",
+    description: "Calculate lot size for forex trading"
+  },
+  "risk-per-trade-calculator": {
+    slug: "risk-per-trade-calculator",
+    title: "Risk Per Trade Calculator",
+    description: "Calculate how much to risk per trade"
+  },
 };
 
 export async function getPublishedPosts(page = 1, pageSize = 12): Promise<{

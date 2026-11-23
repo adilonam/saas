@@ -1,6 +1,4 @@
 import { NextResponse } from "next/server";
-import { auth } from "@/auth";
-import prisma from "@/lib/prisma";
 
 const OPENAI_URL = "https://api.openai.com/v1/chat/completions";
 const MODEL = process.env.OPENAI_MODEL || "gpt-4o-mini";

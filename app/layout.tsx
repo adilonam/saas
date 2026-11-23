@@ -19,8 +19,11 @@ export const metadata: Metadata = {
     template: "%s | eProd",
   },
   description:
-    "Free online productivity tools: PDF tools (sign, merge, convert), calculators, AI-powered generators, converters, and developer utilities. Hundreds of free tools for work and personal use.",
+    "eProd (also known as e-prod) offers free online productivity tools: PDF tools, calculators, AI generators, converters, and developer utilities. No signup required for core tools.",
   keywords: [
+    "eProd",
+    "e-prod",
+    "e prod",
     "online tools",
     "free calculator",
     "pdf tools",
@@ -142,10 +145,30 @@ var e=ttq._i[t]||[],n=0;n<ttq.methods.length;n++)ttq.setAndDefer(e,ttq.methods[n
               "@context": "https://schema.org",
               "@type": "Organization",
               name: "eProd",
+              alternateName: ["e-prod", "eProd", "e prod"],
               url: "https://www.eprod.io",
               logo: "https://www.eprod.io/images/logo/apple-touch-icon.png",
-              description: "Free online productivity tools for work and personal use",
-              sameAs: [],
+              description:
+                "eProd provides free online productivity tools, calculators, and AI utilities for work and personal use.",
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "WebSite",
+              name: "eProd",
+              alternateName: ["e-prod", "eProd", "e prod"],
+              url: "https://www.eprod.io",
+              description:
+                "Free online productivity tools and calculators from eProd—PDFs, AI generators, trading and business calculators, and more.",
+              publisher: {
+                "@type": "Organization",
+                name: "eProd",
+                url: "https://www.eprod.io",
+              },
             }),
           }}
         />

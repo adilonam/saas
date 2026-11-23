@@ -273,6 +273,15 @@ export default function ChurnRateCalculatorPage() {
                 Calculate monthly recurring revenue metrics
               </p>
             </Link>
+            <Link
+              href="/blog/how-to-calculate-churn-rate"
+              className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-rose-500 dark:hover:border-rose-500 transition-colors bg-white dark:bg-slate-800/50 sm:col-span-2"
+            >
+              <h3 className="font-semibold text-slate-900 dark:text-white mb-1">Guide: How to Calculate Churn Rate</h3>
+              <p className="text-sm text-slate-600 dark:text-slate-400">
+                Formula, worked examples, and retention tips
+              </p>
+            </Link>
           </div>
         </div>
       </div>

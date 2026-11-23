@@ -2,7 +2,7 @@
 
 > https://www.eprod.io
 
-eProd provides free online tools for productivity, business, and personal use. No signup required for most tools.
+eProd (also known as e-prod / eProd) provides free online tools for productivity, business, and personal use. No signup required.
 
 ## About
 
@@ -31,6 +31,9 @@ eProd is a comprehensive collection of free online utilities including:
 - Compound Interest Calculator: /compound-interest-calculator
 - Win Probability Calculator: /win-probability-calculator
 - ROI Calculator: /roi-calculator
+- Leverage & Margin Calculator: /leverage-margin-calculator - Trading leverage, margin, CFD/portfolio ratio
+- Churn Rate Calculator: /churn-rate-calculator - Customer churn rate
+- Time Calculator: /time-calculator - Duration and elapsed time
 
 ### Generators
 - YouTube Title Generator: /youtube-title-generator
@@ -40,7 +43,9 @@ eProd is a comprehensive collection of free online utilities including:
 - Acceptance Criteria Generator: /acceptance-criteria-generator
 
 ### Content Tools
-- YouTube Title Length Checker: /youtube-title-length-checker - Verify title character limits
+- YouTube Title Length Checker: /youtube-title-length-checker - Verify title character limits (100 chars)
+- AI Resume Bullet Point Generator: /ai-resume-bullet - Achievement-focused resume bullets
+- AI Email Subject Line Generator: /ai-email-subject-line - Subject line ideas for campaigns
 - Keyword Density Checker: /keyword-density-checker
 - Meta Description Generator: /meta-description-generator
 - Text Summarizer: /text-summarizer
@@ -92,7 +97,7 @@ Calculate ROI, analyze financial metrics, plan budgets, generate reports
 
 ## API
 
-Most tools work entirely in the browser. Some AI-powered features require authentication.
+Most tools work entirely in the browser. Core tools and listed AI generators do not require signup.
 
 ## Blog
 
@@ -103,6 +108,8 @@ Visit our productivity blog at /blog for tips, guides, and tutorials on:
 - Calculator guides and examples
 - AI tool tutorials
 - Business metrics and analytics guides
+- How to calculate leverage in trading: /blog/how-to-calculate-leverage-in-trading
+- How to calculate churn rate: /blog/how-to-calculate-churn-rate
 
 ## Contact
 

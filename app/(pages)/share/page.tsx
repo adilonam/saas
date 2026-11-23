@@ -136,6 +136,26 @@ function SharePageContent() {
   const [receiveProgress, setReceiveProgress] = useState<{fileName: string, progress: number} | null>(null);
   const [queuedItems, setQueuedItems] = useState<QueuedItem[]>([]);
 
+  const markUsingRelay = (value: boolean) => {
+    usingRelayRef.current = value;
+    setUsingRelay(value);
+  };
+
+  const markTransportReady = (value: boolean) => {
+    transportReadyRef.current = value;
+    setTransportReady(value);
+  };
+
+  const enqueueItem = (item: QueuedItem) => {
+    queuedItemsRef.current = [...queuedItemsRef.current, item];
+    setQueuedItems(queuedItemsRef.current);
+  };
+
+  const clearQueue = () => {
+    queuedItemsRef.current = [];
+    setQueuedItems([]);
+  };
+
   const wsRef = useRef<WebSocket | null>(null);
   const rtcRef = useRef<RTCPeerConnection | null>(null);
   const dataChannelRef = useRef<RTCDataChannel | null>(null);
@@ -146,6 +166,9 @@ function SharePageContent() {
   const isInitiatorRef = useRef(false);
   const webrtcTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const usingRelayRef = useRef(false);
+  const transportReadyRef = useRef(false);
+  const queuedItemsRef = useRef<QueuedItem[]>([]);
 
   useEffect(() => {
     if (autoJoinRoom && !mode && wsUrl) {
@@ -250,14 +273,14 @@ function SharePageContent() {
         await setupWebRTC();
       } else {
         console.log('Using relay mode (forced)');
-        setUsingRelay(true);
+        markUsingRelay(true);
         await exchangeKeys();
         // Wait a bit for key exchange to complete
         setTimeout(async () => {
           if (sharedKeyRef.current) {
             console.log('Relay ready with shared key');
             setConnected(true);
-            setTransportReady(true);
+            markTransportReady(true);
             setStatus('Connected (relay)');
             await processQueue();
           }
@@ -282,6 +305,14 @@ function SharePageContent() {
       await handleIceCandidate(msg.candidate);
     } else if (msg.type === 'key-exchange' && msg.publicKey) {
       await handleKeyExchange(msg.publicKey);
+    } else if (
+      msg.type === 'text' ||
+      msg.type === 'file-meta' ||
+      msg.type === 'file-complete'
+    ) {
+      // Server relays app payloads over the same WS (adds from_peer).
+      // These must use the data handler, not the signaling switch above.
+      await handleDataMessage(msg);
     }
   };
 
@@ -299,7 +330,7 @@ function SharePageContent() {
     webrtcTimeoutRef.current = setTimeout(async () => {
       if (!dataChannelRef.current || dataChannelRef.current.readyState !== 'open') {
         console.log('WebRTC timeout after 10s, falling back to relay');
-        setUsingRelay(true);
+        markUsingRelay(true);
         if (rtc) {
           rtc.close();
         }
@@ -310,7 +341,7 @@ function SharePageContent() {
           if (sharedKeyRef.current) {
             console.log('Relay fallback ready with shared key');
             setConnected(true);
-            setTransportReady(true);
+            markTransportReady(true);
             setStatus('Connected (relay)');
             await processQueue();
           }
@@ -355,14 +386,14 @@ function SharePageContent() {
         clearTimeout(webrtcTimeoutRef.current);
       }
       console.log('DataChannel opened, state:', channel.readyState);
-      setUsingRelay(false);
+      markUsingRelay(false);
       await exchangeKeys();
       // Wait for key exchange to complete
       setTimeout(async () => {
         if (sharedKeyRef.current) {
           console.log('DataChannel ready with shared key');
           setConnected(true);
-          setTransportReady(true);
+          markTransportReady(true);
           setStatus('Connected (P2P)');
           await processQueue();
         } else {
@@ -453,11 +484,14 @@ function SharePageContent() {
       sharedKeyRef.current = sharedKey;
       console.log('Shared key established ✓');
       
-      // Check if we should mark as ready now
-      if ((dataChannelRef.current?.readyState === 'open' || usingRelay) && !transportReady) {
+      // Check if we should mark as ready now (use refs — state would be stale here)
+      const relayOrP2P =
+        dataChannelRef.current?.readyState === 'open' || usingRelayRef.current;
+      if (relayOrP2P && !transportReadyRef.current) {
         console.log('Transport becoming ready after key exchange');
-        setTransportReady(true);
+        markTransportReady(true);
         setConnected(true);
+        setStatus(usingRelayRef.current ? 'Connected (relay)' : 'Connected (P2P)');
         await processQueue();
       }
     } catch (e) {
@@ -470,14 +504,16 @@ function SharePageContent() {
       console.log('Cannot process queue: no shared key yet');
       return;
     }
-    
-    if (queuedItems.length === 0) {
+
+    const items = queuedItemsRef.current;
+    if (items.length === 0) {
       console.log('Queue is empty');
       return;
     }
-    
-    console.log(`Processing queue: ${queuedItems.length} items`);
-    for (const item of queuedItems) {
+
+    console.log(`Processing queue: ${items.length} items`);
+    clearQueue();
+    for (const item of items) {
       if (item.type === "text" && item.data) {
         console.log('Sending queued text:', item.data.substring(0, 50));
         await sendTextNow(item.data);
@@ -486,7 +522,6 @@ function SharePageContent() {
         await sendFileNow(item.file);
       }
     }
-    setQueuedItems([]);
     console.log('Queue processed ✓');
   };
 
@@ -592,19 +627,20 @@ function SharePageContent() {
 
   const queueText = () => {
     if (!textInput.trim()) return;
-    
-    if (connected && sharedKeyRef.current) {
-      sendTextNow(textInput);
+    const text = textInput;
+    setTextInput("");
+
+    if (transportReadyRef.current && sharedKeyRef.current) {
+      void sendTextNow(text);
     } else {
-      setQueuedItems(prev => [...prev, { type: "text", data: textInput }]);
+      enqueueItem({ type: "text", data: text });
       setMessages(prev => [...prev, {
         type: "text",
-        content: textInput + " (queued)",
+        content: text + " (queued)",
         from: "you",
         timestamp: Date.now()
       }]);
     }
-    setTextInput("");
   };
 
   const sendTextNow = async (text: string) => {
@@ -612,6 +648,27 @@ function SharePageContent() {
       console.error('Cannot send text: no shared key');
       return;
     }
+
+    // Optimistic local append — server does not echo back to the sender.
+    setMessages(prev => {
+      const queuedIdx = prev.findIndex(
+        (m) => m.from === "you" && m.content === text + " (queued)",
+      );
+      if (queuedIdx >= 0) {
+        return prev.map((m, i) =>
+          i === queuedIdx ? { ...m, content: text } : m,
+        );
+      }
+      return [
+        ...prev,
+        {
+          type: "text" as const,
+          content: text,
+          from: "you" as const,
+          timestamp: Date.now(),
+        },
+      ];
+    });
 
     try {
       console.log('Sending text via', dataChannelRef.current?.readyState === 'open' ? 'DataChannel' : 'WebSocket');
@@ -623,22 +680,12 @@ function SharePageContent() {
       if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
         dataChannelRef.current.send(msg);
         console.log('Text sent via DataChannel');
-      } else if (wsRef.current) {
+      } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(msg);
         console.log('Text sent via WebSocket');
-      }
-
-      setMessages(prev => prev.map(m => 
-        m.content === text + " (queued)" ? { ...m, content: text } : m
-      ));
-      
-      if (!messages.some(m => m.content === text + " (queued)")) {
-        setMessages(prev => [...prev, { 
-          type: "text", 
-          content: text, 
-          from: "you",
-          timestamp: Date.now()
-        }]);
+      } else {
+        console.error('No open transport to send text');
+        setStatus('Send failed: not connected');
       }
     } catch (e) {
       console.error("Send text failed:", e);
@@ -646,10 +693,10 @@ function SharePageContent() {
   };
 
   const queueFile = (file: File) => {
-    if (connected && sharedKeyRef.current) {
-      sendFileNow(file);
+    if (transportReadyRef.current && sharedKeyRef.current) {
+      void sendFileNow(file);
     } else {
-      setQueuedItems(prev => [...prev, { type: "file", file }]);
+      enqueueItem({ type: "file", file });
       setMessages(prev => [...prev, {
         type: "file-start",
         content: `${file.name} (queued)`,
@@ -665,7 +712,8 @@ function SharePageContent() {
       return;
     }
 
-    console.log(`Sending file ${file.name} (${file.size} bytes) via ${usingRelay ? 'relay' : 'P2P'}`);
+    const relay = usingRelayRef.current;
+    console.log(`Sending file ${file.name} (${file.size} bytes) via ${relay ? 'relay' : 'P2P'}`);
     setSendProgress({ fileName: file.name, progress: 0 });
 
     const fileData = await file.arrayBuffer();
@@ -681,34 +729,46 @@ function SharePageContent() {
 
     if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
       dataChannelRef.current.send(metaMsg);
-    } else if (wsRef.current) {
+    } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(metaMsg);
     }
 
     let offset = 0;
-    const CHUNK_SIZE = usingRelay ? 64 * 1024 : 128 * 1024; // 64KB for relay, 128KB for P2P
+    const CHUNK_SIZE = relay ? 64 * 1024 : 128 * 1024; // 64KB for relay, 128KB for P2P
 
     const sendNextChunk = async () => {
       if (offset >= file.size) {
         const completeMsg = JSON.stringify({ type: 'file-complete' });
         if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
           dataChannelRef.current.send(completeMsg);
-        } else if (wsRef.current) {
+        } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
           wsRef.current.send(completeMsg);
         }
 
-        setMessages(prev => prev.map(m =>
-          m.content === `${file.name} (queued)` ? { ...m, content: file.name, type: "file-complete" as const } : m
-        ));
-        
-        if (!messages.some(m => m.content.includes(file.name))) {
-          setMessages(prev => [...prev, {
-            type: "file-complete",
-            content: file.name,
-            from: "you",
-            timestamp: Date.now()
-          }]);
-        }
+        setMessages(prev => {
+          const queuedIdx = prev.findIndex(
+            (m) => m.from === "you" && m.content === `${file.name} (queued)`,
+          );
+          if (queuedIdx >= 0) {
+            return prev.map((m, i) =>
+              i === queuedIdx
+                ? { ...m, content: file.name, type: "file-complete" as const }
+                : m,
+            );
+          }
+          if (prev.some((m) => m.from === "you" && m.content === file.name)) {
+            return prev;
+          }
+          return [
+            ...prev,
+            {
+              type: "file-complete" as const,
+              content: file.name,
+              from: "you" as const,
+              timestamp: Date.now(),
+            },
+          ];
+        });
 
         setSendProgress(null);
         return;
@@ -721,7 +781,7 @@ function SharePageContent() {
       if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
         dataChannelRef.current.send(encrypted);
         console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via DataChannel`);
-      } else if (wsRef.current) {
+      } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
         wsRef.current.send(encrypted);
         console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via WebSocket`);
       }
@@ -730,7 +790,7 @@ function SharePageContent() {
       const progress = Math.round((offset / file.size) * 100);
       setSendProgress({ fileName: file.name, progress: Math.min(progress, 100) });
 
-      const delay = usingRelay ? 100 : 10;
+      const delay = relay ? 100 : 10;
       setTimeout(sendNextChunk, delay);
     };
 

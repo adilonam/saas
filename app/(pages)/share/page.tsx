@@ -1,86 +1,30 @@
 "use client";
 
 import { useSearchParams } from "next/navigation";
-
-import { useState, useEffect, useRef, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import DashboardLayout from "components/DashboardLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { 
-  PaperAirplaneIcon, 
+import {
+  PaperAirplaneIcon,
   ArrowDownTrayIcon,
-  ShareIcon,
   DocumentArrowDownIcon,
-  XMarkIcon 
 } from "@heroicons/react/24/outline";
-// Crypto utilities for E2E encryption (ECDH + AES-GCM)
-async function generateKeyPair() {
-  const keyPair = await crypto.subtle.generateKey(
-    { name: "ECDH", namedCurve: "P-256" },
-    true,
-    ["deriveKey"]
-  );
-  return keyPair;
-}
+import {
+  type AppDataMessage,
+  type SignalInbound,
+  CONNECT_TIMEOUT_MS,
+  FILE_CHUNK_SIZE,
+  fetchIceServers,
+  generateRoomCode,
+  getSignalUrl,
+  waitForBufferedAmountLow,
+} from "@/lib/share-webrtc";
 
-async function deriveSharedKey(privateKey: CryptoKey, publicKey: CryptoKey) {
-  return await crypto.subtle.deriveKey(
-    { name: "ECDH", public: publicKey },
-    privateKey,
-    { name: "AES-GCM", length: 256 },
-    false,
-    ["encrypt", "decrypt"]
-  );
-}
-
-async function exportPublicKey(key: CryptoKey): Promise<string> {
-  const exported = await crypto.subtle.exportKey("raw", key);
-  return btoa(String.fromCharCode(...new Uint8Array(exported)));
-}
-
-async function importPublicKey(keyString: string): Promise<CryptoKey> {
-  const keyData = Uint8Array.from(atob(keyString), c => c.charCodeAt(0));
-  return await crypto.subtle.importKey(
-    "raw",
-    keyData,
-    { name: "ECDH", namedCurve: "P-256" },
-    false,
-    []
-  );
-}
-
-async function encryptData(data: ArrayBuffer, key: CryptoKey): Promise<ArrayBuffer> {
-  const iv = crypto.getRandomValues(new Uint8Array(12));
-  const encrypted = await crypto.subtle.encrypt(
-    { name: "AES-GCM", iv },
-    key,
-    data
-  );
-  const result = new Uint8Array(iv.length + encrypted.byteLength);
-  result.set(iv);
-  result.set(new Uint8Array(encrypted), iv.length);
-  return result.buffer;
-}
-
-async function decryptData(data: ArrayBuffer, key: CryptoKey): Promise<ArrayBuffer> {
-  const dataView = new Uint8Array(data);
-  const iv = dataView.slice(0, 12);
-  const encrypted = dataView.slice(12);
-  return await crypto.subtle.decrypt(
-    { name: "AES-GCM", iv },
-    key,
-    encrypted
-  );
-}
-
-async function hashData(data: ArrayBuffer): Promise<string> {
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  return btoa(String.fromCharCode(...new Uint8Array(hashBuffer)));
-}
-
-interface Message {
-  type: "text" | "file-start" | "file-complete";
+interface ChatMessage {
+  id: string;
+  type: "text" | "file";
   content: string;
   from: "you" | "peer";
   timestamp: number;
@@ -94,780 +38,615 @@ interface ReceivedFile {
   timestamp: number;
 }
 
-interface FileTransfer {
+interface IncomingFile {
   fileName: string;
   fileSize: number;
   fileType: string;
   chunks: ArrayBuffer[];
   received: number;
-  total: number;
-  hash?: string;
 }
 
-interface QueuedItem {
-  type: "text" | "file";
-  data?: string;
-  file?: File;
+function newId() {
+  return `${Date.now()}-${Math.random().toString(36).slice(2, 9)}`;
 }
-
-const CHUNK_SIZE = 128 * 1024;
-const WEBRTC_TIMEOUT = 10000;
 
 function SharePageContent() {
   const searchParams = useSearchParams();
   const autoJoinRoom = searchParams?.get("room") || null;
-  const forceRelay = searchParams?.get("relay") === "1";
 
   const [mode, setMode] = useState<"send" | "receive" | null>(null);
   const [roomCode, setRoomCode] = useState("");
   const [inputCode, setInputCode] = useState("");
-  const [connected, setConnected] = useState(false);
   const [status, setStatus] = useState("Disconnected");
-  const [transportReady, setTransportReady] = useState(false);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [connected, setConnected] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [textInput, setTextInput] = useState("");
   const [qrUrl, setQrUrl] = useState("");
-  const wsUrl = typeof window !== 'undefined' 
-    ? (process.env.NEXT_PUBLIC_SHARE_WS_URL ?? 'wss://saas-backend-326a81a69453.herokuapp.com/ws/share/ws')
-    : '';
-  const [usingRelay, setUsingRelay] = useState(false);
   const [receivedFiles, setReceivedFiles] = useState<ReceivedFile[]>([]);
-  const [sendProgress, setSendProgress] = useState<{fileName: string, progress: number} | null>(null);
-  const [receiveProgress, setReceiveProgress] = useState<{fileName: string, progress: number} | null>(null);
-  const [queuedItems, setQueuedItems] = useState<QueuedItem[]>([]);
-
-  const markUsingRelay = (value: boolean) => {
-    usingRelayRef.current = value;
-    setUsingRelay(value);
-  };
-
-  const markTransportReady = (value: boolean) => {
-    transportReadyRef.current = value;
-    setTransportReady(value);
-  };
-
-  const enqueueItem = (item: QueuedItem) => {
-    queuedItemsRef.current = [...queuedItemsRef.current, item];
-    setQueuedItems(queuedItemsRef.current);
-  };
-
-  const clearQueue = () => {
-    queuedItemsRef.current = [];
-    setQueuedItems([]);
-  };
+  const [sendProgress, setSendProgress] = useState<{
+    fileName: string;
+    progress: number;
+  } | null>(null);
+  const [receiveProgress, setReceiveProgress] = useState<{
+    fileName: string;
+    progress: number;
+  } | null>(null);
 
   const wsRef = useRef<WebSocket | null>(null);
-  const rtcRef = useRef<RTCPeerConnection | null>(null);
-  const dataChannelRef = useRef<RTCDataChannel | null>(null);
-  const keyPairRef = useRef<CryptoKeyPair | null>(null);
-  const sharedKeyRef = useRef<CryptoKey | null>(null);
-  const fileTransferRef = useRef<FileTransfer | null>(null);
-  const peerIdRef = useRef<string>("");
+  const pcRef = useRef<RTCPeerConnection | null>(null);
+  const dcRef = useRef<RTCDataChannel | null>(null);
   const isInitiatorRef = useRef(false);
-  const webrtcTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const peerIdRef = useRef("");
+  const remoteSetRef = useRef(false);
+  const pendingIceRef = useRef<RTCIceCandidateInit[]>([]);
+  const incomingFileRef = useRef<IncomingFile | null>(null);
+  const connectTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const makingOfferRef = useRef(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const usingRelayRef = useRef(false);
-  const transportReadyRef = useRef(false);
-  const queuedItemsRef = useRef<QueuedItem[]>([]);
-  const sentKeyExchangeRef = useRef(false);
+  const startedAutoJoinRef = useRef(false);
+  const connectedRef = useRef(false);
+  const handleSignalRef = useRef<(raw: string) => Promise<void>>(async () => {});
+  const handleDataRef = useRef<(event: MessageEvent) => Promise<void>>(async () => {});
 
-  useEffect(() => {
-    if (autoJoinRoom && !mode && wsUrl) {
-      // Auto-join as receiver from QR code
-      setMode("receive");
-      setInputCode(autoJoinRoom);
-      setTimeout(() => joinRoom(autoJoinRoom), 500);
+  const clearConnectTimer = () => {
+    if (connectTimerRef.current) {
+      clearTimeout(connectTimerRef.current);
+      connectTimerRef.current = null;
     }
-  }, [autoJoinRoom, mode, wsUrl]);
-
-  const generateRoomCode = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  const startSending = async () => {
-    if (!wsUrl) {
-      setStatus("Configuration error");
+  const cleanupPeer = (opts?: { keepSocket?: boolean; statusMsg?: string }) => {
+    clearConnectTimer();
+    if (dcRef.current) {
+      try {
+        dcRef.current.close();
+      } catch {
+        /* ignore */
+      }
+      dcRef.current = null;
+    }
+    if (pcRef.current) {
+      try {
+        pcRef.current.close();
+      } catch {
+        /* ignore */
+      }
+      pcRef.current = null;
+    }
+    remoteSetRef.current = false;
+    pendingIceRef.current = [];
+    makingOfferRef.current = false;
+    incomingFileRef.current = null;
+    connectedRef.current = false;
+    setConnected(false);
+    setSendProgress(null);
+    setReceiveProgress(null);
+    if (!opts?.keepSocket && wsRef.current) {
+      try {
+        wsRef.current.close();
+      } catch {
+        /* ignore */
+      }
+      wsRef.current = null;
+    }
+    if (opts?.statusMsg) setStatus(opts.statusMsg);
+  };
+
+  useEffect(() => {
+    return () => {
+      cleanupPeer();
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (autoJoinRoom && !mode && !startedAutoJoinRef.current) {
+      startedAutoJoinRef.current = true;
+      setMode("receive");
+      setInputCode(autoJoinRoom);
+      void joinRoom(autoJoinRoom);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoJoinRoom, mode]);
+
+  const sendSignal = (payload: Record<string, unknown>) => {
+    const ws = wsRef.current;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify(payload));
+  };
+
+  const markConnected = () => {
+    clearConnectTimer();
+    connectedRef.current = true;
+    setConnected(true);
+    setError(null);
+    setStatus("Connected (P2P)");
+  };
+
+  const startConnectTimer = () => {
+    clearConnectTimer();
+    connectTimerRef.current = setTimeout(() => {
+      if (dcRef.current?.readyState === "open") return;
+      setError(
+        "Could not establish a direct peer connection. This often happens behind a strict firewall or symmetric NAT (no TURN server configured yet). Try another network, or ask the other person to join again.",
+      );
+      setStatus("Connection failed");
+      cleanupPeer({ keepSocket: true, statusMsg: "Connection failed" });
+    }, CONNECT_TIMEOUT_MS);
+  };
+
+  const flushPendingIce = async () => {
+    const pc = pcRef.current;
+    if (!pc || !remoteSetRef.current) return;
+    const queued = pendingIceRef.current.splice(0);
+    for (const c of queued) {
+      try {
+        await pc.addIceCandidate(c);
+      } catch (e) {
+        console.warn("addIceCandidate failed", e);
+      }
+    }
+  };
+
+  const handleDataMessage = async (event: MessageEvent) => {
+    if (typeof event.data === "string") {
+      let msg: AppDataMessage;
+      try {
+        msg = JSON.parse(event.data) as AppDataMessage;
+      } catch {
+        console.warn("Invalid data-channel JSON");
+        return;
+      }
+
+      if (msg.type === "text" && typeof msg.data === "string") {
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: newId(),
+            type: "text",
+            content: msg.data,
+            from: "peer",
+            timestamp: Date.now(),
+          },
+        ]);
+        return;
+      }
+
+      if (msg.type === "file-meta") {
+        incomingFileRef.current = {
+          fileName: msg.fileName,
+          fileSize: msg.fileSize,
+          fileType: msg.fileType || "application/octet-stream",
+          chunks: [],
+          received: 0,
+        };
+        setReceiveProgress({ fileName: msg.fileName, progress: 0 });
+        return;
+      }
+
+      if (msg.type === "file-complete") {
+        const transfer = incomingFileRef.current;
+        incomingFileRef.current = null;
+        setReceiveProgress(null);
+        if (!transfer) return;
+        const blob = new Blob(transfer.chunks, {
+          type: transfer.fileType || "application/octet-stream",
+        });
+        setReceivedFiles((prev) => [
+          ...prev,
+          {
+            fileName: transfer.fileName,
+            fileSize: transfer.fileSize,
+            fileType: transfer.fileType,
+            blob,
+            timestamp: Date.now(),
+          },
+        ]);
+        setMessages((prev) => [
+          ...prev,
+          {
+            id: newId(),
+            type: "file",
+            content: transfer.fileName,
+            from: "peer",
+            timestamp: Date.now(),
+          },
+        ]);
+      }
       return;
     }
 
+    // Binary file chunk
+    let buffer: ArrayBuffer;
+    if (event.data instanceof ArrayBuffer) {
+      buffer = event.data;
+    } else if (ArrayBuffer.isView(event.data)) {
+      buffer = event.data.buffer.slice(
+        event.data.byteOffset,
+        event.data.byteOffset + event.data.byteLength,
+      ) as ArrayBuffer;
+    } else if (typeof Blob !== "undefined" && event.data instanceof Blob) {
+      buffer = await event.data.arrayBuffer();
+    } else {
+      return;
+    }
+
+    const transfer = incomingFileRef.current;
+    if (!transfer) return;
+    transfer.chunks.push(buffer);
+    transfer.received += buffer.byteLength;
+    const progress = Math.min(
+      100,
+      Math.round((transfer.received / Math.max(transfer.fileSize, 1)) * 100),
+    );
+    setReceiveProgress({ fileName: transfer.fileName, progress });
+  };
+
+  const setupDataChannel = (channel: RTCDataChannel) => {
+    dcRef.current = channel;
+    channel.binaryType = "arraybuffer";
+    channel.bufferedAmountLowThreshold = 128 * 1024;
+
+    channel.onopen = () => {
+      console.log("DataChannel open");
+      markConnected();
+    };
+    channel.onclose = () => {
+      console.log("DataChannel closed");
+      connectedRef.current = false;
+      setConnected(false);
+      setStatus("Peer left");
+    };
+    channel.onerror = (e) => {
+      console.error("DataChannel error", e);
+    };
+    channel.onmessage = (event) => {
+      void handleDataRef.current(event);
+    };
+  };
+
+  const createPeerConnection = async () => {
+    if (pcRef.current) return pcRef.current;
+    const iceServers = await fetchIceServers();
+    const pc = new RTCPeerConnection({ iceServers });
+    pcRef.current = pc;
+
+    pc.onicecandidate = (event) => {
+      if (!event.candidate) return;
+      sendSignal({
+        type: "ice-candidate",
+        candidate: event.candidate.candidate,
+        sdpMid: event.candidate.sdpMid,
+        sdpMLineIndex: event.candidate.sdpMLineIndex,
+      });
+    };
+
+    pc.onconnectionstatechange = () => {
+      const state = pc.connectionState;
+      console.log("pc connectionState", state);
+      if (state === "failed") {
+        setError(
+          "Peer connection failed. A direct path could not be found (strict NAT / no TURN). Try again on another network.",
+        );
+        setStatus("Connection failed");
+        cleanupPeer({ keepSocket: true, statusMsg: "Connection failed" });
+      } else if (state === "disconnected") {
+        setConnected(false);
+        setStatus("Peer left");
+      } else if (state === "connecting") {
+        setStatus("Connecting");
+      }
+    };
+
+    pc.ondatachannel = (event) => {
+      setupDataChannel(event.channel);
+    };
+
+    return pc;
+  };
+
+  const createAndSendOffer = async () => {
+    if (makingOfferRef.current) return;
+    makingOfferRef.current = true;
+    try {
+      setStatus("Connecting");
+      startConnectTimer();
+      const pc = await createPeerConnection();
+      const channel = pc.createDataChannel("share", { ordered: true });
+      setupDataChannel(channel);
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      sendSignal({ type: "offer", sdp: offer.sdp });
+    } catch (e) {
+      console.error("createOffer failed", e);
+      setError("Failed to start peer connection.");
+      setStatus("Connection failed");
+    } finally {
+      makingOfferRef.current = false;
+    }
+  };
+
+  const handleOffer = async (sdp: string) => {
+    try {
+      setStatus("Connecting");
+      startConnectTimer();
+      const pc = await createPeerConnection();
+      await pc.setRemoteDescription({ type: "offer", sdp });
+      remoteSetRef.current = true;
+      await flushPendingIce();
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      sendSignal({ type: "answer", sdp: answer.sdp });
+    } catch (e) {
+      console.error("handleOffer failed", e);
+      setError("Failed to accept peer offer.");
+      setStatus("Connection failed");
+    }
+  };
+
+  const handleAnswer = async (sdp: string) => {
+    const pc = pcRef.current;
+    if (!pc) return;
+    try {
+      await pc.setRemoteDescription({ type: "answer", sdp });
+      remoteSetRef.current = true;
+      await flushPendingIce();
+    } catch (e) {
+      console.error("handleAnswer failed", e);
+    }
+  };
+
+  const handleRemoteIce = async (msg: Extract<SignalInbound, { type: "ice-candidate" }>) => {
+    const init: RTCIceCandidateInit = {
+      candidate: msg.candidate ?? undefined,
+      sdpMid: msg.sdpMid ?? undefined,
+      sdpMLineIndex: msg.sdpMLineIndex ?? undefined,
+    };
+    if (!remoteSetRef.current || !pcRef.current) {
+      pendingIceRef.current.push(init);
+      return;
+    }
+    try {
+      await pcRef.current.addIceCandidate(init);
+    } catch (e) {
+      console.warn("addIceCandidate failed", e);
+    }
+  };
+
+  const handleSignalMessage = async (raw: string) => {
+    let msg: SignalInbound;
+    try {
+      msg = JSON.parse(raw) as SignalInbound;
+    } catch {
+      return;
+    }
+
+    switch (msg.type) {
+      case "joined":
+        peerIdRef.current = msg.peer_id;
+        isInitiatorRef.current = !!msg.initiator;
+        setStatus(msg.initiator ? "Waiting for peer" : "Connecting");
+        if (!msg.initiator) {
+          // Second peer waits for offer from initiator
+          setStatus("Connecting");
+          startConnectTimer();
+        }
+        break;
+      case "peer-joined":
+        setStatus("Connecting");
+        if (isInitiatorRef.current) {
+          await createAndSendOffer();
+        }
+        break;
+      case "peer-left":
+        cleanupPeer({
+          keepSocket: true,
+          statusMsg: "Peer left",
+        });
+        setError(null);
+        break;
+      case "error":
+        setError(msg.message || "Signaling error");
+        setStatus(
+          /full/i.test(msg.message || "") ? "Room full" : "Error",
+        );
+        break;
+      case "ping":
+        // Keepalive — ignore (or could echo; not required)
+        break;
+      case "offer":
+        if (msg.sdp) await handleOffer(msg.sdp);
+        break;
+      case "answer":
+        if (msg.sdp) await handleAnswer(msg.sdp);
+        break;
+      case "ice-candidate":
+        await handleRemoteIce(msg);
+        break;
+      default:
+        break;
+    }
+  };
+
+  handleSignalRef.current = handleSignalMessage;
+  handleDataRef.current = handleDataMessage;
+
+  // Expose connection diagnostics for Playwright / manual debug
+  if (typeof window !== "undefined") {
+    (
+      window as unknown as {
+        __shareDebug?: () => {
+          connected: boolean;
+          status: string;
+          dcState: string | undefined;
+          pcState: RTCPeerConnectionState | undefined;
+        };
+      }
+    ).__shareDebug = () => ({
+      connected: connectedRef.current,
+      status,
+      dcState: dcRef.current?.readyState,
+      pcState: pcRef.current?.connectionState,
+    });
+  }
+
+  const connectSignal = (room: string) => {
+    cleanupPeer();
+    setError(null);
+    setConnected(false);
+    setStatus("Connecting");
+
+    const url = getSignalUrl(room);
+    const ws = new WebSocket(url);
+    wsRef.current = ws;
+
+    ws.onopen = () => {
+      console.log("Signaling connected", url);
+    };
+    ws.onmessage = (event) => {
+      if (typeof event.data !== "string") {
+        // Protocol: binary frames rejected by server; ignore if any
+        return;
+      }
+      void handleSignalRef.current(event.data);
+    };
+    ws.onerror = () => {
+      setError("Signaling connection error. Please try again.");
+      setStatus("Error");
+    };
+    ws.onclose = () => {
+      if (connectedRef.current) {
+        connectedRef.current = false;
+        setConnected(false);
+        setStatus("Peer left");
+      }
+    };
+  };
+
+  const startSending = async () => {
     const code = generateRoomCode();
     setRoomCode(code);
     setMode("send");
-    isInitiatorRef.current = true;
-    sentKeyExchangeRef.current = false;
-    sharedKeyRef.current = null;
-    transportReadyRef.current = false;
-    setStatus("Waiting for receiver...");
-
-    const keyPair = await generateKeyPair();
-    keyPairRef.current = keyPair;
-
-    const url = `${window.location.origin}/share?room=${code}`;
-    setQrUrl(url);
-
-    connectWebSocket(code);
+    setMessages([]);
+    setReceivedFiles([]);
+    setQrUrl(`${window.location.origin}/share?room=${code}`);
+    setStatus("Waiting for peer");
+    connectSignal(code);
   };
 
   const startReceiving = () => {
     setMode("receive");
+    setError(null);
   };
 
   const joinRoom = async (code?: string) => {
-    const joinCode = code || inputCode;
-    if (!joinCode || joinCode.length !== 6) {
+    const joinCode = (code || inputCode).replace(/\D/g, "").slice(0, 6);
+    if (joinCode.length !== 6) {
       setStatus("Invalid code");
       return;
     }
-
-    if (!wsUrl) {
-      setStatus("Configuration error");
-      return;
-    }
-
-    setStatus("Joining...");
     setRoomCode(joinCode);
-    isInitiatorRef.current = false;
-    sentKeyExchangeRef.current = false;
-    sharedKeyRef.current = null;
-    transportReadyRef.current = false;
-
-    const keyPair = await generateKeyPair();
-    keyPairRef.current = keyPair;
-
-    connectWebSocket(joinCode);
+    setMode("receive");
+    setMessages([]);
+    setReceivedFiles([]);
+    setStatus("Connecting");
+    connectSignal(joinCode);
   };
 
-  const connectWebSocket = (room: string) => {
-    const ws = new WebSocket(`${wsUrl}/${room}`);
-    // Prefer ArrayBuffer so encrypted file chunks are not Blobs
-    ws.binaryType = "arraybuffer";
-    wsRef.current = ws;
-
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-    };
-
-    ws.onmessage = async (event) => {
-      if (typeof event.data === 'string') {
-        const msg = JSON.parse(event.data);
-        await handleSignalingMessage(msg);
-      } else {
-        await handleBinaryFrame(event.data);
-      }
-    };
-
-    ws.onerror = (err) => {
-      console.error('WebSocket error:', err);
-      setStatus('Connection error');
-    };
-
-    ws.onclose = () => {
-      console.log('WebSocket closed');
-      setConnected(false);
-      setStatus('Peer left');
-      if (rtcRef.current) {
-        rtcRef.current.close();
-        rtcRef.current = null;
-      }
-    };
-  };
-
-  const handleSignalingMessage = async (msg: any) => {
-    if (msg.type === 'connected') {
-      peerIdRef.current = msg.peer_id;
-      // Joiner already sees a peer in the room: kick off key exchange / WebRTC
-      // (only the first peer receives peer_joined).
-      if (typeof msg.peers_in_room === 'number' && msg.peers_in_room >= 2) {
-        console.log('Joined room with existing peer, connecting...');
-        setStatus('Peer present, connecting...');
-        if (!forceRelay) {
-          await setupWebRTC();
-        } else {
-          markUsingRelay(true);
-          await exchangeKeys();
-        }
-      }
-    } else if (msg.type === 'peer_joined') {
-      console.log('Peer joined, setting up connection...');
-      setStatus('Peer joined, connecting...');
-      if (!forceRelay) {
-        await setupWebRTC();
-      } else {
-        console.log('Using relay mode (forced)');
-        markUsingRelay(true);
-        await exchangeKeys();
-        // Wait a bit for key exchange to complete
-        setTimeout(async () => {
-          if (sharedKeyRef.current) {
-            console.log('Relay ready with shared key');
-            setConnected(true);
-            markTransportReady(true);
-            setStatus('Connected (relay)');
-            await processQueue();
-          }
-        }, 1000);
-      }
-    } else if (msg.type === 'peer_left') {
-      setStatus('Peer left');
-      setConnected(false);
-      if (rtcRef.current) {
-        rtcRef.current.close();
-        rtcRef.current = null;
-      }
-    } else if (msg.type === 'error') {
-      setStatus(`Error: ${msg.error}`);
-    } else if (msg.type === 'ping') {
-      // Ignore
-    } else if (msg.type === 'offer' && msg.offer) {
-      await handleOffer(msg.offer);
-    } else if (msg.type === 'answer' && msg.answer) {
-      await handleAnswer(msg.answer);
-    } else if (msg.type === 'ice-candidate' && msg.candidate) {
-      await handleIceCandidate(msg.candidate);
-    } else if (msg.type === 'key-exchange' && msg.publicKey) {
-      await handleKeyExchange(msg.publicKey);
-    } else if (
-      msg.type === 'text' ||
-      msg.type === 'file-meta' ||
-      msg.type === 'file-complete'
-    ) {
-      // Server relays app payloads over the same WS (adds from_peer).
-      // These must use the data handler, not the signaling switch above.
-      await handleDataMessage(msg);
-    }
-  };
-
-  const setupWebRTC = async () => {
-    if (rtcRef.current) return;
-
-    const rtc = new RTCPeerConnection({
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" }
-      ]
-    });
-    rtcRef.current = rtc;
-
-    webrtcTimeoutRef.current = setTimeout(async () => {
-      if (!dataChannelRef.current || dataChannelRef.current.readyState !== 'open') {
-        console.log('WebRTC timeout after 10s, falling back to relay');
-        markUsingRelay(true);
-        if (rtc) {
-          rtc.close();
-        }
-        rtcRef.current = null;
-        await exchangeKeys();
-        // Wait for key exchange
-        setTimeout(async () => {
-          if (sharedKeyRef.current) {
-            console.log('Relay fallback ready with shared key');
-            setConnected(true);
-            markTransportReady(true);
-            setStatus('Connected (relay)');
-            await processQueue();
-          }
-        }, 1000);
-      }
-    }, WEBRTC_TIMEOUT);
-
-    rtc.onicecandidate = (event) => {
-      if (event.candidate && wsRef.current) {
-        wsRef.current.send(JSON.stringify({
-          type: 'ice-candidate',
-          candidate: event.candidate.toJSON()
-        }));
-      }
-    };
-
-    rtc.ondatachannel = (event) => {
-      setupDataChannel(event.channel);
-    };
-
-    if (isInitiatorRef.current) {
-      const channel = rtc.createDataChannel('file-transfer', { ordered: true });
-      setupDataChannel(channel);
-
-      const offer = await rtc.createOffer();
-      await rtc.setLocalDescription(offer);
-      
-      if (wsRef.current) {
-        wsRef.current.send(JSON.stringify({
-          type: 'offer',
-          offer: offer
-        }));
-      }
-    }
-  };
-
-  const setupDataChannel = (channel: RTCDataChannel) => {
-    dataChannelRef.current = channel;
-
-    channel.onopen = async () => {
-      if (webrtcTimeoutRef.current) {
-        clearTimeout(webrtcTimeoutRef.current);
-      }
-      console.log('DataChannel opened, state:', channel.readyState);
-      markUsingRelay(false);
-      await exchangeKeys();
-      // Wait for key exchange to complete
-      setTimeout(async () => {
-        if (sharedKeyRef.current) {
-          console.log('DataChannel ready with shared key');
-          setConnected(true);
-          markTransportReady(true);
-          setStatus('Connected (P2P)');
-          await processQueue();
-        } else {
-          console.error('DataChannel open but no shared key!');
-        }
-      }, 1000);
-    };
-
-    channel.onmessage = async (event) => {
-      if (typeof event.data === 'string') {
-        const msg = JSON.parse(event.data);
-        if (msg.type === 'key-exchange') {
-          await handleKeyExchange(msg.publicKey);
-        } else {
-          await handleDataMessage(msg);
-        }
-      } else {
-        await handleBinaryChunk(event.data);
-      }
-    };
-
-    channel.onerror = (err) => {
-      console.error('DataChannel error:', err);
-    };
-
-    channel.onclose = () => {
-      console.log('DataChannel closed');
-      setConnected(false);
-      setStatus('Peer left');
-    };
-  };
-
-  const handleOffer = async (offer: RTCSessionDescriptionInit) => {
-    if (!rtcRef.current) {
-      await setupWebRTC();
-    }
-    
-    const rtc = rtcRef.current;
-    if (!rtc) return;
-
-    await rtc.setRemoteDescription(offer);
-    const answer = await rtc.createAnswer();
-    await rtc.setLocalDescription(answer);
-
-    if (wsRef.current) {
-      wsRef.current.send(JSON.stringify({
-        type: 'answer',
-        answer: answer
-      }));
-    }
-  };
-
-  const handleAnswer = async (answer: RTCSessionDescriptionInit) => {
-    const rtc = rtcRef.current;
-    if (!rtc) return;
-    await rtc.setRemoteDescription(answer);
-  };
-
-  const handleIceCandidate = async (candidate: RTCIceCandidateInit) => {
-    const rtc = rtcRef.current;
-    if (!rtc) return;
-    await rtc.addIceCandidate(new RTCIceCandidate(candidate));
-  };
-
-  const exchangeKeys = async () => {
-    if (!keyPairRef.current) return;
-    if (sentKeyExchangeRef.current) return;
-
-    const publicKey = await exportPublicKey(keyPairRef.current.publicKey);
-    const msg = JSON.stringify({ type: 'key-exchange', publicKey });
-    sentKeyExchangeRef.current = true;
-
-    if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
-      dataChannelRef.current.send(msg);
-    } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(msg);
-    } else {
-      // Allow retry if socket was not ready yet
-      sentKeyExchangeRef.current = false;
-    }
-  };
-
-  const handleKeyExchange = async (publicKeyString: string) => {
-    if (!keyPairRef.current) {
-      console.error('No key pair for key exchange!');
-      return;
-    }
-
-    try {
-      console.log('Receiving peer public key, deriving shared secret...');
-      const peerPublicKey = await importPublicKey(publicKeyString);
-      const sharedKey = await deriveSharedKey(keyPairRef.current.privateKey, peerPublicKey);
-      sharedKeyRef.current = sharedKey;
-      console.log('Shared key established ✓');
-
-      // Reply once with our public key so the peer can derive the same secret.
-      if (!sentKeyExchangeRef.current) {
-        await exchangeKeys();
-      }
-
-      // On relay (or once P2P datachannel is open), becoming ready after ECDH is enough.
-      const relayOrP2P =
-        dataChannelRef.current?.readyState === 'open' ||
-        usingRelayRef.current ||
-        forceRelay ||
-        !rtcRef.current;
-      if (relayOrP2P && !transportReadyRef.current) {
-        // If WebRTC never came up, treat as relay
-        if (dataChannelRef.current?.readyState !== 'open') {
-          markUsingRelay(true);
-        }
-        console.log('Transport becoming ready after key exchange');
-        markTransportReady(true);
-        setConnected(true);
-        setStatus(
-          dataChannelRef.current?.readyState === 'open'
-            ? 'Connected (P2P)'
-            : 'Connected (relay)',
-        );
-        await processQueue();
-      }
-    } catch (e) {
-      console.error('Key exchange failed:', e);
-    }
-  };
-
-  const processQueue = async () => {
-    if (!sharedKeyRef.current) {
-      console.log('Cannot process queue: no shared key yet');
-      return;
-    }
-
-    const items = queuedItemsRef.current;
-    if (items.length === 0) {
-      console.log('Queue is empty');
-      return;
-    }
-
-    console.log(`Processing queue: ${items.length} items`);
-    clearQueue();
-    for (const item of items) {
-      if (item.type === "text" && item.data) {
-        console.log('Sending queued text:', item.data.substring(0, 50));
-        await sendTextNow(item.data);
-      } else if (item.type === "file" && item.file) {
-        console.log('Sending queued file:', item.file.name);
-        await sendFileNow(item.file);
-      }
-    }
-    console.log('Queue processed ✓');
-  };
-
-  const handleDataMessage = async (msg: any) => {
-    if (msg.type === 'text' && msg.data) {
-      await handleTextMessage(msg.data);
-    } else if (msg.type === 'file-meta' && msg.fileName) {
-      fileTransferRef.current = {
-        fileName: msg.fileName,
-        fileSize: msg.fileSize,
-        fileType: msg.fileType,
-        chunks: [],
-        received: 0,
-        total: msg.fileSize,
-        hash: msg.hash
-      };
-      setReceiveProgress({ fileName: msg.fileName, progress: 0 });
-    } else if (msg.type === 'file-complete') {
-      await completeFileTransfer();
-    }
-  };
-
-  const handleTextMessage = async (encryptedData: string) => {
-    if (!sharedKeyRef.current) {
-      console.error('Cannot decrypt text: no shared key');
-      return;
-    }
-    
-    try {
-      console.log('Decrypting received text message...');
-      const encryptedBuffer = Uint8Array.from(atob(encryptedData), c => c.charCodeAt(0));
-      const decrypted = await decryptData(encryptedBuffer.buffer, sharedKeyRef.current);
-      const text = new TextDecoder().decode(decrypted);
-      console.log('Text decrypted successfully:', text.substring(0, 50));
-      setMessages(prev => [...prev, { 
-        type: "text", 
-        content: text, 
-        from: "peer",
-        timestamp: Date.now()
-      }]);
-    } catch (e) {
-      console.error("Text decryption failed:", e);
-      setStatus('Decryption error');
-    }
-  };
-
-  const handleBinaryChunk = async (data: ArrayBuffer) => {
-    if (!fileTransferRef.current || !sharedKeyRef.current) {
-      console.log('Received binary chunk but no file transfer in progress or no key');
-      return;
-    }
-
-    try {
-      console.log(`Received chunk: ${data.byteLength} bytes encrypted`);
-      const decrypted = await decryptData(data, sharedKeyRef.current);
-      console.log(`Decrypted to: ${decrypted.byteLength} bytes`);
-      fileTransferRef.current.chunks.push(decrypted);
-      fileTransferRef.current.received += decrypted.byteLength;
-
-      const progress = Math.round((fileTransferRef.current.received / fileTransferRef.current.total) * 100);
-      console.log(`File progress: ${progress}% (${fileTransferRef.current.received}/${fileTransferRef.current.total})`);
-      setReceiveProgress({ 
-        fileName: fileTransferRef.current.fileName, 
-        progress 
-      });
-    } catch (e) {
-      console.error("Chunk decryption failed:", e);
-    }
-  };
-
-  const handleBinaryFrame = async (data: Blob | ArrayBuffer | ArrayBufferView) => {
-    let buffer: ArrayBuffer;
-    if (data instanceof ArrayBuffer) {
-      buffer = data;
-    } else if (ArrayBuffer.isView(data)) {
-      buffer = data.buffer.slice(
-        data.byteOffset,
-        data.byteOffset + data.byteLength,
-      ) as ArrayBuffer;
-    } else if (typeof Blob !== "undefined" && data instanceof Blob) {
-      buffer = await data.arrayBuffer();
-    } else {
-      console.error("Unknown binary frame type", data);
-      return;
-    }
-    await handleBinaryChunk(buffer);
-  };
-
-  const completeFileTransfer = async () => {
-    if (!fileTransferRef.current) {
-      console.error('completeFileTransfer called but no transfer in progress!');
-      return;
-    }
-
-    // Snapshot before clearing the ref — React state updaters may run later.
-    const transfer = fileTransferRef.current;
-    fileTransferRef.current = null;
-    setReceiveProgress(null);
-
-    console.log(`Completing file transfer: ${transfer.fileName}`);
-    console.log(`Total chunks received: ${transfer.chunks.length}`);
-    const blob = new Blob(transfer.chunks, { type: transfer.fileType || "application/octet-stream" });
-
-    setReceivedFiles(prev => [...prev, {
-      fileName: transfer.fileName,
-      fileSize: transfer.fileSize,
-      fileType: transfer.fileType,
-      blob,
-      timestamp: Date.now()
-    }]);
-
-    setMessages(prev => [...prev, {
-      type: "file-complete",
-      content: transfer.fileName,
-      from: "peer",
-      timestamp: Date.now()
-    }]);
-  };
-
-  const queueText = () => {
-    if (!textInput.trim()) return;
-    const text = textInput;
+  const sendText = () => {
+    const text = textInput.trim();
+    if (!text) return;
     setTextInput("");
 
-    if (transportReadyRef.current && sharedKeyRef.current) {
-      void sendTextNow(text);
-    } else {
-      enqueueItem({ type: "text", data: text });
-      setMessages(prev => [...prev, {
+    // Optimistic local append — peer will render on receive; no server echo.
+    setMessages((prev) => [
+      ...prev,
+      {
+        id: newId(),
         type: "text",
-        content: text + " (queued)",
+        content: text,
         from: "you",
-        timestamp: Date.now()
-      }]);
+        timestamp: Date.now(),
+      },
+    ]);
+
+    const dc = dcRef.current;
+    if (!dc || dc.readyState !== "open") {
+      setError("Not connected to a peer yet.");
+      return;
+    }
+    try {
+      const payload: AppDataMessage = { type: "text", data: text };
+      dc.send(JSON.stringify(payload));
+    } catch (e) {
+      console.error("send text failed", e);
+      setError("Failed to send text.");
     }
   };
 
-  const sendTextNow = async (text: string) => {
-    if (!sharedKeyRef.current) {
-      console.error('Cannot send text: no shared key');
+  const sendFile = async (file: File) => {
+    const dc = dcRef.current;
+    if (!dc || dc.readyState !== "open") {
+      setError("Not connected to a peer yet.");
       return;
     }
 
-    // Optimistic local append — server does not echo back to the sender.
-    setMessages(prev => {
-      const queuedIdx = prev.findIndex(
-        (m) => m.from === "you" && m.content === text + " (queued)",
-      );
-      if (queuedIdx >= 0) {
-        return prev.map((m, i) =>
-          i === queuedIdx ? { ...m, content: text } : m,
-        );
+    setSendProgress({ fileName: file.name, progress: 0 });
+    try {
+      const meta: AppDataMessage = {
+        type: "file-meta",
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type || "application/octet-stream",
+      };
+      dc.send(JSON.stringify(meta));
+
+      let offset = 0;
+      while (offset < file.size) {
+        await waitForBufferedAmountLow(dc);
+        const slice = file.slice(offset, offset + FILE_CHUNK_SIZE);
+        const buf = await slice.arrayBuffer();
+        dc.send(buf);
+        offset += buf.byteLength;
+        setSendProgress({
+          fileName: file.name,
+          progress: Math.min(100, Math.round((offset / file.size) * 100)),
+        });
       }
-      return [
+
+      await waitForBufferedAmountLow(dc);
+      const done: AppDataMessage = { type: "file-complete" };
+      dc.send(JSON.stringify(done));
+
+      setMessages((prev) => [
         ...prev,
         {
-          type: "text" as const,
-          content: text,
-          from: "you" as const,
+          id: newId(),
+          type: "file",
+          content: file.name,
+          from: "you",
           timestamp: Date.now(),
         },
-      ];
-    });
-
-    try {
-      console.log('Sending text via', dataChannelRef.current?.readyState === 'open' ? 'DataChannel' : 'WebSocket');
-      const textData = new TextEncoder().encode(text);
-      const encrypted = await encryptData(textData.buffer, sharedKeyRef.current);
-      const encryptedString = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-      const msg = JSON.stringify({ type: 'text', data: encryptedString });
-
-      if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
-        dataChannelRef.current.send(msg);
-        console.log('Text sent via DataChannel');
-      } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(msg);
-        console.log('Text sent via WebSocket');
-      } else {
-        console.error('No open transport to send text');
-        setStatus('Send failed: not connected');
-      }
+      ]);
     } catch (e) {
-      console.error("Send text failed:", e);
+      console.error("send file failed", e);
+      setError("Failed to send file.");
+    } finally {
+      setSendProgress(null);
     }
-  };
-
-  const queueFile = (file: File) => {
-    if (transportReadyRef.current && sharedKeyRef.current) {
-      void sendFileNow(file);
-    } else {
-      enqueueItem({ type: "file", file });
-      setMessages(prev => [...prev, {
-        type: "file-start",
-        content: `${file.name} (queued)`,
-        from: "you",
-        timestamp: Date.now()
-      }]);
-    }
-  };
-
-  const sendFileNow = async (file: File) => {
-    if (!sharedKeyRef.current) {
-      console.error('Cannot send file: no shared key');
-      return;
-    }
-
-    const relay = usingRelayRef.current;
-    console.log(`Sending file ${file.name} (${file.size} bytes) via ${relay ? 'relay' : 'P2P'}`);
-    setSendProgress({ fileName: file.name, progress: 0 });
-
-    const fileData = await file.arrayBuffer();
-    const fileHash = await hashData(fileData);
-
-    const metaMsg = JSON.stringify({
-      type: 'file-meta',
-      fileName: file.name,
-      fileSize: file.size,
-      fileType: file.type,
-      hash: fileHash
-    });
-
-    if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
-      dataChannelRef.current.send(metaMsg);
-    } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.send(metaMsg);
-    }
-
-    let offset = 0;
-    const CHUNK_SIZE = relay ? 64 * 1024 : 128 * 1024; // 64KB for relay, 128KB for P2P
-
-    const sendNextChunk = async () => {
-      if (offset >= file.size) {
-        const completeMsg = JSON.stringify({ type: 'file-complete' });
-        if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
-          dataChannelRef.current.send(completeMsg);
-        } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-          wsRef.current.send(completeMsg);
-        }
-
-        setMessages(prev => {
-          const queuedIdx = prev.findIndex(
-            (m) => m.from === "you" && m.content === `${file.name} (queued)`,
-          );
-          if (queuedIdx >= 0) {
-            return prev.map((m, i) =>
-              i === queuedIdx
-                ? { ...m, content: file.name, type: "file-complete" as const }
-                : m,
-            );
-          }
-          if (prev.some((m) => m.from === "you" && m.content === file.name)) {
-            return prev;
-          }
-          return [
-            ...prev,
-            {
-              type: "file-complete" as const,
-              content: file.name,
-              from: "you" as const,
-              timestamp: Date.now(),
-            },
-          ];
-        });
-
-        setSendProgress(null);
-        return;
-      }
-
-      const chunk = file.slice(offset, offset + CHUNK_SIZE);
-      const chunkData = await chunk.arrayBuffer();
-      const encrypted = await encryptData(chunkData, sharedKeyRef.current!);
-
-      if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
-        dataChannelRef.current.send(encrypted);
-        console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via DataChannel`);
-      } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-        wsRef.current.send(encrypted);
-        console.log(`Sent chunk ${Math.floor(offset / CHUNK_SIZE) + 1} via WebSocket`);
-      }
-
-      offset += CHUNK_SIZE;
-      const progress = Math.round((offset / file.size) * 100);
-      setSendProgress({ fileName: file.name, progress: Math.min(progress, 100) });
-
-      const delay = relay ? 100 : 10;
-      setTimeout(sendNextChunk, delay);
-    };
-
-    sendNextChunk();
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files && files.length > 0) {
-      queueFile(files[0]);
-    }
+    const file = e.target.files?.[0];
+    if (file) void sendFile(file);
+    if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
   const handleFileDrop = (e: React.DragEvent) => {
     e.preventDefault();
-    const files = e.dataTransfer.files;
-    if (files && files.length > 0) {
-      queueFile(files[0]);
-    }
+    const file = e.dataTransfer.files?.[0];
+    if (file) void sendFile(file);
   };
 
   const downloadFile = (file: ReceivedFile) => {
@@ -879,6 +658,18 @@ function SharePageContent() {
     URL.revokeObjectURL(url);
   };
 
+  const resetHome = () => {
+    cleanupPeer();
+    setMode(null);
+    setRoomCode("");
+    setInputCode("");
+    setQrUrl("");
+    setMessages([]);
+    setReceivedFiles([]);
+    setError(null);
+    setStatus("Disconnected");
+  };
+
   if (!mode) {
     return (
       <DashboardLayout>
@@ -886,13 +677,13 @@ function SharePageContent() {
           <div className="text-center mb-8">
             <h1 className="text-3xl font-bold mb-2">Secure File & Text Share</h1>
             <p className="text-slate-600 dark:text-slate-400">
-              End-to-end encrypted • No server storage
+              Peer-to-peer WebRTC • Encrypted in transit (DTLS) • No server storage
             </p>
           </div>
 
           <div className="grid sm:grid-cols-2 gap-4">
             <button
-              onClick={startSending}
+              onClick={() => void startSending()}
               className="p-8 rounded-2xl border-2 border-indigo-200 dark:border-indigo-800 bg-gradient-to-br from-indigo-50 to-indigo-100 dark:from-indigo-950 dark:to-indigo-900 hover:border-indigo-300 dark:hover:border-indigo-700 transition-all group"
             >
               <div className="flex flex-col items-center gap-4">
@@ -900,7 +691,9 @@ function SharePageContent() {
                   <PaperAirplaneIcon className="size-8" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">Send</p>
+                  <p className="text-2xl font-bold text-indigo-900 dark:text-indigo-100">
+                    Send
+                  </p>
                   <p className="text-sm text-indigo-700 dark:text-indigo-300 mt-1">
                     Get a code to share
                   </p>
@@ -917,7 +710,9 @@ function SharePageContent() {
                   <ArrowDownTrayIcon className="size-8" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">Receive</p>
+                  <p className="text-2xl font-bold text-emerald-900 dark:text-emerald-100">
+                    Receive
+                  </p>
                   <p className="text-sm text-emerald-700 dark:text-emerald-300 mt-1">
                     Enter a code to join
                   </p>
@@ -946,23 +741,21 @@ function SharePageContent() {
               type="text"
               placeholder="000000"
               value={inputCode}
-              onChange={(e) => setInputCode(e.target.value.replace(/\D/g, "").slice(0, 6))}
+              onChange={(e) =>
+                setInputCode(e.target.value.replace(/\D/g, "").slice(0, 6))
+              }
               className="h-16 text-center text-3xl tracking-widest"
               maxLength={6}
               autoFocus
             />
-            <Button 
-              onClick={() => joinRoom()} 
+            <Button
+              onClick={() => void joinRoom()}
               disabled={inputCode.length !== 6}
               className="w-full h-12 text-lg"
             >
               Join
             </Button>
-            <Button 
-              onClick={() => setMode(null)}
-              variant="ghost"
-              className="w-full"
-            >
+            <Button onClick={resetHome} variant="ghost" className="w-full">
               Back
             </Button>
           </div>
@@ -974,27 +767,40 @@ function SharePageContent() {
   return (
     <DashboardLayout>
       <div className="max-w-4xl mx-auto">
-        {/* Header with code and status */}
         <div className="mb-6 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/40">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="text-center sm:text-left">
               <p className="text-sm text-slate-600 dark:text-slate-400">Room Code</p>
               <p className="text-3xl font-bold tracking-widest">{roomCode}</p>
             </div>
-            <div className={`px-4 py-2 rounded-full text-sm font-medium ${
-              connected 
-                ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
-                : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
-            }`}>
+            <div
+              data-testid="share-status"
+              data-connected={connected ? "true" : "false"}
+              className={`px-4 py-2 rounded-full text-sm font-medium ${
+                connected
+                  ? "bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400"
+                  : error
+                    ? "bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400"
+                    : "bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-400"
+              }`}
+            >
               {status}
             </div>
           </div>
 
+          {error && (
+            <div className="mt-4 p-3 rounded-xl bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-800 text-sm text-red-800 dark:text-red-200">
+              {error}
+            </div>
+          )}
+
           {mode === "send" && qrUrl && (
             <div className="mt-4 p-4 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 text-center">Scan to join:</p>
+              <p className="text-sm text-slate-600 dark:text-slate-400 mb-3 text-center">
+                Scan to join:
+              </p>
               <div className="flex justify-center">
-                <img 
+                <img
                   src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(qrUrl)}`}
                   alt="QR Code"
                   className="w-40 h-40"
@@ -1002,46 +808,68 @@ function SharePageContent() {
               </div>
             </div>
           )}
+
+          <div className="mt-4 flex justify-center">
+            <Button variant="ghost" size="sm" onClick={resetHome}>
+              Leave room
+            </Button>
+          </div>
         </div>
 
         <div className="grid lg:grid-cols-2 gap-4">
-          {/* Send panel */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Send</h3>
-            
+
             <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 space-y-3">
               <textarea
                 value={textInput}
                 onChange={(e) => setTextInput(e.target.value)}
-                placeholder="Type a message..."
-                className="w-full min-h-[100px] px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 resize-none"
+                placeholder={
+                  connected ? "Type a message..." : "Connect to a peer to send…"
+                }
+                disabled={!connected}
+                className="w-full min-h-[100px] px-3 py-2 rounded-xl border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 resize-none disabled:opacity-60"
                 onKeyDown={(e) => {
                   if (e.key === "Enter" && !e.shiftKey) {
                     e.preventDefault();
-                    queueText();
+                    sendText();
                   }
                 }}
               />
-              <Button onClick={queueText} disabled={!textInput.trim()} className="w-full">
+              <Button
+                onClick={sendText}
+                disabled={!connected || !textInput.trim()}
+                className="w-full"
+              >
                 <PaperAirplaneIcon className="h-4 w-4 mr-2" />
                 Send Text
               </Button>
             </div>
 
-            <div 
-              className="p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/40 text-center cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20 transition-colors"
-              onClick={() => fileInputRef.current?.click()}
+            <div
+              className={`p-6 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/40 text-center transition-colors ${
+                connected
+                  ? "cursor-pointer hover:border-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/20"
+                  : "opacity-60"
+              }`}
+              onClick={() => connected && fileInputRef.current?.click()}
               onDragOver={(e) => e.preventDefault()}
-              onDrop={handleFileDrop}
+              onDrop={(e) => {
+                if (connected) handleFileDrop(e);
+                else e.preventDefault();
+              }}
             >
               <DocumentArrowDownIcon className="h-12 w-12 mx-auto text-slate-400 mb-2" />
               <p className="text-sm font-medium">Click or drag file here</p>
-              <p className="text-xs text-slate-500 mt-1">Encrypted end-to-end</p>
+              <p className="text-xs text-slate-500 mt-1">
+                Sent peer-to-peer over WebRTC
+              </p>
               <input
                 ref={fileInputRef}
                 type="file"
                 onChange={handleFileSelect}
                 className="hidden"
+                disabled={!connected}
               />
             </div>
 
@@ -1049,7 +877,7 @@ function SharePageContent() {
               <div className="p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-200 dark:border-indigo-800">
                 <p className="text-sm font-medium mb-2">{sendProgress.fileName}</p>
                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-indigo-500 h-2 rounded-full transition-all"
                     style={{ width: `${sendProgress.progress}%` }}
                   />
@@ -1059,19 +887,24 @@ function SharePageContent() {
             )}
           </div>
 
-          {/* Receive panel */}
           <div className="space-y-4">
             <h3 className="font-semibold text-lg">Received</h3>
 
             {messages.length > 0 && (
               <div className="p-4 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 max-h-64 overflow-y-auto space-y-2">
-                {messages.map((msg, i) => (
-                  <div key={i} className={`p-3 rounded-lg text-sm ${
-                    msg.from === "you"
-                      ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100"
-                      : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100"
-                  }`}>
-                    <p className="text-xs opacity-60 mb-1">{msg.from === "you" ? "You" : "Peer"}</p>
+                {messages.map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`p-3 rounded-lg text-sm ${
+                      msg.from === "you"
+                        ? "bg-indigo-50 dark:bg-indigo-900/20 text-indigo-900 dark:text-indigo-100"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-slate-100"
+                    }`}
+                  >
+                    <p className="text-xs opacity-60 mb-1">
+                      {msg.from === "you" ? "You" : "Peer"}
+                      {msg.type === "file" ? " · file" : ""}
+                    </p>
                     <p className="break-words">{msg.content}</p>
                   </div>
                 ))}
@@ -1080,14 +913,18 @@ function SharePageContent() {
 
             {receiveProgress && (
               <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800">
-                <p className="text-sm font-medium mb-2">{receiveProgress.fileName}</p>
+                <p className="text-sm font-medium mb-2">
+                  {receiveProgress.fileName}
+                </p>
                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-2">
-                  <div 
+                  <div
                     className="bg-emerald-500 h-2 rounded-full transition-all"
                     style={{ width: `${receiveProgress.progress}%` }}
                   />
                 </div>
-                <p className="text-xs text-right mt-1">{receiveProgress.progress}%</p>
+                <p className="text-xs text-right mt-1">
+                  {receiveProgress.progress}%
+                </p>
               </div>
             )}
 
@@ -1095,10 +932,20 @@ function SharePageContent() {
               <div className="space-y-2">
                 <Label>Files</Label>
                 {receivedFiles.map((file, i) => (
-                  <div key={i} className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                    <div className="flex-1 min-w-0">
+                  <div
+                    key={`${file.fileName}-${file.timestamp}-${i}`}
+                    className="p-3 rounded-xl bg-slate-50 dark:bg-slate-900/40 border border-slate-200 dark:border-slate-700 flex items-center justify-between"
+                  >
+                    <div
+                      className="flex-1 min-w-0"
+                      data-testid="received-file"
+                      data-filename={file.fileName}
+                      data-filesize={file.fileSize}
+                    >
                       <p className="font-medium truncate">{file.fileName}</p>
-                      <p className="text-xs text-slate-500">{(file.fileSize / 1024).toFixed(1)} KB</p>
+                      <p className="text-xs text-slate-500">
+                        {(file.fileSize / 1024).toFixed(1)} KB
+                      </p>
                     </div>
                     <Button size="sm" onClick={() => downloadFile(file)}>
                       <ArrowDownTrayIcon className="h-4 w-4" />
@@ -1116,15 +963,17 @@ function SharePageContent() {
 
 export default function SharePage() {
   return (
-    <Suspense fallback={
-      <DashboardLayout>
-        <div className="max-w-4xl mx-auto">
-          <div className="flex items-center justify-center h-64">
-            <p className="text-slate-500">Loading...</p>
+    <Suspense
+      fallback={
+        <DashboardLayout>
+          <div className="max-w-4xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <p className="text-slate-500">Loading...</p>
+            </div>
           </div>
-        </div>
-      </DashboardLayout>
-    }>
+        </DashboardLayout>
+      }
+    >
       <SharePageContent />
     </Suspense>
   );

@@ -56,8 +56,13 @@ export function formatBytes(n: number): string {
 export async function waitForWsBufferedAmount(
   ws: WebSocket,
   highWater = WS_HIGH_WATER,
+  timeoutMs = 120_000,
 ): Promise<void> {
+  const started = Date.now();
   while (ws.readyState === WebSocket.OPEN && ws.bufferedAmount > highWater) {
+    if (Date.now() - started > timeoutMs) {
+      throw new Error("Send buffer stuck (backpressure timeout)");
+    }
     await new Promise((r) => setTimeout(r, 40));
   }
   if (ws.readyState !== WebSocket.OPEN) {

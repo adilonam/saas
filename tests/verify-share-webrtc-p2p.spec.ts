@@ -138,23 +138,49 @@ async function runShareSession(
     });
     console.log("B->A text ok");
 
-    // ~20MB file
-    await pageA.locator('input[type="file"]').setInputFiles(largeFilePath);
+    // ~20MB file — use Node timers (page.waitForTimeout can stall if UI thread is busy)
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-    const deadline = Date.now() + 180_000;
+    await Promise.race([
+      pageA.locator('input[type="file"]').setInputFiles(largeFilePath),
+      sleep(60_000).then(() => {
+        throw new Error("setInputFiles timed out after 60s");
+      }),
+    ]);
+    console.log("file input set; waiting for receive…");
+
+    const deadline = Date.now() + 240_000;
     let received = false;
+    let lastProgress = "";
     while (Date.now() < deadline) {
       const errA = await pageA
         .getByTestId("share-error")
-        .textContent()
+        .textContent({ timeout: 500 })
         .catch(() => null);
       const errB = await pageB
         .getByTestId("share-error")
-        .textContent()
+        .textContent({ timeout: 500 })
         .catch(() => null);
       const errText = `${errA || ""} ${errB || ""}`.trim();
       if (errText && isRateLimitError(errText)) {
         return { ok: false, rateLimited: true, detail: errText };
+      }
+      if (errText && /Failed to send file|closed during|backpressure/i.test(errText)) {
+        return { ok: false, rateLimited: false, detail: errText };
+      }
+
+      const sendProg = await pageA
+        .getByTestId("send-progress")
+        .textContent({ timeout: 200 })
+        .catch(() => null);
+      const recvProg = await pageB
+        .getByTestId("receive-progress")
+        .textContent({ timeout: 200 })
+        .catch(() => null);
+      const prog = `send=${sendProg || "-"} recv=${recvProg || "-"}`;
+      if (prog !== lastProgress) {
+        console.log(prog);
+        lastProgress = prog;
       }
 
       const fileEl = pageB.getByTestId("received-file");
@@ -166,19 +192,21 @@ async function runShareSession(
         received = true;
         break;
       }
-      await pageB.waitForTimeout(500);
+      await sleep(750);
     }
 
     if (!received) {
       const errA = await pageA
-        .locator("[data-testid=share-error]")
-        .textContent()
+        .getByTestId("share-error")
+        .textContent({ timeout: 500 })
         .catch(() => "");
       const errB = await pageB
-        .locator("[data-testid=share-error]")
-        .textContent()
+        .getByTestId("share-error")
+        .textContent({ timeout: 500 })
         .catch(() => "");
-      const detail = `${errA || ""} ${errB || ""}`.trim() || "file not received in time";
+      const detail =
+        `${errA || ""} ${errB || ""}`.trim() ||
+        `file not received in time (${lastProgress})`;
       if (isRateLimitError(detail)) {
         return { ok: false, rateLimited: true, detail };
       }

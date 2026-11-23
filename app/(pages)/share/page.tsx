@@ -719,7 +719,10 @@ function SharePageContent() {
         ws.send(encrypted);
         offset += buf.byteLength;
 
-        // Throttle UI updates (~4 times/sec worth of chunks)
+        // Always yield so the UI / WS close handlers can run
+        await new Promise((r) => setTimeout(r, 0));
+
+        // Throttle UI updates
         if (offset - lastUi >= FILE_CHUNK_SIZE * 8 || offset >= file.size) {
           lastUi = offset;
           setSendProgress({

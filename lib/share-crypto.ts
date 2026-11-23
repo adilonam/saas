@@ -1,4 +1,4 @@
-/** ECDH + AES-GCM helpers for Share relay mode (legacy WS path). */
+/** ECDH + AES-GCM helpers for Share encrypted WebSocket transport. */
 
 export async function generateKeyPair(): Promise<CryptoKeyPair> {
   return crypto.subtle.generateKey(

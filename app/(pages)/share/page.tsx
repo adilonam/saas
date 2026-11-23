@@ -239,6 +239,8 @@ function SharePageContent() {
 
   const connectWebSocket = (room: string) => {
     const ws = new WebSocket(`${wsUrl}/${room}`);
+    // Prefer ArrayBuffer so encrypted file chunks are not Blobs
+    ws.binaryType = "arraybuffer";
     wsRef.current = ws;
 
     ws.onopen = () => {
@@ -632,8 +634,22 @@ function SharePageContent() {
     }
   };
 
-  const handleBinaryFrame = async (data: ArrayBuffer) => {
-    await handleBinaryChunk(data);
+  const handleBinaryFrame = async (data: Blob | ArrayBuffer | ArrayBufferView) => {
+    let buffer: ArrayBuffer;
+    if (data instanceof ArrayBuffer) {
+      buffer = data;
+    } else if (ArrayBuffer.isView(data)) {
+      buffer = data.buffer.slice(
+        data.byteOffset,
+        data.byteOffset + data.byteLength,
+      ) as ArrayBuffer;
+    } else if (typeof Blob !== "undefined" && data instanceof Blob) {
+      buffer = await data.arrayBuffer();
+    } else {
+      console.error("Unknown binary frame type", data);
+      return;
+    }
+    await handleBinaryChunk(buffer);
   };
 
   const completeFileTransfer = async () => {

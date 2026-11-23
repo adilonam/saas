@@ -4,6 +4,74 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-23 - AI Tool Depth, Brand Schema, Leverage Content & Blog
+
+Based on GSC through Nov 22 (7d: 961 imp / 0 clicks / pos 18.6; 28d: 2,307 imp / 3 clicks / pos 24.4). Focused on high-impression pages stuck mid-SERP, brand query CTR, leverage query variants, and blog crawlability.
+
+### Enhanced Tool Pages
+
+**1. AI Resume Bullet Point Generator** (`/ai-resume-bullet`, ~171 imp / pos ~30)
+- Title/meta aligned to “AI resume bullet point generator”
+- How it works, illustrative example, tips
+- 5 FAQs + FAQPage JSON-LD
+- Related tools: email subject, cold outreach, acceptance criteria, meta description
+- Confirmed free / no signup (API already public)
+
+**2. AI Email Subject Line Generator** (`/ai-email-subject-line`, ~100 imp / pos ~40–75)
+- Title/meta aligned to “AI email subject line generator” / “AI subject line generator”
+- How it works, example styles, tips
+- 5 FAQs + FAQPage JSON-LD
+- Related tools cross-links; removed unused auth imports from API route
+
+**3. YouTube Title Length Checker** (`/youtube-title-length-checker`, ~53 imp / pos ~11–13)
+- Sharper title/meta for “youtube title length checker”
+- Live results (removed unlock / useToolAccess gate)
+- How-to content, tips, 5 FAQs + FAQPage JSON-LD
+- Related tools: title generator, hashtag generator, email subject, meta description
+
+**4. Leverage & Margin Calculator** (`/leverage-margin-calculator`, ~543 imp / pos ~39)
+- New `layout.tsx` with query-matched metadata (leverage calculator, profit, portfolio, CFD, options, DE/NL keyword terms)
+- Added leveraged P&L worked example; portfolio / CFD / options-exposure sections
+- FAQPage JSON-LD; FAQs updated for profit, portfolio/CFD, options caveats
+- Link to new leverage blog guide
+- English-only explanations with Hebel/hefboom terminology note (no machine-translated pages)
+
+### Homepage / Brand (query “eprod” ~366 imp / pos ~6 / 0 clicks)
+
+- Root description and keywords include eProd / e-prod / e prod
+- Organization JSON-LD: `alternateName` added; empty `sameAs` removed (no fake profiles)
+- WebSite JSON-LD added (name + alternateName + url + publisher). No SearchAction (no crawlable `/search` URL)
+- Home H1: “eProd – Free Productivity Tools”
+
+### Blog Indexing Fix
+
+- Verified `/blog/how-to-calculate-churn-rate` is PUBLISHED, in sitemap with `lastmod`, and listed on `/blog` (was page 2 at pageSize 12)
+- Increased blog listing page size to 24 so all published posts appear on page 1 for crawlers
+- Sitemap already includes published posts dynamically with `lastModified` from `updatedAt`
+
+### New Blog Article
+
+- **How to Calculate Leverage in Trading (Formula, Margin & Examples)** → `/blog/how-to-calculate-leverage-in-trading`
+- Targets: calculate leverage, leverage calculator, leverage trading calculator, leverage profit calculator
+- Formulas, three illustrative worked examples, CFD/portfolio/options notes, risk warning, FAQ
+- CTAs to existing tools only: leverage-margin, position-size, risk-reward, forex position size, risk-per-trade
+- Seed JSON: `scripts/blog-leverage-trading-article.json`
+- TOOL_MAP extended for trading tool CTAs in `lib/blog-utils.ts`
+
+### GEO / llms.txt
+
+- Updated `public/llms.txt` and `public/llms-full.txt` for leverage, AI tools, brand aliases, blog URLs
+- Clarified no-signup messaging (removed outdated “AI requires auth” wording)
+
+### Content Guidelines Followed
+
+- Site remains 100% free (no Stripe/paywall/auth gates on these tools)
+- No invented reviews, ratings, user counts, search volumes, benchmarks, or regulatory limit numbers
+- Worked examples clearly marked illustrative
+- Backend repo untouched
+
+---
+
 ## 2026-11-22 (Follow-up) - Removed Unsourced Statistics
 
 Removed all specific numeric benchmarks and statistics that lacked cited sources, per site policy.

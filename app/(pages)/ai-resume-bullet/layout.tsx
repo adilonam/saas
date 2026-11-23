@@ -1,8 +1,8 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Resume Bullet Point Generator – AI (Free)";
-const toolDescription = "Free AI resume bullet point generator. Transform job descriptions into impactful resume bullet points using AI. Create achievement-focused resume content that stands out to recruiters and ATS systems.";
+const toolName = "AI Resume Bullet Point Generator (Free)";
+const toolDescription = "Free AI resume bullet point generator. Turn job duties into achievement-focused resume bullets with strong action verbs. No signup required.";
 const toolPath = "/ai-resume-bullet";
 
 export const metadata: Metadata = generateToolMetadata({
@@ -10,13 +10,14 @@ export const metadata: Metadata = generateToolMetadata({
   description: toolDescription,
   path: toolPath,
   keywords: [
-    "resume bullet points",
-    "ai resume generator",
-    "resume writing",
+    "ai resume bullet point generator",
+    "resume bullet point generator",
+    "ai resume bullets",
     "resume bullet generator",
-    "job description",
-    "resume builder",
-    "ats resume",
+    "ai resume generator",
+    "achievement resume bullets",
+    "ats resume bullets",
+    "free resume bullet points",
   ],
   category: "AI Tools",
 });

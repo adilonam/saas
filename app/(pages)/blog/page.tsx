@@ -13,7 +13,8 @@ interface PageProps {
 export default async function BlogPage(props: PageProps) {
   const searchParams = await props.searchParams;
   const page = Number(searchParams.page) || 1;
-  const { posts, totalPages, totalPosts } = await getPublishedPosts(page, 12);
+  // Show enough posts that every published article appears on page 1 for crawlability
+  const { posts, totalPages, totalPosts } = await getPublishedPosts(page, 24);
 
   return (
     <UnifiedLayout>

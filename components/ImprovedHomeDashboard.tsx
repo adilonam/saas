@@ -117,7 +117,7 @@ export default function ImprovedHomeDashboard({ onSearchClick }: ImprovedHomeDas
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
             <h1 className="text-3xl md:text-5xl font-bold text-gray-900 dark:text-white mb-3 md:mb-4">
-              Free Productivity Tools
+              eProd – Free Productivity Tools
             </h1>
             <p className="text-base md:text-xl text-gray-700 dark:text-gray-300 mb-6 md:mb-8">
               {totalTools}+ free online tools for PDF, calculators, generators, and more

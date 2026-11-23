@@ -169,6 +169,7 @@ function SharePageContent() {
   const usingRelayRef = useRef(false);
   const transportReadyRef = useRef(false);
   const queuedItemsRef = useRef<QueuedItem[]>([]);
+  const sentKeyExchangeRef = useRef(false);
 
   useEffect(() => {
     if (autoJoinRoom && !mode && wsUrl) {
@@ -193,6 +194,9 @@ function SharePageContent() {
     setRoomCode(code);
     setMode("send");
     isInitiatorRef.current = true;
+    sentKeyExchangeRef.current = false;
+    sharedKeyRef.current = null;
+    transportReadyRef.current = false;
     setStatus("Waiting for receiver...");
 
     const keyPair = await generateKeyPair();
@@ -223,6 +227,9 @@ function SharePageContent() {
     setStatus("Joining...");
     setRoomCode(joinCode);
     isInitiatorRef.current = false;
+    sentKeyExchangeRef.current = false;
+    sharedKeyRef.current = null;
+    transportReadyRef.current = false;
 
     const keyPair = await generateKeyPair();
     keyPairRef.current = keyPair;
@@ -266,6 +273,18 @@ function SharePageContent() {
   const handleSignalingMessage = async (msg: any) => {
     if (msg.type === 'connected') {
       peerIdRef.current = msg.peer_id;
+      // Joiner already sees a peer in the room: kick off key exchange / WebRTC
+      // (only the first peer receives peer_joined).
+      if (typeof msg.peers_in_room === 'number' && msg.peers_in_room >= 2) {
+        console.log('Joined room with existing peer, connecting...');
+        setStatus('Peer present, connecting...');
+        if (!forceRelay) {
+          await setupWebRTC();
+        } else {
+          markUsingRelay(true);
+          await exchangeKeys();
+        }
+      }
     } else if (msg.type === 'peer_joined') {
       console.log('Peer joined, setting up connection...');
       setStatus('Peer joined, connecting...');
@@ -460,14 +479,19 @@ function SharePageContent() {
 
   const exchangeKeys = async () => {
     if (!keyPairRef.current) return;
-    
+    if (sentKeyExchangeRef.current) return;
+
     const publicKey = await exportPublicKey(keyPairRef.current.publicKey);
     const msg = JSON.stringify({ type: 'key-exchange', publicKey });
+    sentKeyExchangeRef.current = true;
 
     if (dataChannelRef.current && dataChannelRef.current.readyState === 'open') {
       dataChannelRef.current.send(msg);
-    } else if (wsRef.current) {
+    } else if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
       wsRef.current.send(msg);
+    } else {
+      // Allow retry if socket was not ready yet
+      sentKeyExchangeRef.current = false;
     }
   };
 
@@ -483,15 +507,31 @@ function SharePageContent() {
       const sharedKey = await deriveSharedKey(keyPairRef.current.privateKey, peerPublicKey);
       sharedKeyRef.current = sharedKey;
       console.log('Shared key established ✓');
-      
-      // Check if we should mark as ready now (use refs — state would be stale here)
+
+      // Reply once with our public key so the peer can derive the same secret.
+      if (!sentKeyExchangeRef.current) {
+        await exchangeKeys();
+      }
+
+      // On relay (or once P2P datachannel is open), becoming ready after ECDH is enough.
       const relayOrP2P =
-        dataChannelRef.current?.readyState === 'open' || usingRelayRef.current;
+        dataChannelRef.current?.readyState === 'open' ||
+        usingRelayRef.current ||
+        forceRelay ||
+        !rtcRef.current;
       if (relayOrP2P && !transportReadyRef.current) {
+        // If WebRTC never came up, treat as relay
+        if (dataChannelRef.current?.readyState !== 'open') {
+          markUsingRelay(true);
+        }
         console.log('Transport becoming ready after key exchange');
         markTransportReady(true);
         setConnected(true);
-        setStatus(usingRelayRef.current ? 'Connected (relay)' : 'Connected (P2P)');
+        setStatus(
+          dataChannelRef.current?.readyState === 'open'
+            ? 'Connected (P2P)'
+            : 'Connected (relay)',
+        );
         await processQueue();
       }
     } catch (e) {

@@ -1,8 +1,8 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Time Calculator – Add & Subtract Hours (Free)";
-const toolDescription = "Free online time calculator. Add, subtract, and convert time durations with precision. Calculate hours, minutes, seconds, and time differences between dates. Perfect for time tracking and scheduling.";
+const toolName = "Time Period & Duration Calculator – Elapsed Time (Free)";
+const toolDescription = "Free time period calculator and duration calculator. Find elapsed time between two dates, or add and combine durations (video length, test duration, and more). No signup.";
 const toolPath = "/time-calculator";
 
 export const metadata: Metadata = generateToolMetadata({
@@ -11,13 +11,15 @@ export const metadata: Metadata = generateToolMetadata({
   path: toolPath,
   keywords: [
     "time calculator",
+    "time period calculator",
     "duration calculator",
-    "time difference calculator",
-    "hours calculator",
-    "time converter",
     "elapsed time calculator",
-    "time addition",
-    "time subtraction",
+    "online elapsed time calculator",
+    "time difference calculator",
+    "video duration calculator",
+    "test duration calculator",
+    "combine durations",
+    "add time durations",
   ],
   category: "Calculators",
 });

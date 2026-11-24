@@ -29,7 +29,8 @@ const TOOL_CATEGORIES = {
     { path: "discount-calculator", title: "Discount Calculator" },
     { path: "black-friday-discount-calculator", title: "Black Friday Calculator" },
     { path: "tip-split-calculator", title: "Tip Split Calculator" },
-    { path: "time-calculator", title: "Time Calculator" },
+    { path: "time-calculator", title: "Time Period & Duration" },
+    { path: "win-probability-calculator", title: "pWin / Win Probability" },
     { path: "calorie-calculator", title: "Calorie Calculator" },
     { path: "probability-calculator", title: "Probability" },
     { path: "christmas-countdown", title: "Christmas Countdown" },
@@ -100,11 +101,22 @@ const TOOL_CATEGORIES = {
   ],
 };
 
-interface ImprovedHomeDashboardProps {
-  onSearchClick: () => void;
+interface HomeGuide {
+  slug: string;
+  title: string;
+  metaDescription: string | null;
+  category: string | null;
 }
 
-export default function ImprovedHomeDashboard({ onSearchClick }: ImprovedHomeDashboardProps) {
+interface ImprovedHomeDashboardProps {
+  onSearchClick: () => void;
+  guides?: HomeGuide[];
+}
+
+export default function ImprovedHomeDashboard({
+  onSearchClick,
+  guides = [],
+}: ImprovedHomeDashboardProps) {
   const totalTools = Object.values(TOOL_CATEGORIES).reduce(
     (sum, tools) => sum + tools.length,
     0
@@ -168,6 +180,51 @@ export default function ImprovedHomeDashboard({ onSearchClick }: ImprovedHomeDas
           </Link>
         </div>
       </section>
+
+      {/* Guides – latest published blog posts (SSR links for crawlability) */}
+      {guides.length > 0 && (
+        <section id="guides" className="py-8 border-b border-gray-200 dark:border-gray-800">
+          <div className="container mx-auto px-4">
+            <div className="flex flex-wrap items-end justify-between gap-3 mb-4">
+              <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
+                Guides
+              </h2>
+              <Link
+                href="/blog"
+                className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
+              >
+                View all guides →
+              </Link>
+            </div>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-2xl">
+              Practical how-tos for calculators and productivity workflows—linked from related tools.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+              {guides.map((guide) => (
+                <Link
+                  key={guide.slug}
+                  href={`/blog/${guide.slug}`}
+                  className="group p-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all"
+                >
+                  {guide.category && (
+                    <p className="text-xs font-medium text-blue-600 dark:text-blue-400 mb-1">
+                      {guide.category}
+                    </p>
+                  )}
+                  <h3 className="font-medium text-gray-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    {guide.title}
+                  </h3>
+                  {guide.metaDescription && (
+                    <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
+                      {guide.metaDescription}
+                    </p>
+                  )}
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* All Tools by Category */}
       <section id="all-tools" className="py-8 md:py-12">

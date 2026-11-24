@@ -29,11 +29,11 @@ eProd is a comprehensive collection of free online utilities including:
 - Age Calculator: /age-calculator - Calculate age from birthdate
 - BMI Calculator: /bmi-calculator - Body Mass Index calculator
 - Compound Interest Calculator: /compound-interest-calculator
-- Win Probability Calculator: /win-probability-calculator
+- pWin / Win Probability Calculator: /win-probability-calculator - Proposal/bid pWin scorecard, win rate from record, odds-implied probability
 - ROI Calculator: /roi-calculator
 - Leverage & Margin Calculator: /leverage-margin-calculator - Trading leverage, margin, CFD/portfolio ratio
 - Churn Rate Calculator: /churn-rate-calculator - Customer churn rate
-- Time Calculator: /time-calculator - Duration and elapsed time
+- Time Calculator: /time-calculator - Time period, elapsed time, and combine durations
 
 ### Generators
 - YouTube Title Generator: /youtube-title-generator
@@ -110,6 +110,7 @@ Visit our productivity blog at /blog for tips, guides, and tutorials on:
 - Business metrics and analytics guides
 - How to calculate leverage in trading: /blog/how-to-calculate-leverage-in-trading
 - How to calculate churn rate: /blog/how-to-calculate-churn-rate
+- How to calculate pWin for bids and proposals: /blog/how-to-calculate-pwin-for-bids-and-proposals
 
 ## Contact
 

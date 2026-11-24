@@ -15,8 +15,14 @@ export default function Footer() {
           </p>
           <nav
             className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-slate-600 dark:text-slate-400"
-            aria-label="Legal"
+            aria-label="Footer"
           >
+            <Link
+              href="/blog"
+              className="hover:text-slate-900 dark:hover:text-white hover:underline"
+            >
+              Blog &amp; Guides
+            </Link>
             <Link
               href="/privacy"
               className="hover:text-slate-900 dark:hover:text-white hover:underline"

@@ -4,6 +4,50 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-24 - Blog Discoverability, pWin Mode & Time Period Intent
+
+Based on GSC through Nov 23 (7d: 1,015 imp / 0 clicks / pos 19.1; 28d: 2,465 imp / 3 clicks / pos 23.9). Blog posts for churn/leverage were discovered or unknown to Google; `/win-probability-calculator` had impressions for “pWin calculator” but only offered W/L + odds modes; `/time-calculator` sat just off page 1 for duration/period queries.
+
+### Blog Crawl / Indexing Fixes
+
+- Homepage **Guides** section (SSR): latest published posts from Prisma, linked at `/blog/{slug}`, plus “View all guides → /blog”
+- Footer: added **Blog & Guides** → `/blog` (nav already had Blog)
+- Tool → guide: churn and leverage already linked; win-probability now links the new pWin guide
+- Verified blog `[slug]` pages are server-rendered markdown HTML, canonical + indexable via `generateBlogPostMetadata`, and included in `sitemap.ts` with `lastModified`
+
+### pWin on Win Probability Calculator (`/win-probability-calculator`, ~85 imp / pos ~48; query “pwin calculator” 36 imp / pos ~86)
+
+- New **Proposal / bid pWin** mode: weighted-factor scorecard (relationship, solution fit, price, past performance, competition, incumbent); adjustable weights; subjective-estimate disclaimer
+- Kept **From record** and **From decimal odds** modes
+- Title/meta/H1 cover “pWin calculator” and “win probability calculator”
+- How-it-works, illustrative example, 5 FAQs + FAQPage JSON-LD, related tools + guide link
+
+### Time Calculator (`/time-calculator`, ~263 imp / pos ~11)
+
+- Title/meta/intro tuned for “time period calculator”, “duration calculator”, “elapsed time”
+- New **Add / combine durations** mode (sum video/test/session lengths)
+- Content section on combining durations; Search entry keywords updated
+
+### New Blog Article
+
+- **How to Calculate pWin (Probability of Win) for Bids and Proposals** → `/blog/how-to-calculate-pwin-for-bids-and-proposals`
+- Weighted scorecard method, illustrative example, bid/no-bid use, mistakes, FAQ
+- CTAs: win-probability-calculator, probability-calculator, roi-calculator, task-prioritizer, risk-reward-ratio-calculator
+- Seed: `scripts/blog-pwin-article.json`; TOOL_MAP extended in `lib/blog-utils.ts`
+
+### GEO / llms.txt
+
+- Updated `public/llms.txt` and `llms-full.txt` for pWin mode, time period/combine durations, and new article URL
+
+### Content Guidelines Followed
+
+- Site remains 100% free (no Stripe/paywall/auth gates)
+- No invented reviews, ratings, user counts, search volumes, benchmarks, or studies
+- Worked examples clearly marked illustrative
+- Backend repo untouched
+
+---
+
 ## 2026-11-23 - AI Tool Depth, Brand Schema, Leverage Content & Blog
 
 Based on GSC through Nov 22 (7d: 961 imp / 0 clicks / pos 18.6; 28d: 2,307 imp / 3 clicks / pos 24.4). Focused on high-impression pages stuck mid-SERP, brand query CTR, leverage query variants, and blog crawlability.

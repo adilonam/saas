@@ -1,8 +1,8 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Win Probability Calculator";
-const toolDescription = "Free win probability calculator. Calculate the probability of winning based on odds, win rate, and number of attempts. Statistical probability tool for games, sports betting, and risk analysis.";
+const toolName = "pWin Calculator – Win Probability for Bids & Records";
+const toolDescription = "Free pWin calculator for proposal and bid probability of win. Also calculate win rate from a W/L record and implied probability from decimal odds. Transparent weighted scorecard—no signup.";
 const toolPath = "/win-probability-calculator";
 
 export const metadata: Metadata = generateToolMetadata({
@@ -10,13 +10,15 @@ export const metadata: Metadata = generateToolMetadata({
   description: toolDescription,
   path: toolPath,
   keywords: [
-    "win probability",
-    "probability calculator",
+    "pwin calculator",
+    "pWin calculator",
+    "win probability calculator",
+    "probability of win",
+    "bid win probability",
+    "proposal pWin",
     "win rate calculator",
-    "odds calculator",
-    "betting calculator",
-    "statistical probability",
-    "chance calculator",
+    "how to calculate pwin",
+    "odds probability calculator",
   ],
   category: "Calculators",
 });

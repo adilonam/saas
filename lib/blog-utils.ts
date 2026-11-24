@@ -69,8 +69,23 @@ const TOOL_MAP: Record<string, RelatedTool> = {
   },
   "win-probability-calculator": {
     slug: "win-probability-calculator",
-    title: "Win Probability Calculator",
-    description: "Calculate winning probabilities for games and competitions"
+    title: "pWin / Win Probability Calculator",
+    description: "Proposal pWin scorecard, win rate from record, and odds-implied probability"
+  },
+  "probability-calculator": {
+    slug: "probability-calculator",
+    title: "Probability Calculator",
+    description: "General probability calculations for events and combinations"
+  },
+  "roi-calculator": {
+    slug: "roi-calculator",
+    title: "ROI Calculator",
+    description: "Estimate return on investment for projects and proposals"
+  },
+  "task-prioritizer": {
+    slug: "task-prioritizer",
+    title: "Task Prioritizer",
+    description: "Rank work when deciding which opportunities to pursue"
   },
   "churn-rate-calculator": {
     slug: "churn-rate-calculator",

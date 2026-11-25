@@ -132,6 +132,31 @@ const TOOL_MAP: Record<string, RelatedTool> = {
     title: "Risk Per Trade Calculator",
     description: "Calculate how much to risk per trade"
   },
+  "countdown-timer-generator": {
+    slug: "countdown-timer-generator",
+    title: "Countdown Timer Generator",
+    description: "Free online countdown maker with shareable link and website embed snippet"
+  },
+  "christmas-countdown": {
+    slug: "christmas-countdown",
+    title: "Christmas Countdown",
+    description: "Live countdown to Christmas Day"
+  },
+  "new-year-countdown": {
+    slug: "new-year-countdown",
+    title: "New Year Countdown",
+    description: "Live countdown to the new year"
+  },
+  "working-days-countdown": {
+    slug: "working-days-countdown",
+    title: "Working Days Countdown",
+    description: "Count business days until a target date"
+  },
+  "time-calculator": {
+    slug: "time-calculator",
+    title: "Time / Duration Calculator",
+    description: "Elapsed time, time periods, and combine durations"
+  },
 };
 
 export async function getPublishedPosts(page = 1, pageSize = 12): Promise<{

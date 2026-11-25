@@ -54,7 +54,7 @@ export const TOOLS_REGISTRY: Tool[] = [
   // Countdown/Time Tools
   { slug: "christmas-countdown", title: "Christmas Countdown", description: "Count down to Christmas", category: "Time", keywords: ["countdown", "christmas", "timer", "holiday", "count"] },
   { slug: "new-year-countdown", title: "New Year Countdown", description: "Count down to New Year", category: "Time", keywords: ["countdown", "new year", "timer", "count"] },
-  { slug: "countdown-timer-generator", title: "Countdown Timer", description: "Create custom countdown timers", category: "Time", keywords: ["countdown", "timer", "count", "time"] },
+  { slug: "countdown-timer-generator", title: "Countdown Timer Generator", description: "Online countdown maker with shareable link and embed", category: "Time", keywords: ["countdown timer generator", "online countdown generator", "countdown maker", "countdown", "timer", "embed"] },
   { slug: "time-calculator", title: "Time Calculator", description: "Calculate time durations", category: "Calculator", keywords: ["time", "calculator", "duration", "hours", "minutes"] },
   { slug: "timestamp-converter", title: "Timestamp Converter", description: "Convert timestamps", category: "Time", keywords: ["timestamp", "unix", "convert", "time", "date"] },
 

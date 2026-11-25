@@ -511,7 +511,7 @@ export default function WinProbabilityCalculatorPage() {
                 Compare upside vs downside on an opportunity
               </p>
             </Link>
-            <Link
+            <a
               href="/blog/how-to-calculate-pwin-for-bids-and-proposals"
               className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-cyan-500 dark:hover:border-cyan-500 transition-colors bg-white dark:bg-slate-800/50 sm:col-span-2"
             >
@@ -521,7 +521,7 @@ export default function WinProbabilityCalculatorPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 Weighted scorecard method, illustrative example, and bid/no-bid tips
               </p>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

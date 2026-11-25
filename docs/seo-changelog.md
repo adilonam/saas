@@ -4,6 +4,53 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-25 - Countdown Generator Depth, Churn Metadata & Countdown Guide
+
+Based on GSC through Nov 24 (7d: 1,008 imp / 0 clicks / pos 19.3; 28d: 2,588 imp / 3 clicks / pos 23.6). `/countdown-timer-generator` had solid impressions at deep positions with no dedicated share/embed pass; `/churn-rate-calculator` was missing tool metadata (homepage title leak); blog posts for churn/leverage/pWin return 200 with SSR HTML and appear in sitemap but remain poorly indexed by Google.
+
+### Countdown Timer Generator (`/countdown-timer-generator`, ~271 imp / pos ~38)
+
+- Title/meta/H1 aligned to “countdown timer generator”, “online countdown generator”, “countdown maker”
+- Shareable URL via `?date=&time=` (auto-starts); copy shareable link + iframe embed snippet (no backend/login)
+- How-it-works, illustrative example, website/event/social use cases, tips
+- 6 FAQs + FAQPage JSON-LD; WebApplication JSON-LD via layout
+- Related: Christmas, New Year, time calculator, working-days countdown, new guide
+- Search keywords updated
+
+### Churn Rate Calculator (`/churn-rate-calculator`, ~136 imp / pos ~20)
+
+- **Bugfix:** added `layout.tsx` with proper title/meta/canonical (page previously inherited homepage metadata)
+- Title/meta tuned for “churn rate calculator” / “churn calculator” / gym / churn impact
+- Optional ARPU field for estimated churn impact (revenue lost)
+- Dedicated gym/membership and churn-impact content sections
+- FAQPage JSON-LD; plain `<a href>` link to churn guide
+- Search keywords updated
+
+### Blog Discoverability
+
+- Verified production: churn, leverage, and pWin guides return **200** with server-rendered article HTML, canonicals, and sitemap entries with `lastmod`
+- Converted leverage + win-probability guide CTAs to plain `<a href>` (churn/countdown likewise)
+- **Sitemap dilution:** reviewed; did **not** prune/noindex pages—no confident GSC evidence that specific thin URLs have zero value, and crawl budget issues are more likely low overall crawl frequency than proven dilution
+
+### New Blog Article
+
+- **How to Create a Countdown Timer (for a Website, Event or Launch)** → `/blog/how-to-create-a-countdown-timer`
+- Practical steps, share/embed, tips, FAQ; CTAs to countdown generator, Christmas/New Year, working-days, time calculator
+- Seed: `scripts/blog-countdown-timer-article.json`; TOOL_MAP extended in `lib/blog-utils.ts`
+
+### GEO / llms.txt
+
+- Updated `public/llms.txt` and `llms-full.txt` for countdown tools, churn impact, and new article URL
+
+### Content Guidelines Followed
+
+- Site remains 100% free (no Stripe/paywall/auth gates)
+- No invented reviews, ratings, user counts, search volumes, benchmarks, or studies
+- Worked examples clearly marked illustrative
+- Backend repo untouched
+
+---
+
 ## 2026-11-24 - Blog Discoverability, pWin Mode & Time Period Intent
 
 Based on GSC through Nov 23 (7d: 1,015 imp / 0 clicks / pos 19.1; 28d: 2,465 imp / 3 clicks / pos 23.9). Blog posts for churn/leverage were discovered or unknown to Google; `/win-probability-calculator` had impressions for “pWin calculator” but only offered W/L + odds modes; `/time-calculator` sat just off page 1 for duration/period queries.

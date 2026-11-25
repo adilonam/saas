@@ -335,7 +335,7 @@ export default function LeverageMarginCalculatorPage() {
                 Calculate how much to risk per trade
               </p>
             </Link>
-            <Link
+            <a
               href="/blog/how-to-calculate-leverage-in-trading"
               className="p-4 rounded-lg border border-slate-200 dark:border-slate-700 hover:border-indigo-500 dark:hover:border-indigo-500 transition-colors bg-white dark:bg-slate-800/50 sm:col-span-2"
             >
@@ -343,7 +343,7 @@ export default function LeverageMarginCalculatorPage() {
               <p className="text-sm text-slate-600 dark:text-slate-400">
                 Formulas, margin examples, CFD and portfolio leverage explained
               </p>
-            </Link>
+            </a>
           </div>
         </div>
       </div>

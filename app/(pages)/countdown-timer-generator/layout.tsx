@@ -1,11 +1,49 @@
-import type { Metadata } from "next";
+import { generateToolMetadata, generateJsonLd } from "@/lib/metadata-utils";
+import { Metadata } from "next";
 
-export const metadata: Metadata = {
-  title: "Countdown Timer Generator – eProd",
-  description:
-    "Set a target date and time and see a live countdown in days, hours, minutes, and seconds.",
-};
+const toolName = "Countdown Timer Generator – Online Countdown Maker (Free)";
+const toolDescription =
+  "Free online countdown timer generator and countdown maker. Set any date and time, get a live countdown, shareable link, and simple embed snippet for websites—no signup.";
+const toolPath = "/countdown-timer-generator";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  return children;
+export const metadata: Metadata = generateToolMetadata({
+  title: toolName,
+  description: toolDescription,
+  path: toolPath,
+  keywords: [
+    "countdown timer generator",
+    "online countdown generator",
+    "countdown maker",
+    "countdown generator",
+    "countdown clock generator",
+    "countdown creator",
+    "countdown generator for website",
+    "countdown builder",
+    "countdown generator for facebook",
+    "free countdown timer",
+  ],
+  category: "Time Tools",
+});
+
+export default function CountdownTimerGeneratorLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const jsonLd = generateJsonLd({
+    name: toolName,
+    description: toolDescription,
+    url: `https://www.eprod.io${toolPath}`,
+    applicationCategory: "UtilitiesApplication",
+  });
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {children}
+    </>
+  );
 }

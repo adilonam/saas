@@ -32,8 +32,11 @@ eProd is a comprehensive collection of free online utilities including:
 - pWin / Win Probability Calculator: /win-probability-calculator - Proposal/bid pWin scorecard, win rate from record, odds-implied probability
 - ROI Calculator: /roi-calculator
 - Leverage & Margin Calculator: /leverage-margin-calculator - Trading leverage, margin, CFD/portfolio ratio
-- Churn Rate Calculator: /churn-rate-calculator - Customer churn rate
+- Churn Rate Calculator: /churn-rate-calculator - Customer/gym churn rate and optional revenue impact
 - Time Calculator: /time-calculator - Time period, elapsed time, and combine durations
+- Countdown Timer Generator: /countdown-timer-generator - Online countdown maker with shareable link and embed
+- Christmas Countdown: /christmas-countdown
+- New Year Countdown: /new-year-countdown
 
 ### Generators
 - YouTube Title Generator: /youtube-title-generator
@@ -111,6 +114,7 @@ Visit our productivity blog at /blog for tips, guides, and tutorials on:
 - How to calculate leverage in trading: /blog/how-to-calculate-leverage-in-trading
 - How to calculate churn rate: /blog/how-to-calculate-churn-rate
 - How to calculate pWin for bids and proposals: /blog/how-to-calculate-pwin-for-bids-and-proposals
+- How to create a countdown timer: /blog/how-to-create-a-countdown-timer
 
 ## Contact
 

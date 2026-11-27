@@ -31,6 +31,7 @@ Based on GSC domain property (last 28 days ~Oct 29–Nov 25). `/leverage-margin-
 - Homepage **Guides** section uses plain crawlable `<a href>` links (SSR posts from Prisma)
 - Tool → guide links on leverage + resume pages; `/blog` lists posts server-side; sitemap includes posts with `lastModified`
 - Blog posts retain Article (BlogPosting) JSON-LD + canonical via `generateBlogPostMetadata`
+- Seed fix: stop overwriting `publishedAt` on updates when omitted; set explicit dates in `seed-blog-posts.json` so newest guides (incl. resume bullets) surface on the homepage
 
 ### New Blog Article
 

@@ -39,7 +39,8 @@ async function seedBlogPosts() {
         });
         
         if (existing) {
-          // Update existing post
+          // Update existing post. Only set publishedAt when the seed provides one —
+          // otherwise preserve the DB value so every build does not bump "newest" guides.
           await prisma.blogPost.update({
             where: { slug: post.slug },
             data: {
@@ -50,7 +51,9 @@ async function seedBlogPosts() {
               coverImage: post.coverImage || null,
               relatedTools: post.relatedTools || null,
               category: post.category || null,
-              publishedAt: post.publishedAt ? new Date(post.publishedAt) : new Date(),
+              ...(post.publishedAt
+                ? { publishedAt: new Date(post.publishedAt) }
+                : {}),
               status: 'PUBLISHED',
             },
           });

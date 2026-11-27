@@ -4,6 +4,54 @@ This file tracks SEO improvements and optimizations made to eprod.io.
 
 ---
 
+## 2026-11-27 - Leverage Calculator Intent, Resume Bullets & Crawl Discovery
+
+Based on GSC domain property (last 28 days ~Oct 29–Nov 25). `/leverage-margin-calculator` led impressions among tool pages (~655 impr / pos ~36.6 / 0 clicks) for “leverage calculator” and related queries; `/ai-resume-bullet` (~200 impr / pos ~26.7) and `/ai-email-subject-line` (~112 impr / pos ~40) needed tighter title/meta alignment. Blog guides remained poorly indexed (discovered/unknown) despite `/blog` being indexed.
+
+### Leverage Calculator (`/leverage-margin-calculator`)
+
+- Title/meta/H1 retargeted to **Leverage Calculator** (margin & position size)
+- Content: leverage ratio vs margin, how to calculate leverage, forex/crypto/CFD illustrative examples
+- FAQ + FAQPage JSON-LD; layout metadata + canonical retained
+- Plain `<a href>` to `/blog/how-to-calculate-leverage-in-trading`
+
+### Resume Bullet Point Generator (`/ai-resume-bullet`)
+
+- Title/meta/H1 → **Resume Bullet Point Generator (Free AI)**
+- STAR / action-verb + result formula, illustrative before/after examples, FAQ + FAQPage JSON-LD
+- Related tools + plain `<a href>` to new guide
+
+### AI Email Subject Line Generator (`/ai-email-subject-line`)
+
+- Title/meta/keywords tightened toward “AI email subject line generator (free)”
+- FAQ + FAQPage JSON-LD already present; intro copy clarified
+
+### Blog Crawl Discovery
+
+- Homepage **Guides** section uses plain crawlable `<a href>` links (SSR posts from Prisma)
+- Tool → guide links on leverage + resume pages; `/blog` lists posts server-side; sitemap includes posts with `lastModified`
+- Blog posts retain Article (BlogPosting) JSON-LD + canonical via `generateBlogPostMetadata`
+
+### New Blog Article
+
+- **How to Write Resume Bullet Points (Formula + Examples)** → `/blog/how-to-write-resume-bullet-points`
+- Formula, illustrative examples, tips by role, mistakes, FAQ; CTAs to resume generator, skills gap, LinkedIn headline, cold outreach, email subject lines
+- Seed: `scripts/blog-resume-bullet-points-article.json` + `seed-blog-posts.json`; TOOL_MAP extended
+
+### GEO / llms.txt
+
+- Updated `public/llms.txt` and `llms-full.txt` for leverage, resume bullets, email subject lines, and new article URL
+- Search + tools-registry titles/keywords updated
+
+### Content Guidelines Followed
+
+- Site remains 100% free (no subscriptions / sign-in gates for these tools)
+- No invented statistics, studies, or benchmarks
+- Worked examples clearly marked illustrative
+- Backend repo untouched
+
+---
+
 ## 2026-11-25 - Countdown Generator Depth, Churn Metadata & Countdown Guide
 
 Based on GSC through Nov 24 (7d: 1,008 imp / 0 clicks / pos 19.3; 28d: 2,588 imp / 3 clicks / pos 23.6). `/countdown-timer-generator` had solid impressions at deep positions with no dedicated share/embed pass; `/churn-rate-calculator` was missing tool metadata (homepage title leak); blog posts for churn/leverage/pWin return 200 with SSR HTML and appear in sitemap but remain poorly indexed by Google.

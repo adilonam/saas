@@ -55,12 +55,27 @@ const TOOL_MAP: Record<string, RelatedTool> = {
   "ai-email-subject-line": {
     slug: "ai-email-subject-line",
     title: "AI Email Subject Line Generator",
-    description: "Create compelling email subject lines with AI"
+    description: "Free AI email subject line ideas for campaigns and outreach"
   },
   "ai-resume-bullet": {
     slug: "ai-resume-bullet",
-    title: "AI Resume Bullet Generator",
-    description: "Generate impactful resume bullet points with AI"
+    title: "Resume Bullet Point Generator",
+    description: "Free AI resume bullet point generator—achievement-focused bullets"
+  },
+  "resume-skills-gap": {
+    slug: "resume-skills-gap",
+    title: "Resume Skills Gap Suggester",
+    description: "Compare your resume language to a job description"
+  },
+  "linkedin-headline-combiner": {
+    slug: "linkedin-headline-combiner",
+    title: "LinkedIn Headline Combiner",
+    description: "Combine role keywords into a clear LinkedIn headline"
+  },
+  "ai-cold-outreach": {
+    slug: "ai-cold-outreach",
+    title: "AI Cold Outreach Writer",
+    description: "Draft personalized cold outreach messages"
   },
   "wealth-comparison-calculator": {
     slug: "wealth-comparison-calculator",
@@ -109,8 +124,8 @@ const TOOL_MAP: Record<string, RelatedTool> = {
   },
   "leverage-margin-calculator": {
     slug: "leverage-margin-calculator",
-    title: "Leverage & Margin Calculator",
-    description: "Calculate required margin and leverage ratios for trading"
+    title: "Leverage Calculator",
+    description: "Free leverage, margin, and position size calculator for trading"
   },
   "position-size-calculator": {
     slug: "position-size-calculator",

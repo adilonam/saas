@@ -101,7 +101,7 @@ export default function AIEmailSubjectLinePage() {
               AI Email Subject Line Generator
             </h1>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-0.5">
-              Free AI subject line generator—get five concise ideas for your campaign. No signup.
+              Free AI email subject line generator—five concise ideas for newsletters, launches, and outreach. No signup.
             </p>
           </div>
         </div>

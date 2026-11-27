@@ -31,7 +31,7 @@ eProd is a comprehensive collection of free online utilities including:
 - Compound Interest Calculator: /compound-interest-calculator
 - pWin / Win Probability Calculator: /win-probability-calculator - Proposal/bid pWin scorecard, win rate from record, odds-implied probability
 - ROI Calculator: /roi-calculator
-- Leverage & Margin Calculator: /leverage-margin-calculator - Trading leverage, margin, CFD/portfolio ratio
+- Leverage Calculator: /leverage-margin-calculator - Free leverage, margin & position size calculator (forex, CFD, crypto)
 - Churn Rate Calculator: /churn-rate-calculator - Customer/gym churn rate and optional revenue impact
 - Time Calculator: /time-calculator - Time period, elapsed time, and combine durations
 - Countdown Timer Generator: /countdown-timer-generator - Online countdown maker with shareable link and embed
@@ -47,8 +47,8 @@ eProd is a comprehensive collection of free online utilities including:
 
 ### Content Tools
 - YouTube Title Length Checker: /youtube-title-length-checker - Verify title character limits (100 chars)
-- AI Resume Bullet Point Generator: /ai-resume-bullet - Achievement-focused resume bullets
-- AI Email Subject Line Generator: /ai-email-subject-line - Subject line ideas for campaigns
+- Resume Bullet Point Generator: /ai-resume-bullet - Free AI resume bullet point generator (action verb + result)
+- AI Email Subject Line Generator: /ai-email-subject-line - Free AI email subject line generator for campaigns
 - Keyword Density Checker: /keyword-density-checker
 - Meta Description Generator: /meta-description-generator
 - Text Summarizer: /text-summarizer
@@ -115,6 +115,7 @@ Visit our productivity blog at /blog for tips, guides, and tutorials on:
 - How to calculate churn rate: /blog/how-to-calculate-churn-rate
 - How to calculate pWin for bids and proposals: /blog/how-to-calculate-pwin-for-bids-and-proposals
 - How to create a countdown timer: /blog/how-to-create-a-countdown-timer
+- How to write resume bullet points: /blog/how-to-write-resume-bullet-points
 
 ## Contact
 

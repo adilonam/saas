@@ -1,8 +1,8 @@
 import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
-const toolName = "Leverage Calculator – Margin, Profit & Trading (Free)";
-const toolDescription = "Free leverage and margin calculator for trading. Find required margin, understand leverage ratios for forex, CFDs, options-style exposure, and portfolios. No signup required.";
+const toolName = "Leverage Calculator – Free Leverage, Margin & Position Size Calculator";
+const toolDescription = "Free leverage calculator for trading. Calculate leverage ratio, required margin, and position size for forex, CFDs, and crypto. No signup required.";
 const toolPath = "/leverage-margin-calculator";
 
 export const metadata: Metadata = generateToolMetadata({
@@ -13,13 +13,13 @@ export const metadata: Metadata = generateToolMetadata({
     "leverage calculator",
     "calculate leverage",
     "leverage trading calculator",
-    "leverage profit calculator",
-    "portfolio leverage calculator",
-    "options leverage calculator",
+    "leverage trade calculator",
     "cfd leverage ratio calculator",
-    "margin calculator",
     "leverage rechner",
     "leverage berekenen",
+    "margin calculator",
+    "leverage profit calculator",
+    "portfolio leverage calculator",
   ],
   category: "Calculators",
 });

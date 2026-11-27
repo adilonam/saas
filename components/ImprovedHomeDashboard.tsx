@@ -47,8 +47,8 @@ const TOOL_CATEGORIES = {
     { path: "slug-generator", title: "Slug Generator" },
   ],
   "AI Tools": [
-    { path: "ai-email-subject-line", title: "AI Email Subject Line" },
-    { path: "ai-resume-bullet", title: "AI Resume Bullet" },
+    { path: "ai-email-subject-line", title: "AI Email Subject Line Generator" },
+    { path: "ai-resume-bullet", title: "Resume Bullet Point Generator" },
     { path: "ai-product-description", title: "AI Product Description" },
     { path: "ai-meeting-notes-summarizer", title: "AI Meeting Notes" },
     { path: "text-summarizer", title: "Text Summarizer" },
@@ -189,19 +189,19 @@ export default function ImprovedHomeDashboard({
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
                 Guides
               </h2>
-              <Link
+              <a
                 href="/blog"
                 className="text-sm font-medium text-blue-600 dark:text-blue-400 hover:underline"
               >
                 View all guides →
-              </Link>
+              </a>
             </div>
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-4 max-w-2xl">
               Practical how-tos for calculators and productivity workflows—linked from related tools.
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
               {guides.map((guide) => (
-                <Link
+                <a
                   key={guide.slug}
                   href={`/blog/${guide.slug}`}
                   className="group p-4 rounded-lg border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all"
@@ -219,7 +219,7 @@ export default function ImprovedHomeDashboard({
                       {guide.metaDescription}
                     </p>
                   )}
-                </Link>
+                </a>
               ))}
             </div>
           </div>

@@ -2,7 +2,7 @@ import { generateToolMetadata, generateJsonLd } from '@/lib/metadata-utils';
 import { Metadata } from 'next';
 
 const toolName = "AI Email Subject Line Generator (Free)";
-const toolDescription = "Free AI email subject line generator. Get concise, engaging subject line ideas for newsletters, launches, and outreach. No signup required.";
+const toolDescription = "Free AI email subject line generator. Get concise subject line ideas for newsletters, product launches, and outreach—no signup required.";
 const toolPath = "/ai-email-subject-line";
 
 export const metadata: Metadata = generateToolMetadata({
@@ -12,12 +12,12 @@ export const metadata: Metadata = generateToolMetadata({
   keywords: [
     "ai email subject line generator",
     "ai subject line generator",
-    "email subject generator ai",
+    "email subject line generator ai",
+    "subject line generator ai",
     "email subject line generator",
     "ai email subject",
-    "subject line tool",
     "catchy subject lines",
-    "email open rate",
+    "newsletter subject line generator",
   ],
   category: "AI Tools",
 });

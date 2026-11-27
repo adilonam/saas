@@ -97,8 +97,8 @@ export const TOOLS_REGISTRY: Tool[] = [
   { slug: "hashtag-counter", title: "Hashtag Counter", description: "Count hashtags", category: "Social", keywords: ["hashtag", "counter", "count", "social media"] },
 
   // AI & Content Tools
-  { slug: "ai-email-subject-line", title: "AI Email Subject Line", description: "Generate email subject lines", category: "AI", keywords: ["ai", "email", "subject", "line", "generator"] },
-  { slug: "ai-resume-bullet", title: "AI Resume Bullet", description: "Generate resume bullet points", category: "AI", keywords: ["ai", "resume", "bullet", "points", "generator"] },
+  { slug: "ai-email-subject-line", title: "AI Email Subject Line Generator", description: "Free AI email subject line generator", category: "AI", keywords: ["ai", "email", "subject", "line", "generator"] },
+  { slug: "ai-resume-bullet", title: "Resume Bullet Point Generator", description: "Free AI resume bullet point generator", category: "AI", keywords: ["ai", "resume", "bullet", "points", "generator", "free"] },
   { slug: "acceptance-criteria-generator", title: "Acceptance Criteria Generator", description: "Generate acceptance criteria", category: "Generator", keywords: ["acceptance", "criteria", "generator", "agile", "user story"] },
 
   // Regex & Code Tools
